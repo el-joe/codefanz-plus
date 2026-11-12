@@ -112,7 +112,7 @@
             <div class="flex flex-col gap-4 rounded-xl border border-line bg-surface p-6 shadow-md">
                 <h2 id="quote-card" class="text-lg font-bold text-fg">{{ __('Request a quote') }}</h2>
                 <p class="text-sm text-fg-secondary">{{ __('Tell us about your project and get a free preliminary estimate within 48 hours. No payment required.') }}</p>
-                <x-ui.button :href="route('contact', ['topic' => 'quote', 'ref' => $translation->title])" size="lg">{{ __('Start Your Project') }}</x-ui.button>
+                <x-ui.button :href="route('quote', ['service' => $translation->slug])" size="lg">{{ __('Start Your Project') }}</x-ui.button>
                 <a href="{{ route('services.index') }}" class="text-center text-sm font-semibold text-fg-brand hover:underline">{{ __('Browse all services') }}</a>
             </div>
         </aside>

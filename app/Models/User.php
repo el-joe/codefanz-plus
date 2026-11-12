@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Enums\Permission;
 use App\Enums\Role;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -44,6 +46,17 @@ class User extends Authenticatable implements HasLocalePreference
     public function preferredLocale(): ?string
     {
         return $this->locale;
+    }
+
+    /**
+     * Active users who may own leads: their roles grant leads.manage (Super Admin's role grants everything).
+     *
+     * @param  Builder<User>  $query
+     */
+    public function scopeLeadManagers(Builder $query): void
+    {
+        $query->where('is_active', true)
+            ->whereHas('roles.permissions', fn (Builder $permissions) => $permissions->where('name', Permission::LeadsManage->value));
     }
 
     public function isStaff(): bool

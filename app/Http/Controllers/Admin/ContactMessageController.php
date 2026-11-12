@@ -10,7 +10,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 /**
- * Read-only inbox of contact-form messages (leads.view). Milestone 5 turns these into leads.
+ * Read-only inbox of contact-form messages (leads.view). Each message also becomes a lead.
  */
 class ContactMessageController extends Controller
 {
@@ -29,6 +29,6 @@ class ContactMessageController extends Controller
 
     public function show(ContactMessage $contactMessage): View
     {
-        return view('admin.contact-messages.show', ['message' => $contactMessage]);
+        return view('admin.contact-messages.show', ['message' => $contactMessage->load('lead:id,ulid,contact_message_id,reference')]);
     }
 }

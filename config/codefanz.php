@@ -93,6 +93,23 @@ return [
         'per_day' => 20,
     ],
 
+    /*
+    | Request a Quote attachments: stored on the private disk under random
+    | names and only downloadable by staff with leads.view. Both the detected
+    | MIME type and the file extension must match the allow-list.
+    */
+
+    'leads' => [
+        'attachments' => [
+            'max_files' => 5,
+            'max_kb' => (int) env('LEAD_ATTACHMENT_MAX_KB', 10240),
+            'extensions' => ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'png', 'jpg', 'jpeg', 'zip'],
+            'disk' => env('MEDIA_PRIVATE_DISK', 'local'),
+            'directory' => 'lead-attachments',
+        ],
+        'default_currency' => 'USD',
+    ],
+
     'change_requests' => [
         'expires_after_days' => (int) env('CHANGE_REQUEST_EXPIRY_DAYS', 14),
     ],

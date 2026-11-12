@@ -11,6 +11,7 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TechnologyController;
@@ -55,6 +56,8 @@ Route::prefix('{locale}')
         Route::get('/about', AboutController::class)->name('about');
         Route::get('/contact', [ContactController::class, 'show'])->name('contact');
         Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:contact')->name('contact.store');
+        Route::get('/quote', [QuoteController::class, 'show'])->name('quote');
+        Route::post('/quote', [QuoteController::class, 'store'])->middleware('throttle:quote')->name('quote.store');
         Route::get('/search', SearchController::class)->middleware('throttle:60,1')->name('search');
 
         // Catch-all CMS pages: keep last so the specific routes above win.

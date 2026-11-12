@@ -17,7 +17,7 @@
     $current = url()->current();
     $isCurrent = fn (string $url): bool => rtrim($url, '/') === rtrim($current, '/');
     $newTab = fn (array $link): string => $link['new_tab'] ? 'target="_blank" rel="noopener noreferrer"' : '';
-    $quoteUrl = route('contact', ['topic' => 'quote']);
+    $quoteUrl = route('quote');
     // OpenGraph: locale as language_TERRITORY; the image is the cover's ~1200px WebP variant when there is one.
     $ogLocale = fn (string $code): string => ['en' => 'en_US', 'ar' => 'ar_AR'][$code] ?? $code;
     $ogImage = $image instanceof \App\Models\Media

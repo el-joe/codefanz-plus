@@ -23,6 +23,9 @@
             </dl>
             <div class="mt-4 flex flex-col gap-2">
                 <x-ui.button :href="'mailto:'.$message->email.'?subject='.rawurlencode('Re: '.$message->topic->label())">{{ __('Reply by email') }}</x-ui.button>
+                @if ($message->lead)
+                    <a href="{{ route('admin.leads.show', $message->lead) }}" class="text-sm font-semibold text-fg-brand hover:underline">{{ __('Open lead :reference', ['reference' => $message->lead->reference]) }}</a>
+                @endif
                 <a href="{{ route('admin.contact-messages.index') }}" class="text-sm font-semibold text-fg-brand hover:underline">{{ __('Back to inbox') }}</a>
             </div>
         </x-ui.card>

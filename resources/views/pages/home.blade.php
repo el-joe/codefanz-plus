@@ -1,6 +1,6 @@
 {{-- Homepage built from the managed sections (Admin → Homepage). Each block: section, copy (translated or default) and data. --}}
 @php
-    $contactHref = route('contact', ['topic' => 'quote']);
+    $contactHref = route('quote');
     $hero = $blocks->first(fn ($block) => $block['section']->type === \App\Enums\PageSectionType::Hero);
 @endphp
 

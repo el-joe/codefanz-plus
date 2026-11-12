@@ -41,6 +41,7 @@ class MenuItem extends Model
         'testimonials.index' => 'Testimonials',
         'about' => 'About Us',
         'contact' => 'Contact',
+        'quote' => 'Request a Quote',
     ];
 
     /**

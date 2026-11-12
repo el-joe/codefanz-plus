@@ -31,7 +31,7 @@ test('the about page shows default intro and mission but no unwritten story, val
         ->assertDontSee('data-section="about_story"', false)
         ->assertDontSee('data-section="about_values"', false)
         ->assertDontSee('data-section="about_team"', false)
-        ->assertSee(route('contact', ['locale' => 'en', 'topic' => 'quote']), false);
+        ->assertSee(route('quote', ['locale' => 'en']), false);
 });
 
 test('the about page renders editable story, values and disciplines in english and arabic', function () {

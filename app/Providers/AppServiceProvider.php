@@ -12,6 +12,7 @@ use App\Models\Faq;
 use App\Models\FaqCategory;
 use App\Models\Industry;
 use App\Models\KillSwitch;
+use App\Models\Lead;
 use App\Models\Media;
 use App\Models\Menu;
 use App\Models\MenuItem;
@@ -82,12 +83,19 @@ class AppServiceProvider extends ServiceProvider
             'menu_item' => MenuItem::class,
             'page_section' => PageSection::class,
             'contact_message' => ContactMessage::class,
+            'lead' => Lead::class,
         ]);
 
         // Public contact form: a few messages a minute and a daily cap per visitor IP.
         RateLimiter::for('contact', fn (Request $request): array => [
             Limit::perMinute((int) config('codefanz.contact_form.per_minute'))->by('contact-minute:'.$request->ip()),
             Limit::perDay((int) config('codefanz.contact_form.per_day'))->by('contact-day:'.$request->ip()),
+        ]);
+
+        // Request a Quote: same limits as the contact form, counted separately.
+        RateLimiter::for('quote', fn (Request $request): array => [
+            Limit::perMinute((int) config('codefanz.contact_form.per_minute'))->by('quote-minute:'.$request->ip()),
+            Limit::perDay((int) config('codefanz.contact_form.per_day'))->by('quote-day:'.$request->ip()),
         ]);
 
         // Resolved menus are cached per locale; any change to menus or to content they link to invalidates them.

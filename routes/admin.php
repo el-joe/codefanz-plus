@@ -10,9 +10,15 @@ use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\HomeSectionController;
 use App\Http\Controllers\Admin\IndustryController;
 use App\Http\Controllers\Admin\KillSwitchController;
+use App\Http\Controllers\Admin\LeadActivityController;
+use App\Http\Controllers\Admin\LeadAssignmentController;
+use App\Http\Controllers\Admin\LeadAttachmentController;
+use App\Http\Controllers\Admin\LeadController;
+use App\Http\Controllers\Admin\LeadStatusController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\MenuItemController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PortfolioCategoryController;
 use App\Http\Controllers\Admin\PortfolioProjectController;
@@ -50,6 +56,24 @@ Route::middleware('two-factor')->group(function (): void {
         Route::get('media/{media}', [MediaController::class, 'show'])->name('media.show');
         Route::patch('media/{media}', [MediaController::class, 'update'])->name('media.update');
         Route::delete('media/{media}', [MediaController::class, 'destroy'])->name('media.destroy');
+    });
+
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+    Route::post('notifications/{notification}/read', [NotificationController::class, 'read'])->whereUuid('notification')->name('notifications.read');
+
+    Route::middleware('can:viewAny,App\Models\Lead')->group(function (): void {
+        Route::get('leads', [LeadController::class, 'index'])->name('leads.index');
+        Route::get('leads/board', [LeadController::class, 'board'])->name('leads.board');
+        Route::get('leads/create', [LeadController::class, 'create'])->name('leads.create');
+        Route::post('leads', [LeadController::class, 'store'])->name('leads.store');
+        Route::get('leads/{lead}', [LeadController::class, 'show'])->name('leads.show');
+        Route::get('leads/{lead}/edit', [LeadController::class, 'edit'])->name('leads.edit');
+        Route::put('leads/{lead}', [LeadController::class, 'update'])->name('leads.update');
+        Route::post('leads/{lead}/status', LeadStatusController::class)->middleware('throttle:120,1')->name('leads.status');
+        Route::post('leads/{lead}/assignment', LeadAssignmentController::class)->name('leads.assign');
+        Route::post('leads/{lead}/activities', [LeadActivityController::class, 'store'])->name('leads.activities.store');
+        Route::get('leads/{lead}/attachments/{attachment}', [LeadAttachmentController::class, 'show'])->scopeBindings()->name('leads.attachments.show');
     });
 
     Route::middleware('can:leads.view')->group(function (): void {

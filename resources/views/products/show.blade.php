@@ -90,7 +90,7 @@
                             @endif
                             <h3 class="text-lg font-semibold text-fg">{{ $model->label() }}</h3>
                             <p class="flex-1 text-sm text-fg-secondary">{{ $model->description() }}</p>
-                            <x-ui.button :variant="$loop->first ? 'primary' : 'secondary'" :href="route('contact', ['topic' => 'quote', 'ref' => $translation->name.' — '.$model->label()])">{{ __('Get a quote') }}</x-ui.button>
+                            <x-ui.button :variant="$loop->first ? 'primary' : 'secondary'" :href="route('quote', ['ref' => $translation->name.' — '.$model->label()])">{{ __('Get a quote') }}</x-ui.button>
                         </li>
                     @endforeach
                 </ul>

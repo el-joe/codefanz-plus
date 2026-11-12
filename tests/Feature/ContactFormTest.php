@@ -74,7 +74,7 @@ test('the message is still stored when no contact email is configured', function
     $this->post('/en/contact', contactPayload())->assertRedirect();
 
     expect(ContactMessage::query()->count())->toBe(1);
-    Notification::assertNothingSent();
+    Notification::assertSentOnDemandTimes(ContactMessageReceived::class, 0);
 });
 
 test('contact form input is validated', function (array $overrides, string $field) {

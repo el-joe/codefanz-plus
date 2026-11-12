@@ -17,7 +17,7 @@
                 __('Services') => route('services.index', ['locale' => $locale]),
                 __('Portfolio') => route('portfolio.index', ['locale' => $locale]),
                 __('FAQ') => route('faq.index', ['locale' => $locale]),
-                __('Request a Quote') => route('contact', ['locale' => $locale, 'topic' => 'quote']),
+                __('Request a Quote') => route('quote', ['locale' => $locale]),
             ] as $label => $url)
                 <li><a href="{{ $url }}" class="inline-flex rounded-full border border-line bg-surface px-4 py-1.5 font-semibold text-fg hover:bg-subtle">{{ $label }}</a></li>
             @endforeach

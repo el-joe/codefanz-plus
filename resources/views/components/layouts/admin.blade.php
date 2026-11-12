@@ -5,6 +5,7 @@
     $nav = [
         ['label' => __('Overview'), 'route' => 'admin.dashboard', 'can' => 'admin.access'],
         ['label' => __('Approvals'), 'route' => 'admin.approvals.index', 'can' => 'viewAny', 'model' => \App\Models\ChangeRequest::class, 'count' => $pendingApprovalsCount ?? null],
+        ['label' => __('Leads'), 'route' => 'admin.leads.index', 'can' => 'viewAny', 'model' => \App\Models\Lead::class, 'also' => 'admin.leads.*'],
         ['label' => __('Contact inbox'), 'route' => 'admin.contact-messages.index', 'can' => 'leads.view'],
         ['label' => __('Pages'), 'route' => 'admin.pages.index', 'can' => 'viewAny', 'model' => \App\Models\Page::class],
         ['label' => __('Page sections'), 'route' => 'admin.home-sections.index', 'can' => 'viewAny', 'model' => \App\Models\PageSection::class],
@@ -24,6 +25,8 @@
         ['label' => __('Settings'), 'route' => 'admin.settings.index', 'can' => 'settings.manage', 'also' => 'admin.settings.*'],
         ['label' => __('Audit logs'), 'route' => 'admin.audit-logs.index', 'can' => 'audit.view'],
     ];
+    $unreadNotificationCount = $user->unreadNotifications()->count();
+    $recentNotifications = $user->notifications()->limit(8)->get();
 @endphp
 
 <x-layouts.base :title="$title" entry="resources/js/admin.js">
@@ -57,6 +60,41 @@
                 </div>
                 <x-language-switch />
                 <button type="button" data-theme-toggle class="rounded-md border border-line px-3 py-2 text-sm font-semibold text-fg hover:bg-subtle">{{ __('Theme') }}</button>
+                <div data-dropdown class="relative" data-notification-bell>
+                    <button type="button" data-dropdown-trigger class="relative flex size-10 items-center justify-center rounded-md border border-line text-fg hover:bg-subtle"
+                            aria-label="{{ $unreadNotificationCount ? __('Notifications (:count unread)', ['count' => $unreadNotificationCount]) : __('Notifications') }}">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                        @if ($unreadNotificationCount)
+                            <span class="absolute -end-1.5 -top-1.5 flex min-w-5 items-center justify-center rounded-full bg-danger px-1 text-[11px] font-semibold text-fg-on-brand" data-unread-count aria-hidden="true">{{ $unreadNotificationCount > 99 ? '99+' : $unreadNotificationCount }}</span>
+                        @endif
+                    </button>
+                    <div data-dropdown-menu hidden class="absolute end-0 z-40 mt-2 w-80 rounded-lg border border-line bg-surface-raised p-1.5 shadow-lg">
+                        <div class="flex items-center justify-between gap-2 px-3 py-2">
+                            <p class="text-sm font-semibold text-fg">{{ __('Notifications') }}</p>
+                            @if ($unreadNotificationCount)
+                                <form method="POST" action="{{ route('admin.notifications.read-all') }}">
+                                    @csrf
+                                    <button type="submit" class="text-xs font-semibold text-fg-brand hover:underline">{{ __('Mark all as read') }}</button>
+                                </form>
+                            @endif
+                        </div>
+                        @forelse ($recentNotifications as $notification)
+                            <form method="POST" action="{{ route('admin.notifications.read', $notification->id) }}">
+                                @csrf
+                                <button type="submit" class="flex w-full items-start gap-2 rounded-md px-3 py-2 text-start text-sm hover:bg-subtle">
+                                    <span class="mt-1.5 size-2 shrink-0 rounded-full {{ $notification->read_at ? 'bg-transparent' : 'bg-brand' }}" aria-hidden="true"></span>
+                                    <span class="flex min-w-0 flex-col">
+                                        <span class="text-fg {{ $notification->read_at ? '' : 'font-semibold' }}" dir="auto">@include('admin.notifications._text', ['notification' => $notification])</span>
+                                        <span class="text-xs text-fg-tertiary">{{ $notification->created_at->diffForHumans() }}@unless ($notification->read_at) · <span class="sr-only">{{ __('Unread') }}</span>@endunless</span>
+                                    </span>
+                                </button>
+                            </form>
+                        @empty
+                            <p class="px-3 py-4 text-sm text-fg-secondary">{{ __('You’re all caught up.') }}</p>
+                        @endforelse
+                        <a href="{{ route('admin.notifications.index') }}" class="block rounded-md px-3 py-2 text-center text-sm font-semibold text-fg-brand hover:bg-subtle">{{ __('View all notifications') }}</a>
+                    </div>
+                </div>
                 <div data-dropdown class="relative">
                     <button type="button" data-dropdown-trigger class="flex size-10 items-center justify-center rounded-full bg-brand-subtle text-sm font-semibold text-fg-brand" aria-label="{{ __('Account menu') }}">{{ $user->initials() }}</button>
                     <div data-dropdown-menu hidden class="absolute end-0 z-40 mt-2 w-56 rounded-lg border border-line bg-surface-raised p-1.5 shadow-lg">

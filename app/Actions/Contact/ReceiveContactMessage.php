@@ -2,8 +2,10 @@
 
 namespace App\Actions\Contact;
 
+use App\Actions\Leads\CreateLead;
 use App\Enums\ActorType;
 use App\Enums\ContactTopic;
+use App\Enums\LeadSource;
 use App\Models\ContactMessage;
 use App\Models\Language;
 use App\Notifications\ContactMessageReceived;
@@ -13,12 +15,12 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 
 /**
- * Stores a contact-form message, audits it and emails the contact address from Settings.
- * Without a configured contact address the message still lands in the admin inbox.
+ * Stores a contact-form message, audits it, emails the contact address from Settings and turns it into
+ * a CRM lead (source contact_form). Without a configured contact address the message still lands in the inbox.
  */
 class ReceiveContactMessage
 {
-    public function __construct(private AuditLogger $audit, private Settings $settings) {}
+    public function __construct(private AuditLogger $audit, private Settings $settings, private CreateLead $createLead) {}
 
     /**
      * @param  array{name: string, email: string, phone?: string|null, topic: string, message: string, preferred_locale: string}  $data
@@ -55,6 +57,29 @@ class ReceiveContactMessage
             Log::warning('Contact message received but no contact email is configured.', ['contact_message_id' => $message->id]);
         }
 
+        $this->createLead->handle(self::leadData($message), LeadSource::ContactForm, contactMessage: $message, sendAutoReply: true);
+
         return $message;
+    }
+
+    /**
+     * Lead attributes for a contact message (also used by the backfill command).
+     *
+     * @return array<string, mixed>
+     */
+    public static function leadData(ContactMessage $message): array
+    {
+        return [
+            'name' => $message->name,
+            'email' => $message->email,
+            'phone' => $message->phone,
+            'preferred_locale' => $message->preferred_locale,
+            'description' => $message->message,
+            'brief' => ['topic' => $message->topic->value],
+            'locale' => $message->locale,
+            'ip_address' => $message->ip_address,
+            'user_agent' => $message->user_agent,
+            'consent_at' => $message->consented_at,
+        ];
     }
 }

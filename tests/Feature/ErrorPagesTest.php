@@ -11,7 +11,7 @@ test('the 404 page renders in english with search and popular links', function (
         ->assertSee('This page can’t be found')
         ->assertSee('dir="ltr">404</p>', false)
         ->assertSee('action="'.route('search', ['locale' => 'en']).'"', false)
-        ->assertSee(route('contact', ['locale' => 'en', 'topic' => 'quote']), false)
+        ->assertSee(route('quote', ['locale' => 'en']), false)
         ->assertSee('href="#main"', false);
 });
 

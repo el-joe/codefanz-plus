@@ -2,8 +2,13 @@
 
 namespace Database\Seeders;
 
+use App\Enums\BudgetRange;
 use App\Enums\ContentStatus;
 use App\Enums\EmploymentType;
+use App\Enums\LeadActivityType;
+use App\Enums\LeadPriority;
+use App\Enums\LeadSource;
+use App\Enums\LeadStatus;
 use App\Enums\MenuLinkType;
 use App\Enums\MenuLocation;
 use App\Enums\PageSectionType;
@@ -17,6 +22,7 @@ use App\Models\Career;
 use App\Models\Faq;
 use App\Models\FaqCategory;
 use App\Models\Industry;
+use App\Models\Lead;
 use App\Models\Menu;
 use App\Models\MenuItem;
 use App\Models\Page;
@@ -55,6 +61,7 @@ class DemoContentSeeder extends Seeder
         $this->homeSections();
         $this->aboutAndCareersSections();
         $this->legalPages();
+        $this->leads();
     }
 
     /**
@@ -576,6 +583,52 @@ class DemoContentSeeder extends Seeder
                     'body' => $clauses($values['headings'], $locale === 'ar' ? $draftAr : $draftEn),
                 ]);
             }
+        }
+    }
+
+    /**
+     * Clearly-sample leads across the pipeline for the CRM board and table. Emails use example.test.
+     */
+    private function leads(): void
+    {
+        if (Lead::query()->where('email', 'like', '%@example.test')->exists()) {
+            return;
+        }
+
+        $services = Service::query()->pluck('id');
+        $samples = [
+            ['Sample: Clinic booking platform lead', 'Sample Clinic Co.', LeadSource::QuoteForm, LeadStatus::New, LeadPriority::High, 1_200_000, 'ar'],
+            ['Sample: Company website redesign lead', null, LeadSource::ContactForm, LeadStatus::New, LeadPriority::Normal, null, 'en'],
+            ['Sample: Delivery app lead', 'Sample Logistics', LeadSource::QuoteForm, LeadStatus::Contacted, LeadPriority::Normal, 2_200_000, 'en'],
+            ['Sample: LMS for a training centre', 'Sample Academy', LeadSource::Manual, LeadStatus::Qualified, LeadPriority::Normal, 1_500_000, 'ar'],
+            ['Sample: ERP for a retail chain', 'Sample Retail', LeadSource::QuoteForm, LeadStatus::Proposal, LeadPriority::High, 4_850_000, 'en'],
+            ['Sample: Fintech dashboard', 'Sample Finance', LeadSource::Manual, LeadStatus::Negotiation, LeadPriority::High, 3_000_000, 'en'],
+            ['Sample: Restaurant ordering app', 'Sample Foods', LeadSource::QuoteForm, LeadStatus::Won, LeadPriority::Normal, 900_000, 'ar'],
+            ['Sample: Marketing landing page', null, LeadSource::ContactForm, LeadStatus::Lost, LeadPriority::Low, null, 'en'],
+        ];
+
+        foreach ($samples as $index => [$name, $company, $source, $status, $priority, $value, $locale]) {
+            $lead = Lead::create([
+                'source' => $source,
+                'status' => $status,
+                'priority' => $priority,
+                'name' => $name,
+                'email' => 'lead'.($index + 1).'@example.test',
+                'company' => $company,
+                'country' => $locale === 'ar' ? 'EG' : 'AE',
+                'preferred_locale' => $locale,
+                'platforms' => ['web'],
+                'description' => 'Sample lead for layout review only. Not a real request.',
+                'budget_range' => BudgetRange::From10kTo25k,
+                'estimated_value_minor' => $value,
+                'currency' => $value ? 'USD' : null,
+                'follow_up_at' => $status->isOpen() ? now()->addDays($index)->setTime(11, 0) : null,
+                'lost_reason' => $status === LeadStatus::Lost ? 'Sample: budget not approved' : null,
+                'consent_at' => now(),
+                'locale' => $locale,
+            ]);
+            $lead->services()->sync($services->shuffle()->take(1)->all());
+            $lead->activities()->create(['type' => LeadActivityType::System, 'meta' => ['event' => 'created', 'source' => $source->value]]);
         }
     }
 }
