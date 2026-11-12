@@ -1,5 +1,17 @@
-<x-layouts.admin :title="__('Homepage sections')" :crumb="__('Pages')">
-    <p class="text-sm text-fg-secondary">{{ __('Reorder, show or hide the homepage sections and edit their copy in each language. Lists (services, projects, statistics…) come from their own admin screens; a section with nothing published stays hidden automatically.') }}</p>
+<x-layouts.admin :title="__('Page sections')" :crumb="__('Pages')">
+    <nav aria-label="{{ __('Choose a page') }}">
+        <ul class="flex flex-wrap gap-2">
+            @foreach (array_keys(\App\Models\PageSection::PAGES) as $key)
+                <li>
+                    <a href="{{ route('admin.home-sections.index', ['page' => $key]) }}" @if ($key === $page) aria-current="page" @endif
+                       class="inline-flex rounded-full border border-line px-4 py-1.5 text-sm font-semibold text-fg-secondary hover:bg-subtle aria-[current=page]:border-brand aria-[current=page]:bg-brand-subtle aria-[current=page]:text-fg-brand">{{ \App\Models\PageSection::pageLabel($key) }}</a>
+                </li>
+            @endforeach
+        </ul>
+    </nav>
+
+    <p class="text-sm text-fg-secondary">{{ __('Reorder, show or hide the sections of this page and edit their copy in each language. Lists (services, projects, statistics…) come from their own admin screens; a section with nothing to show stays hidden automatically.') }}
+        <a href="{{ route(\App\Models\PageSection::PAGES[$page], ['locale' => app()->getLocale()]) }}" target="_blank" rel="noopener" class="font-semibold text-fg-brand hover:underline">{{ __('View page') }}</a></p>
 
     <x-ui.card padding="p-0" class="overflow-x-auto">
         <table class="w-full text-sm">

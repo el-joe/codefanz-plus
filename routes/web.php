@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AboutController;
 use App\Http\Controllers\CareerController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardRedirectController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\HomeController;
@@ -9,6 +11,7 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TechnologyController;
 use App\Http\Controllers\TestimonialController;
@@ -49,6 +52,10 @@ Route::prefix('{locale}')
         Route::get('/careers/{slug}', [CareerController::class, 'show'])->where('slug', '[^/]+')->name('careers.show');
         Route::get('/faq', FaqController::class)->name('faq.index');
         Route::get('/testimonials', TestimonialController::class)->name('testimonials.index');
+        Route::get('/about', AboutController::class)->name('about');
+        Route::get('/contact', [ContactController::class, 'show'])->name('contact');
+        Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:contact')->name('contact.store');
+        Route::get('/search', SearchController::class)->middleware('throttle:60,1')->name('search');
 
         // Catch-all CMS pages: keep last so the specific routes above win.
         Route::get('/{slug}', PageController::class)->where('slug', '[^/]+')->name('pages.show');

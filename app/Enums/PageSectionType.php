@@ -3,7 +3,8 @@
 namespace App\Enums;
 
 /**
- * The fixed set of homepage sections. Admins reorder, hide and edit their copy; data comes from the catalog.
+ * The fixed set of managed page sections (homepage, About, Careers). Admins reorder, hide and edit their copy;
+ * list data comes from the catalog.
  */
 enum PageSectionType: string
 {
@@ -20,6 +21,34 @@ enum PageSectionType: string
     case LatestArticles = 'latest_articles';
     case Faq = 'faq';
     case Cta = 'cta';
+    case AboutIntro = 'about_intro';
+    case AboutStory = 'about_story';
+    case AboutMission = 'about_mission';
+    case AboutValues = 'about_values';
+    case AboutTeam = 'about_team';
+    case CareersPerks = 'careers_perks';
+
+    /**
+     * The section-managed page this type belongs to (see PageSection::PAGES).
+     */
+    public function page(): string
+    {
+        return match ($this) {
+            self::AboutIntro, self::AboutStory, self::AboutMission, self::AboutValues, self::AboutTeam => 'about',
+            self::CareersPerks => 'careers',
+            default => 'home',
+        };
+    }
+
+    /**
+     * Types of one page in their default order.
+     *
+     * @return list<self>
+     */
+    public static function forPage(string $page): array
+    {
+        return array_values(array_filter(self::cases(), fn (self $type): bool => $type->page() === $page));
+    }
 
     public function label(): string
     {
@@ -37,6 +66,12 @@ enum PageSectionType: string
             self::LatestArticles => __('Latest articles'),
             self::Faq => __('FAQ'),
             self::Cta => __('Call to action'),
+            self::AboutIntro => __('Introduction'),
+            self::AboutStory => __('Our story'),
+            self::AboutMission => __('Mission'),
+            self::AboutValues => __('Values'),
+            self::AboutTeam => __('Team disciplines'),
+            self::CareersPerks => __('Why work with us'),
         };
     }
 
@@ -46,7 +81,9 @@ enum PageSectionType: string
     public function source(): string
     {
         return match ($this) {
-            self::Hero, self::Process, self::WhyUs, self::Cta => __('Copy on this screen'),
+            self::Hero, self::Process, self::WhyUs, self::Cta, self::AboutIntro, self::AboutMission => __('Copy on this screen'),
+            self::AboutStory => __('Copy on this screen; shown once the story text is filled'),
+            self::AboutValues, self::AboutTeam, self::CareersPerks => __('Rows on this screen; shown once at least one row is filled'),
             self::Services => __('Featured services first'),
             self::Technologies => __('Verified and expertise technologies'),
             self::FeaturedProjects => __('Featured public projects first'),
@@ -88,6 +125,12 @@ enum PageSectionType: string
             self::LatestArticles => [__('Blog', [], $locale), __('Latest from our blog', [], $locale), null, null],
             self::Faq => [__('FAQ', [], $locale), __('Questions, answered', [], $locale), null, __('See all questions', [], $locale)],
             self::Cta => [null, __('Have an idea? Let’s build it together.', [], $locale), __('Get a free preliminary estimate within 48 hours. No payment required.', [], $locale), __('Start Your Project', [], $locale)],
+            self::AboutIntro => [__('About CodeFanz', [], $locale), __('Engineering digital products that last', [], $locale), __('CodeFanz is a software development company helping startups and established businesses design, build and scale web, mobile and AI-powered products.', [], $locale), null],
+            self::AboutStory => [__('Our story', [], $locale), __('How CodeFanz started', [], $locale), null, null],
+            self::AboutMission => [__('Our mission', [], $locale), __('Turn ideas into reliable, secure and scalable software that creates measurable business value.', [], $locale), null, null],
+            self::AboutValues => [__('Our values', [], $locale), __('What guides every project', [], $locale), null, null],
+            self::AboutTeam => [__('Our team', [], $locale), __('One team, every discipline', [], $locale), __('A dedicated squad is formed for each project — sized to your scope.', [], $locale), null],
+            self::CareersPerks => [null, __('Why work with us', [], $locale), null, null],
         };
 
         return ['eyebrow' => $eyebrow, 'heading' => $heading, 'subheading' => $subheading, 'cta_label' => $cta];
@@ -134,6 +177,20 @@ enum PageSectionType: string
      */
     public function hasItems(): bool
     {
-        return in_array($this, [self::Process, self::WhyUs], true);
+        return in_array($this, [self::Process, self::WhyUs, self::AboutValues, self::AboutTeam, self::CareersPerks], true);
+    }
+
+    /**
+     * Admin heading for the editable rows.
+     */
+    public function itemsLabel(): string
+    {
+        return match ($this) {
+            self::Process => __('Process steps'),
+            self::AboutValues => __('Values'),
+            self::AboutTeam => __('Disciplines'),
+            self::CareersPerks => __('Perks'),
+            default => __('Reasons'),
+        };
     }
 }

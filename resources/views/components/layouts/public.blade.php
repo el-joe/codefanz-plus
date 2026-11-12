@@ -1,4 +1,4 @@
-@props(['title', 'description' => null, 'alternates' => [], 'robots' => null])
+@props(['title', 'description' => null, 'alternates' => [], 'robots' => null, 'image' => null, 'ogType' => 'website'])
 
 @php
     $menus = app(\App\Services\MenuResolver::class);
@@ -17,6 +17,12 @@
     $current = url()->current();
     $isCurrent = fn (string $url): bool => rtrim($url, '/') === rtrim($current, '/');
     $newTab = fn (array $link): string => $link['new_tab'] ? 'target="_blank" rel="noopener noreferrer"' : '';
+    $quoteUrl = route('contact', ['topic' => 'quote']);
+    // OpenGraph: locale as language_TERRITORY; the image is the cover's ~1200px WebP variant when there is one.
+    $ogLocale = fn (string $code): string => ['en' => 'en_US', 'ar' => 'ar_AR'][$code] ?? $code;
+    $ogImage = $image instanceof \App\Models\Media
+        ? ($image->variantsFor('webp')->first(fn ($variant) => $variant->width >= 1200) ?? $image->largestVariant('webp'))
+        : null;
 @endphp
 
 <x-layouts.base :title="$title">
@@ -34,6 +40,25 @@
             <link rel="alternate" hreflang="x-default" href="{{ $alternates[\App\Models\Language::defaultCode()] }}">
         @endisset
         <link rel="canonical" href="{{ url()->current() }}">
+        <meta property="og:site_name" content="CodeFanz">
+        <meta property="og:type" content="{{ $ogType }}">
+        <meta property="og:title" content="{{ $title }}">
+        @if ($description)
+            <meta property="og:description" content="{{ $description }}">
+        @endif
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:locale" content="{{ $ogLocale($locale) }}">
+        @foreach (array_keys($alternates) as $code)
+            @continue($code === $locale)
+            <meta property="og:locale:alternate" content="{{ $ogLocale($code) }}">
+        @endforeach
+        @if ($ogImage)
+            <meta property="og:image" content="{{ url($ogImage->url()) }}">
+            <meta property="og:image:width" content="{{ $ogImage->width }}">
+            <meta property="og:image:height" content="{{ $ogImage->height }}">
+            <meta property="og:image:alt" content="{{ $image->altText() }}">
+        @endif
+        <meta name="twitter:card" content="{{ $ogImage ? 'summary_large_image' : 'summary' }}">
     </x-slot:meta>
 
     <header class="relative z-30 border-b border-line-subtle bg-surface">
@@ -68,7 +93,7 @@
             <div class="ms-auto flex items-center gap-2 xl:ms-0">
                 <x-language-switch :alternates="$alternates" />
                 <x-ui.button :href="route('login')" variant="ghost" class="whitespace-nowrap max-sm:hidden">{{ __('Client Portal') }}</x-ui.button>
-                <x-ui.button :href="'mailto:'.$email" class="whitespace-nowrap max-md:hidden">
+                <x-ui.button :href="$quoteUrl" class="whitespace-nowrap max-md:hidden">
                     {{ __('Start Your Project') }}
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="rtl:-scale-x-100"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
                 </x-ui.button>
@@ -97,7 +122,7 @@
                     </li>
                 @endforeach
                 <li class="mt-2 flex flex-wrap gap-2 border-t border-line-subtle pt-3">
-                    <x-ui.button :href="'mailto:'.$email" size="sm">{{ __('Start Your Project') }}</x-ui.button>
+                    <x-ui.button :href="$quoteUrl" size="sm">{{ __('Start Your Project') }}</x-ui.button>
                     <x-ui.button :href="route('login')" variant="secondary" size="sm">{{ __('Client Portal') }}</x-ui.button>
                 </li>
             </ul>
@@ -114,7 +139,7 @@
                     <p class="max-w-xs text-sm text-fg-secondary">{{ $tagline }}</p>
                     <ul class="flex gap-2" aria-label="{{ __('Contact channels') }}">
                         @if ($whatsapp)
-                            <li><a href="https://wa.me/{{ ltrim($whatsapp, '+') }}" target="_blank" rel="noopener noreferrer" class="flex size-10 items-center justify-center rounded-lg bg-surface text-fg hover:bg-subtle" aria-label="{{ __('WhatsApp') }}">
+                            <li><a href="{{ \App\Services\ContactChannels::whatsappUrl($whatsapp) }}" target="_blank" rel="noopener noreferrer" class="flex size-10 items-center justify-center rounded-lg bg-surface text-fg hover:bg-subtle" aria-label="{{ __('WhatsApp') }}">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M3 21l1.65-3.8A9 9 0 1 1 7.8 20.4z"/></svg>
                             </a></li>
                         @endif

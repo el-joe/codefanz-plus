@@ -7,7 +7,7 @@
     $isLocalized = $route && in_array('locale.route', $route->gatherMiddleware(), true);
 @endphp
 
-<div class="flex items-center gap-1" aria-label="{{ __('Language') }}">
+<div class="flex items-center gap-1" role="group" aria-label="{{ __('Language') }}">
     @foreach ($languages as $code => $language)
         @continue($code === $current)
         @if ($isLocalized)

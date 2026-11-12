@@ -5,8 +5,9 @@
     $nav = [
         ['label' => __('Overview'), 'route' => 'admin.dashboard', 'can' => 'admin.access'],
         ['label' => __('Approvals'), 'route' => 'admin.approvals.index', 'can' => 'viewAny', 'model' => \App\Models\ChangeRequest::class, 'count' => $pendingApprovalsCount ?? null],
+        ['label' => __('Contact inbox'), 'route' => 'admin.contact-messages.index', 'can' => 'leads.view'],
         ['label' => __('Pages'), 'route' => 'admin.pages.index', 'can' => 'viewAny', 'model' => \App\Models\Page::class],
-        ['label' => __('Homepage sections'), 'route' => 'admin.home-sections.index', 'can' => 'viewAny', 'model' => \App\Models\PageSection::class],
+        ['label' => __('Page sections'), 'route' => 'admin.home-sections.index', 'can' => 'viewAny', 'model' => \App\Models\PageSection::class],
         ['label' => __('Navigation & menus'), 'route' => 'admin.menus.index', 'can' => 'viewAny', 'model' => \App\Models\MenuItem::class],
         ['label' => __('Services'), 'route' => 'admin.services.index', 'can' => 'viewAny', 'model' => \App\Models\Service::class],
         ['label' => __('Technologies'), 'route' => 'admin.technologies.index', 'can' => 'viewAny', 'model' => \App\Models\Technology::class, 'also' => 'admin.technology-categories.*'],

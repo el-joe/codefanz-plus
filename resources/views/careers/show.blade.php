@@ -31,7 +31,7 @@
 
 <x-layouts.public
     :title="$translation->seo_title ?: $translation->title"
-    :description="$translation->seo_description ?: $translation->summary"
+    :description="$translation->seo_description ?: ($translation->summary ?: $translation->title)"
     :alternates="$career->translations->mapWithKeys(fn ($alt) => [$alt->locale => route('careers.show', ['locale' => $alt->locale, 'slug' => $alt->slug])])->all()">
     <x-site.page-hero :title="$translation->title" :lead="$translation->summary" :crumbs="[__('Careers') => route('careers.index'), $translation->title => null]">
         <x-slot:before>
@@ -45,7 +45,10 @@
                 @endif
             </p>
         </x-slot:before>
-        <div><x-ui.button :href="$applyHref" size="lg">{{ __('Apply by email') }}</x-ui.button></div>
+        <div class="flex flex-wrap gap-3">
+            <x-ui.button :href="$applyHref" size="lg">{{ __('Apply by email') }}</x-ui.button>
+            <x-ui.button :href="route('contact', ['topic' => 'careers', 'ref' => $translation->title])" variant="secondary" size="lg">{{ __('Ask a question') }}</x-ui.button>
+        </div>
     </x-site.page-hero>
 
     <div class="mx-auto grid max-w-7xl gap-10 px-5 py-14 lg:grid-cols-[1fr_340px] lg:px-20 lg:py-20">

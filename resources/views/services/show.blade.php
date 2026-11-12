@@ -11,7 +11,8 @@
 
 <x-layouts.public
     :title="$translation->seo_title ?: $translation->title"
-    :description="$translation->seo_description ?: $translation->summary"
+    :description="$translation->seo_description ?: ($translation->summary ?: $translation->title)"
+    :image="$cover"
     :alternates="$service->translations->mapWithKeys(fn ($alt) => [$alt->locale => route('services.show', ['locale' => $alt->locale, 'slug' => $alt->slug])])->all()">
     <x-site.page-hero :eyebrow="$service->tier->label()" :title="$translation->title" :lead="$translation->summary"
                       :crumbs="$crumbs">
@@ -111,7 +112,7 @@
             <div class="flex flex-col gap-4 rounded-xl border border-line bg-surface p-6 shadow-md">
                 <h2 id="quote-card" class="text-lg font-bold text-fg">{{ __('Request a quote') }}</h2>
                 <p class="text-sm text-fg-secondary">{{ __('Tell us about your project and get a free preliminary estimate within 48 hours. No payment required.') }}</p>
-                <x-ui.button :href="'mailto:'.(app(\App\Services\Settings::class)->get('contact', 'email') ?: 'hello@codefanz.com').'?subject='.rawurlencode($translation->title)" size="lg">{{ __('Start Your Project') }}</x-ui.button>
+                <x-ui.button :href="route('contact', ['topic' => 'quote', 'ref' => $translation->title])" size="lg">{{ __('Start Your Project') }}</x-ui.button>
                 <a href="{{ route('services.index') }}" class="text-center text-sm font-semibold text-fg-brand hover:underline">{{ __('Browse all services') }}</a>
             </div>
         </aside>

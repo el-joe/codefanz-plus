@@ -39,7 +39,7 @@
 | Table | Notes |
 |---|---|
 | `pages` + `page_translations` | template, status, published_at, lock_version |
-| `page_sections` + `page_section_translations` | `page` key (only `home` today), type (`App\Enums\PageSectionType`, UNIQUE per page), sort_order, is_visible, settings JSON (`limit`, `cta_url`); translations: eyebrow, heading, subheading, cta_label, `points` JSON list, `items` JSON list aligned across locales. A language without a row uses the built-in default wording. Rows are structural (`PageSectionSeeder`) |
+| `page_sections` + `page_section_translations` | `page` key (`home`, `about`, `careers` — see `PageSection::PAGES`), type (`App\Enums\PageSectionType`, UNIQUE per page), sort_order, is_visible, settings JSON (`limit`, `cta_url`); translations: eyebrow, heading, subheading, cta_label, `points` JSON list, `items` JSON list aligned across locales. A language without a row uses the built-in default wording. Rows are structural (`PageSectionSeeder`) |
 | `menus`, `menu_items` (+translations) | `menus.location` UNIQUE (`App\Enums\MenuLocation`); items: parent_id (two levels, header only), link_type `route` (whitelisted public route + `route_params` query JSON) / `linkable` morph (page, service, product, portfolio_project, career → translated slug per locale) / `url` (https only), is_visible, open_in_new_tab, sort_order; translations: label. Resolved per locale by `App\Services\MenuResolver` into cached plain arrays (versioned key bumped on menu or linked-content writes) |
 | `redirects` | from_path UNIQUE, to_path, status_code, hits, is_active |
 | `services` + `service_translations` | parent_id (one level of sub-services), tier (`core`/`specialist`), icon (curated key, `App\Enums\ContentIcon`), status, is_featured, sort_order, lock_version; cover via `mediables` collection `cover` (no cover_media_id column) |
@@ -68,6 +68,7 @@
 |---|---|
 | `customers` | type (company/individual), company_name, country, user_id (portal login), primary contact, soft deletes |
 | `contacts` | customer_id, name, email, phone, role |
+| `contact_messages` | Website contact-form intake (M4): name, email, phone, topic (`App\Enums\ContactTopic`, indexed), message, preferred_locale, locale, consented_at, ip_address, user_agent, soft deletes. Read-only admin inbox (`leads.view`); M5 converts them into `leads` (source `contact_form`) |
 | `leads` | reference UNIQUE (e.g. `LD-2026-000123`), source (contact_form, quote_form, chatbot, whatsapp, meeting, manual), name, email, phone, country, company, project_type, platform, description, features, technologies, budget_range, deadline, existing_url, preferred_contact, preferred_locale, status, priority, assigned_to, follow_up_at, estimated_value_minor, currency, converted_customer_id, lost_reason, consent_at, soft deletes. Indexes: (status, assigned_to), follow_up_at, email |
 | `lead_activities` | lead_id, type (note, call, email, status_change, meeting), body, meta JSON, user_id |
 | `tags`, `taggables` | shared tagging |

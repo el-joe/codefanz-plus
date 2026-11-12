@@ -181,7 +181,7 @@ test('the products index lists published products with availability and demo req
         ->assertSee('Available')
         ->assertSee('Multi-branch POS')
         ->assertSee('Request a demo')
-        ->assertSee('mailto:', false)
+        ->assertSee(route('contact', ['locale' => 'en', 'topic' => 'demo', 'ref' => 'FanzERP']))
         ->assertSee('Contact sales')
         ->assertDontSee('Draft Product')
         ->assertDontSee('منتج عربي')

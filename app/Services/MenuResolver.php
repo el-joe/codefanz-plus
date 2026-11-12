@@ -10,6 +10,7 @@ use App\Models\Career;
 use App\Models\Menu;
 use App\Models\MenuItem;
 use App\Models\Page;
+use App\Models\PageTranslation;
 use App\Models\PortfolioProject;
 use App\Models\Product;
 use App\Models\Service;
@@ -186,17 +187,38 @@ class MenuResolver
      */
     public function fallback(MenuLocation $location): array
     {
+        if ($location === MenuLocation::FooterLegal) {
+            return $this->legalPages(app()->getLocale());
+        }
+
         $routes = match ($location) {
-            MenuLocation::Header => ['services.index' => __('Services'), 'portfolio.index' => __('Portfolio'), 'products.index' => __('Products'), 'technologies.index' => __('Technologies'), 'industries.index' => __('Industries')],
+            MenuLocation::Header => ['services.index' => __('Services'), 'portfolio.index' => __('Portfolio'), 'products.index' => __('Products'), 'technologies.index' => __('Technologies'), 'about' => __('About')],
             MenuLocation::FooterServices => ['services.index' => __('All services'), 'technologies.index' => __('Technologies'), 'industries.index' => __('Industries')],
-            MenuLocation::FooterCompany => ['portfolio.index' => __('Portfolio'), 'careers.index' => __('Careers'), 'testimonials.index' => __('Testimonials')],
-            MenuLocation::FooterResources => ['products.index' => __('Products'), 'faq.index' => __('FAQ')],
-            MenuLocation::FooterLegal => [],
+            MenuLocation::FooterCompany => ['about' => __('About Us'), 'portfolio.index' => __('Portfolio'), 'careers.index' => __('Careers'), 'testimonials.index' => __('Testimonials'), 'contact' => __('Contact')],
+            MenuLocation::FooterResources => ['products.index' => __('Products'), 'industries.index' => __('Industries'), 'faq.index' => __('FAQ')],
         };
 
         return collect($routes)
             ->map(fn (string $label, string $name): array => ['label' => $label, 'url' => route($name), 'new_tab' => false, 'children' => []])
             ->values()
             ->all();
+    }
+
+    /**
+     * Published legal pages (template "legal") in this locale, used until the legal footer menu is filled.
+     *
+     * @return list<array{label: string, url: string, new_tab: bool, children: list<mixed>}>
+     */
+    private function legalPages(string $locale): array
+    {
+        $key = sprintf('menus.%s.legal-fallback.%s', self::version(), $locale);
+
+        return Cache::remember($key, now()->addDay(), fn (): array => PageTranslation::query()
+            ->where('locale', $locale)
+            ->whereHas('page', fn ($query) => $query->where('template', 'legal')->where('status', PageStatus::Published))
+            ->orderBy('page_id')
+            ->get(['title', 'slug'])
+            ->map(fn (PageTranslation $translation): array => ['label' => $translation->title, 'url' => route('pages.show', ['locale' => $locale, 'slug' => $translation->slug]), 'new_tab' => false, 'children' => []])
+            ->all());
     }
 }

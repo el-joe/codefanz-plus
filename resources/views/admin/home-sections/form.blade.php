@@ -4,7 +4,7 @@
     $limit = $type->limit();
 @endphp
 
-<x-layouts.admin :title="__('Section: :section', ['section' => $type->label()])" :crumb="__('Homepage sections')">
+<x-layouts.admin :title="__('Section: :section', ['section' => $type->label()])" :crumb="\App\Models\PageSection::pageLabel($section->page)">
     @if ($errors->any())
         <x-ui.alert tone="danger" :title="__('Please fix the highlighted fields')">{{ __('Some fields need attention.') }}</x-ui.alert>
     @endif
@@ -45,7 +45,7 @@
             @if ($type->hasItems())
                 @include('admin.services._repeater', [
                     'group' => 'items',
-                    'title' => $type === \App\Enums\PageSectionType::Process ? __('Process steps') : __('Reasons'),
+                    'title' => $type->itemsLabel(),
                     'description' => __('Shown in this order. Leave every language empty to remove a row.'),
                     'rows' => $itemRows,
                     'fields' => [
@@ -61,7 +61,7 @@
             <x-ui.card :title="__('Display')">
                 <div class="flex flex-col gap-4">
                     <label class="flex items-center justify-between gap-3">
-                        <span class="text-sm font-semibold text-fg">{{ __('Show on the homepage') }}</span>
+                        <span class="text-sm font-semibold text-fg">{{ __('Show on the page') }}</span>
                         <input type="checkbox" name="is_visible" value="1" form="section-form" @checked(old('is_visible', $section->is_visible)) class="size-4 accent-brand">
                     </label>
                     @if ($limit)
@@ -70,10 +70,11 @@
                     @endif
                     @if ($type->hasCustomCtaUrl())
                         <x-ui.input name="cta_url" form="section-form" :label="__('Button link')" :value="$section->ctaUrl()" dir="ltr" placeholder="https://"
-                                    :helper="__('Leave empty to open an email to the contact address from Settings.')" />
+                                    :helper="__('Leave empty to open the contact page.')" />
                     @endif
                     <x-ui.button form="section-form">{{ __('Save changes') }}</x-ui.button>
-                    <a href="{{ route('home', ['locale' => app()->getLocale()]) }}" target="_blank" rel="noopener" class="text-sm font-semibold text-fg-brand hover:underline">{{ __('View homepage') }}</a>
+                    <a href="{{ $section->pageUrl() }}" target="_blank" rel="noopener" class="text-sm font-semibold text-fg-brand hover:underline">{{ __('View page') }}</a>
+                    <a href="{{ route('admin.home-sections.index', ['page' => $section->page]) }}" class="text-sm font-semibold text-fg-secondary hover:underline">{{ __('Back to sections') }}</a>
                 </div>
             </x-ui.card>
         </div>

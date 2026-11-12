@@ -1,6 +1,6 @@
 <x-layouts.public
     :title="$translation->seo_title ?: $translation->title"
-    :description="$translation->seo_description"
+    :description="$translation->seo_description ?: (\Illuminate\Support\Str::limit(\Illuminate\Support\Str::squish(strip_tags($body)), 155) ?: $translation->title)"
     :alternates="$alternates->mapWithKeys(fn ($alt) => [$alt->locale => route('pages.show', ['locale' => $alt->locale, 'slug' => $alt->slug])])->all()">
     <article class="mx-auto flex max-w-3xl flex-col gap-6 px-5 py-16 lg:py-24">
         <h1 class="text-4xl font-bold leading-tight text-fg">{{ $translation->title }}</h1>

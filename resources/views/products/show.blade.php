@@ -1,7 +1,5 @@
 @php
     $locale = app()->getLocale();
-    $email = app(\App\Services\Settings::class)->get('contact', 'email') ?: 'hello@codefanz.com';
-    $mailto = fn (string $subject): string => 'mailto:'.$email.'?subject='.rawurlencode($subject);
     $cover = $product->coverImage();
     $latest = $product->latestVersion();
     $features = $translation->filledFeatures();
@@ -11,7 +9,8 @@
 
 <x-layouts.public
     :title="$translation->seo_title ?: $translation->name"
-    :description="$translation->seo_description ?: $translation->tagline"
+    :description="$translation->seo_description ?: ($translation->tagline ?: $translation->name)"
+    :image="$cover"
     :alternates="$product->translations->mapWithKeys(fn ($alt) => [$alt->locale => route('products.show', ['locale' => $alt->locale, 'slug' => $alt->slug])])->all()">
     <x-site.page-hero :title="$translation->name" :lead="$translation->tagline"
                       :crumbs="[__('Products') => route('products.index'), $translation->name => null]">
@@ -31,7 +30,7 @@
             @if ($product->demo_enabled)
                 <x-ui.button :href="'#request-demo'">{{ __('Request a demo') }}</x-ui.button>
             @endif
-            <x-ui.button variant="secondary" :href="$mailto(__('Sales enquiry: :product', ['product' => $translation->name]))">{{ __('Contact sales') }}</x-ui.button>
+            <x-ui.button variant="secondary" :href="route('contact', ['topic' => 'quote', 'ref' => $translation->name])">{{ __('Contact sales') }}</x-ui.button>
         </div>
     </x-site.page-hero>
 
@@ -91,7 +90,7 @@
                             @endif
                             <h3 class="text-lg font-semibold text-fg">{{ $model->label() }}</h3>
                             <p class="flex-1 text-sm text-fg-secondary">{{ $model->description() }}</p>
-                            <x-ui.button :variant="$loop->first ? 'primary' : 'secondary'" :href="$mailto(__('Quote request: :product (:model)', ['product' => $translation->name, 'model' => $model->label()]))">{{ __('Get a quote') }}</x-ui.button>
+                            <x-ui.button :variant="$loop->first ? 'primary' : 'secondary'" :href="route('contact', ['topic' => 'quote', 'ref' => $translation->name.' — '.$model->label()])">{{ __('Get a quote') }}</x-ui.button>
                         </li>
                     @endforeach
                 </ul>
@@ -149,7 +148,7 @@
             <section id="request-demo" aria-labelledby="request-demo-title" class="mx-auto flex w-full max-w-2xl scroll-mt-6 flex-col gap-4 rounded-2xl border border-line bg-surface p-8 shadow-md">
                 <h2 id="request-demo-title" class="text-2xl font-bold text-fg">{{ __('Request a :product demo', ['product' => $translation->name]) }}</h2>
                 <p class="text-fg-secondary">{{ __('A product specialist will walk you through the platform using your workflows. Tell us your company, team size and number of branches.') }}</p>
-                <x-ui.button class="w-fit" :href="$mailto(__('Demo request: :product', ['product' => $translation->name]))">{{ __('Request demo') }}</x-ui.button>
+                <x-ui.button class="w-fit" :href="route('contact', ['topic' => 'demo', 'ref' => $translation->name])">{{ __('Request demo') }}</x-ui.button>
             </section>
         @endif
     </div>

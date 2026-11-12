@@ -32,7 +32,7 @@ test('the section manager lists every section type once, in order', function () 
 
     $this->actingAs($this->editor)->get(route('admin.home-sections.index'));
 
-    expect(PageSection::query()->count())->toBe(count(PageSectionType::cases()))
+    expect(PageSection::query()->count())->toBe(count(PageSectionType::forPage(PageSection::HOME)))
         ->and(PageSection::query()->where('type', 'latest_articles')->value('is_visible'))->toBeFalsy();
 });
 
@@ -92,4 +92,37 @@ test('sections can be hidden and reordered', function () {
 
     $this->actingAs($this->editor)->post(route('admin.home-sections.move', $services), ['direction' => 'sideways'])->assertSessionHasErrors('direction');
     expect(AuditLog::query()->whereIn('operation', ['page_section.hidden', 'page_section.moved'])->count())->toBe(2);
+});
+
+test('the section manager switches between the homepage, about and careers pages', function () {
+    $this->actingAs($this->editor)->get(route('admin.home-sections.index', ['page' => 'about']))
+        ->assertSuccessful()
+        ->assertSeeInOrder(['Introduction', 'Our story', 'Mission', 'Values', 'Team disciplines'])
+        ->assertDontSee('Featured projects');
+
+    $this->actingAs($this->editor)->get(route('admin.home-sections.index', ['page' => 'careers']))->assertSuccessful()->assertSee('Why work with us');
+    $this->actingAs($this->editor)->get(route('admin.home-sections.index', ['page' => 'unknown']))->assertSuccessful()->assertSee('Hero');
+
+    expect(PageSection::query()->where('page', 'about')->count())->toBe(5)
+        ->and(PageSection::query()->where('page', 'careers')->count())->toBe(1);
+});
+
+test('an editor writes about values and they appear on the about page', function () {
+    PageSection::ensureSections(PageSection::ABOUT);
+    $values = PageSection::query()->where('type', PageSectionType::AboutValues)->sole();
+
+    $this->actingAs($this->editor)->get(route('admin.home-sections.edit', $values))->assertSuccessful()->assertSee('What guides every project');
+
+    $this->actingAs($this->editor)->put(route('admin.home-sections.update', $values), [
+        'is_visible' => '1',
+        'translations' => ['en' => ['heading' => ''], 'ar' => []],
+        'items' => [['translations' => ['en' => ['title' => 'Integrity', 'text' => 'Honest estimates.'], 'ar' => ['title' => 'النزاهة']]]],
+    ])->assertSessionHasNoErrors()->assertRedirect(route('admin.home-sections.edit', $values));
+
+    $this->get('/en/about')->assertSee('Integrity')->assertSee('Honest estimates.');
+
+    // Moving a section only reorders sections of the same page.
+    $this->actingAs($this->editor)->post(route('admin.home-sections.move', $values), ['direction' => 'up'])->assertRedirect();
+    expect(PageSection::query()->where('page', 'about')->orderBy('sort_order')->pluck('type')->map->value->all())
+        ->toBe(['about_intro', 'about_story', 'about_values', 'about_mission', 'about_team']);
 });

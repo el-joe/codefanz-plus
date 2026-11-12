@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\CareerController;
 use App\Http\Controllers\Admin\ChangeRequestController;
+use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FaqCategoryController;
 use App\Http\Controllers\Admin\FaqController;
@@ -49,6 +50,11 @@ Route::middleware('two-factor')->group(function (): void {
         Route::get('media/{media}', [MediaController::class, 'show'])->name('media.show');
         Route::patch('media/{media}', [MediaController::class, 'update'])->name('media.update');
         Route::delete('media/{media}', [MediaController::class, 'destroy'])->name('media.destroy');
+    });
+
+    Route::middleware('can:leads.view')->group(function (): void {
+        Route::get('contact-messages', [ContactMessageController::class, 'index'])->name('contact-messages.index');
+        Route::get('contact-messages/{contactMessage}', [ContactMessageController::class, 'show'])->name('contact-messages.show');
     });
 
     Route::resource('pages', PageController::class)->except(['show']);

@@ -16,18 +16,23 @@ use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 /**
- * Homepage section manager (A08): reorder, show/hide and edit each section's copy per language.
+ * Page section manager (A08): reorder, show/hide and edit each section's copy per language, for every
+ * section-managed page (homepage, About, Careers).
  */
 class HomeSectionController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         Gate::authorize('viewAny', PageSection::class);
 
-        PageSection::ensureHomeSections();
+        $page = $request->query('page');
+        $page = is_string($page) && array_key_exists($page, PageSection::PAGES) ? $page : PageSection::HOME;
+
+        PageSection::ensureSections($page);
 
         return view('admin.home-sections.index', [
-            'sections' => PageSection::query()->home()->with('translations')->ordered()->get(),
+            'page' => $page,
+            'sections' => PageSection::query()->where('page', $page)->with('translations')->ordered()->get(),
         ]);
     }
 
@@ -57,7 +62,7 @@ class HomeSectionController extends Controller
         $section->forceFill(['is_visible' => ! $section->is_visible, 'updated_by' => $request->user()->getKey()])->save();
         $audit->record(operation: $section->is_visible ? 'page_section.shown' : 'page_section.hidden', auditable: $section, user: $request->user());
 
-        return back()->with('toast', $section->is_visible ? __('Section shown on the homepage.') : __('Section hidden from the homepage.'));
+        return back()->with('toast', $section->is_visible ? __('Section shown on the page.') : __('Section hidden from the page.'));
     }
 
     /**

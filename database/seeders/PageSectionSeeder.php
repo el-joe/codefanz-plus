@@ -6,13 +6,15 @@ use App\Models\PageSection;
 use Illuminate\Database\Seeder;
 
 /**
- * Structural homepage section rows (type + default order, no copy). Safe to re-run.
+ * Structural section rows for every section-managed page (type + default order, no copy). Safe to re-run.
  * Sample copy lives in DemoContentSeeder.
  */
 class PageSectionSeeder extends Seeder
 {
     public function run(): void
     {
-        PageSection::ensureHomeSections();
+        foreach (array_keys(PageSection::PAGES) as $page) {
+            PageSection::ensureSections($page);
+        }
     }
 }

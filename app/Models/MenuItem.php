@@ -39,6 +39,8 @@ class MenuItem extends Model
         'careers.index' => 'Careers',
         'faq.index' => 'FAQ',
         'testimonials.index' => 'Testimonials',
+        'about' => 'About Us',
+        'contact' => 'Contact',
     ];
 
     /**

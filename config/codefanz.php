@@ -54,6 +54,8 @@ return [
             'phone' => ['type' => 'text', 'label' => 'Phone', 'rules' => ['nullable', 'string', 'max:30', 'regex:/^\+?[0-9 ()-]{6,30}$/']],
             'whatsapp' => ['type' => 'text', 'label' => 'WhatsApp number', 'rules' => ['nullable', 'string', 'max:20', 'regex:/^\+?[0-9]{6,20}$/']],
             'address' => ['type' => 'translatable', 'label' => 'Address', 'rules' => ['nullable', 'string', 'max:255']],
+            'hours' => ['type' => 'translatable', 'label' => 'Office hours', 'rules' => ['nullable', 'string', 'max:120']],
+            'meeting_url' => ['type' => 'url', 'label' => 'Meeting booking link (https)', 'rules' => ['nullable', 'url:https', 'max:500']],
         ],
         'integrations' => [
             'ga4_measurement_id' => ['type' => 'text', 'label' => 'GA4 measurement ID', 'rules' => ['nullable', 'string', 'regex:/^G-[A-Z0-9]{4,20}$/']],
@@ -70,6 +72,25 @@ return [
     'integrations' => [
         'google_analytics' => ['label' => 'Google Analytics 4', 'keys' => ['ga4_measurement_id', 'ga4_api_secret']],
         'anthropic' => ['label' => 'Anthropic (AI Content Studio)', 'keys' => ['anthropic_api_key']],
+    ],
+
+    /*
+    | Shown on error pages, which must render without the database (so it is
+    | not read from Settings).
+    */
+
+    'support_email' => env('SUPPORT_EMAIL', 'hello@codefanz.com'),
+
+    /*
+    | Public contact form (anti-spam). Submissions faster than min_seconds or
+    | older than max_minutes after the form was rendered are discarded.
+    */
+
+    'contact_form' => [
+        'min_seconds' => 3,
+        'max_minutes' => 120,
+        'per_minute' => 3,
+        'per_day' => 20,
     ],
 
     'change_requests' => [

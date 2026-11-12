@@ -1,6 +1,6 @@
 {{-- Homepage built from the managed sections (Admin → Homepage). Each block: section, copy (translated or default) and data. --}}
 @php
-    $contactHref = 'mailto:'.(app(\App\Services\Settings::class)->get('contact', 'email') ?: 'hello@codefanz.com');
+    $contactHref = route('contact', ['topic' => 'quote']);
     $hero = $blocks->first(fn ($block) => $block['section']->type === \App\Enums\PageSectionType::Hero);
 @endphp
 

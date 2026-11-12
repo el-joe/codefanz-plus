@@ -1,6 +1,5 @@
 @php
     $locale = app()->getLocale();
-    $email = app(\App\Services\Settings::class)->get('contact', 'email') ?: 'hello@codefanz.com';
     $reasons = [
         ['trending-up', __('Launch faster'), __('Start from a production-tested core.')],
         ['palette', __('Customized to you'), __('Workflows, branding and integrations.')],
@@ -49,7 +48,7 @@
                         @endif
                         <div class="mt-auto flex flex-wrap items-center gap-4">
                             @if ($product->demo_enabled)
-                                <x-ui.button size="sm" :href="'mailto:'.$email.'?subject='.rawurlencode(__('Demo request: :product', ['product' => $translation->name]))">{{ __('Request a demo') }}</x-ui.button>
+                                <x-ui.button size="sm" :href="route('contact', ['topic' => 'demo', 'ref' => $translation->name])">{{ __('Request a demo') }}</x-ui.button>
                             @endif
                             <a href="{{ $url }}" class="inline-flex items-center gap-1.5 text-sm font-semibold text-fg-brand hover:underline">
                                 {{ __('Learn more') }}<span class="sr-only">: {{ $translation->name }}</span>

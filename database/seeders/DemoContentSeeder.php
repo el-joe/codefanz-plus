@@ -7,6 +7,7 @@ use App\Enums\EmploymentType;
 use App\Enums\MenuLinkType;
 use App\Enums\MenuLocation;
 use App\Enums\PageSectionType;
+use App\Enums\PageStatus;
 use App\Enums\PricingModel;
 use App\Enums\ProductAvailability;
 use App\Enums\ProjectType;
@@ -18,7 +19,9 @@ use App\Models\FaqCategory;
 use App\Models\Industry;
 use App\Models\Menu;
 use App\Models\MenuItem;
+use App\Models\Page;
 use App\Models\PageSection;
+use App\Models\PageTranslation;
 use App\Models\PortfolioCategory;
 use App\Models\PortfolioProject;
 use App\Models\Product;
@@ -50,6 +53,8 @@ class DemoContentSeeder extends Seeder
         $this->careers();
         $this->menus();
         $this->homeSections();
+        $this->aboutAndCareersSections();
+        $this->legalPages();
     }
 
     /**
@@ -407,12 +412,15 @@ class DemoContentSeeder extends Seeder
                 $route('products.index', ['en' => 'Products', 'ar' => 'المنتجات']),
                 $route('technologies.index', ['en' => 'Technologies', 'ar' => 'التقنيات']),
                 $route('careers.index', ['en' => 'Careers', 'ar' => 'الوظائف']),
+                $route('about', ['en' => 'About', 'ar' => 'من نحن']),
             ],
             MenuLocation::FooterServices->value => $serviceLinks,
             MenuLocation::FooterCompany->value => [
+                $route('about', ['en' => 'About Us', 'ar' => 'من نحن']),
                 $route('portfolio.index', ['en' => 'Portfolio', 'ar' => 'أعمالنا']),
                 $route('careers.index', ['en' => 'Careers', 'ar' => 'الوظائف']),
                 $route('testimonials.index', ['en' => 'Testimonials', 'ar' => 'آراء العملاء']),
+                $route('contact', ['en' => 'Contact', 'ar' => 'تواصل معنا']),
             ],
             MenuLocation::FooterResources->value => [
                 $route('products.index', ['en' => 'Products', 'ar' => 'المنتجات']),
@@ -489,6 +497,84 @@ class DemoContentSeeder extends Seeder
 
             foreach ($locales as $locale => $values) {
                 $section->translations()->create(['locale' => $locale, ...$values]);
+            }
+        }
+    }
+
+    /**
+     * Sample About copy (story, values, disciplines) and careers perks, clearly marked as samples.
+     */
+    private function aboutAndCareersSections(): void
+    {
+        PageSection::ensureSections(PageSection::ABOUT);
+        PageSection::ensureSections(PageSection::CAREERS);
+
+        $copy = [
+            PageSectionType::AboutStory->value => [
+                'en' => ['subheading' => 'Sample story text — replace it in Admin → Page sections → About page.'],
+                'ar' => ['subheading' => 'نص تجريبي لقصتنا — استبدله من لوحة التحكم ← أقسام الصفحات ← صفحة من نحن.'],
+            ],
+            PageSectionType::AboutValues->value => [
+                'en' => ['items' => [['title' => 'Integrity', 'text' => 'Sample value description.'], ['title' => 'Craftsmanship', 'text' => 'Sample value description.'], ['title' => 'Partnership', 'text' => 'Sample value description.'], ['title' => 'Continuous learning', 'text' => 'Sample value description.']]],
+                'ar' => ['items' => [['title' => 'النزاهة', 'text' => 'وصف تجريبي.'], ['title' => 'الإتقان', 'text' => 'وصف تجريبي.'], ['title' => 'الشراكة', 'text' => 'وصف تجريبي.'], ['title' => 'التعلم المستمر', 'text' => 'وصف تجريبي.']]],
+            ],
+            PageSectionType::AboutTeam->value => [
+                'en' => ['items' => [['title' => 'Product & UX design', 'text' => 'Research, flows, prototypes'], ['title' => 'Backend engineering', 'text' => 'APIs, data, integrations'], ['title' => 'Frontend & mobile', 'text' => 'Web, Android, iOS'], ['title' => 'QA & DevOps', 'text' => 'Testing, CI/CD, monitoring'], ['title' => 'AI engineering', 'text' => 'LLMs, automation, evaluation'], ['title' => 'Project management', 'text' => 'Planning, demos, reporting']]],
+                'ar' => ['items' => [['title' => 'تصميم المنتج وتجربة المستخدم', 'text' => 'بحث، مسارات، نماذج أولية'], ['title' => 'هندسة الخوادم', 'text' => 'واجهات برمجية، بيانات، تكاملات'], ['title' => 'الواجهات والجوال', 'text' => 'ويب، أندرويد، iOS'], ['title' => 'الجودة وDevOps', 'text' => 'اختبارات، CI/CD، مراقبة'], ['title' => 'هندسة الذكاء الاصطناعي', 'text' => 'نماذج لغوية، أتمتة، تقييم'], ['title' => 'إدارة المشاريع', 'text' => 'تخطيط، عروض، تقارير']]],
+            ],
+            PageSectionType::CareersPerks->value => [
+                'en' => ['items' => [['title' => 'Remote-friendly', 'text' => 'Sample perk description.'], ['title' => 'Grow fast', 'text' => 'Sample perk description.'], ['title' => 'Healthy pace', 'text' => 'Sample perk description.'], ['title' => 'Modern stack', 'text' => 'Sample perk description.']]],
+                'ar' => ['items' => [['title' => 'عمل عن بُعد', 'text' => 'وصف تجريبي.'], ['title' => 'تطوّر سريع', 'text' => 'وصف تجريبي.'], ['title' => 'إيقاع صحي', 'text' => 'وصف تجريبي.'], ['title' => 'تقنيات حديثة', 'text' => 'وصف تجريبي.']]],
+            ],
+        ];
+
+        foreach ($copy as $type => $locales) {
+            $section = PageSection::query()->where('type', $type)->first();
+
+            if ($section === null || $section->translations()->exists()) {
+                continue;
+            }
+
+            foreach ($locales as $locale => $values) {
+                $section->translations()->create(['locale' => $locale, ...$values]);
+            }
+        }
+    }
+
+    /**
+     * Draft Privacy Policy and Terms skeletons (legal template). They stay drafts until legal review.
+     */
+    private function legalPages(): void
+    {
+        $draftEn = '**Draft — requires legal review.** Replace this placeholder before publishing.';
+        $draftAr = '**مسودة — تتطلب مراجعة قانونية.** استبدل هذا النص قبل النشر.';
+        $clauses = fn (array $headings, string $draft): string => collect($headings)->map(fn (string $heading): string => "## {$heading}\n\n{$draft}")->implode("\n\n");
+
+        $pages = [
+            [
+                'en' => ['title' => 'Privacy Policy', 'slug' => 'privacy-policy', 'headings' => ['Information we collect', 'How we use it', 'AI assistant conversations', 'Cookies & analytics', 'Your rights', 'Data retention & security']],
+                'ar' => ['title' => 'سياسة الخصوصية', 'slug' => 'سياسة-الخصوصية', 'headings' => ['المعلومات التي نجمعها', 'كيف نستخدمها', 'محادثات المساعد الذكي', 'ملفات تعريف الارتباط والتحليلات', 'حقوقك', 'الاحتفاظ بالبيانات وأمنها']],
+            ],
+            [
+                'en' => ['title' => 'Terms & Conditions', 'slug' => 'terms', 'headings' => ['Scope', 'Quotes and proposals', 'Payments', 'Intellectual property', 'Liability', 'Changes to these terms']],
+                'ar' => ['title' => 'الشروط والأحكام', 'slug' => 'الشروط-والأحكام', 'headings' => ['النطاق', 'العروض والتقديرات', 'المدفوعات', 'الملكية الفكرية', 'المسؤولية', 'التعديلات على هذه الشروط']],
+            ],
+        ];
+
+        foreach ($pages as $translations) {
+            if (PageTranslation::query()->where('locale', 'en')->where('slug', $translations['en']['slug'])->exists()) {
+                continue;
+            }
+
+            $page = Page::create(['template' => 'legal', 'status' => PageStatus::Draft]);
+
+            foreach ($translations as $locale => $values) {
+                $page->translations()->create([
+                    'locale' => $locale,
+                    'title' => $values['title'],
+                    'slug' => $values['slug'],
+                    'body' => $clauses($values['headings'], $locale === 'ar' ? $draftAr : $draftEn),
+                ]);
             }
         }
     }

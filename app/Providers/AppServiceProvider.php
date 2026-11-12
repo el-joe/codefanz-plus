@@ -7,6 +7,7 @@ use App\Enums\Role;
 use App\Models\Career;
 use App\Models\CareerTranslation;
 use App\Models\ChangeRequest;
+use App\Models\ContactMessage;
 use App\Models\Faq;
 use App\Models\FaqCategory;
 use App\Models\Industry;
@@ -32,9 +33,12 @@ use App\Models\TechnologyCategory;
 use App\Models\Testimonial;
 use App\Models\User;
 use App\Services\MenuResolver;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -77,6 +81,13 @@ class AppServiceProvider extends ServiceProvider
             'menu' => Menu::class,
             'menu_item' => MenuItem::class,
             'page_section' => PageSection::class,
+            'contact_message' => ContactMessage::class,
+        ]);
+
+        // Public contact form: a few messages a minute and a daily cap per visitor IP.
+        RateLimiter::for('contact', fn (Request $request): array => [
+            Limit::perMinute((int) config('codefanz.contact_form.per_minute'))->by('contact-minute:'.$request->ip()),
+            Limit::perDay((int) config('codefanz.contact_form.per_day'))->by('contact-day:'.$request->ip()),
         ]);
 
         // Resolved menus are cached per locale; any change to menus or to content they link to invalidates them.

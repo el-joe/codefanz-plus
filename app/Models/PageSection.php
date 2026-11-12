@@ -11,7 +11,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 /**
- * A homepage section (fixed type). Copy is translated; blank copy falls back to the built-in default wording.
+ * A managed page section (fixed type) on the homepage, About or Careers page. Copy is translated; blank copy
+ * falls back to the built-in default wording.
  *
  * @method PageSectionTranslation|null translation(?string $locale = null)
  * @method PageSectionTranslation|null exactTranslation(string $locale)
@@ -22,6 +23,19 @@ class PageSection extends Model
     use HasTranslations;
 
     public const HOME = 'home';
+
+    public const ABOUT = 'about';
+
+    public const CAREERS = 'careers';
+
+    /**
+     * Section-managed pages and their public route names.
+     */
+    public const PAGES = [
+        self::HOME => 'home',
+        self::ABOUT => 'about',
+        self::CAREERS => 'careers.index',
+    ];
 
     public const TRANSLATED_FIELDS = ['eyebrow', 'heading', 'subheading', 'cta_label', 'points', 'items'];
 
@@ -54,12 +68,20 @@ class PageSection extends Model
      */
     public static function ensureHomeSections(): void
     {
-        $existing = static::query()->home()->pluck('type')->map(fn (PageSectionType $type): string => $type->value)->all();
+        static::ensureSections(self::HOME);
+    }
 
-        foreach (PageSectionType::cases() as $position => $type) {
+    /**
+     * Create any missing section rows of one page (structural data: type + default order, no copy).
+     */
+    public static function ensureSections(string $page): void
+    {
+        $existing = static::query()->where('page', $page)->pluck('type')->map(fn (PageSectionType $type): string => $type->value)->all();
+
+        foreach (PageSectionType::forPage($page) as $position => $type) {
             if (! in_array($type->value, $existing, true)) {
                 static::query()->create([
-                    'page' => self::HOME,
+                    'page' => $page,
                     'type' => $type,
                     'sort_order' => $position,
                     'is_visible' => $type->isAvailable(),
@@ -69,17 +91,62 @@ class PageSection extends Model
     }
 
     /**
-     * Unsaved section rows in default order, used before the sections are seeded.
+     * Unsaved homepage section rows in default order, used before the sections are seeded.
      *
      * @return Collection<int, PageSection>
      */
     public static function defaultHomeSections(): Collection
     {
-        return collect(PageSectionType::cases())
+        return static::defaultSections(self::HOME);
+    }
+
+    /**
+     * Unsaved section rows of one page in default order, used before the sections are seeded.
+     *
+     * @return Collection<int, PageSection>
+     */
+    public static function defaultSections(string $page): Collection
+    {
+        return collect(PageSectionType::forPage($page))
             ->map(fn (PageSectionType $type, int $position): PageSection => (new static)->forceFill([
-                'page' => self::HOME, 'type' => $type, 'sort_order' => $position, 'is_visible' => $type->isAvailable(),
+                'page' => $page, 'type' => $type, 'sort_order' => $position, 'is_visible' => $type->isAvailable(),
             ])->setRelation('translations', new EloquentCollection))
             ->values();
+    }
+
+    /**
+     * Visible sections of a page keyed by type value, with translations (default rows before seeding).
+     *
+     * @return Collection<string, PageSection>
+     */
+    public static function visibleFor(string $page): Collection
+    {
+        $sections = static::query()->where('page', $page)->with('translations')->ordered()->get();
+
+        if ($sections->isEmpty()) {
+            $sections = static::defaultSections($page);
+        }
+
+        return $sections
+            ->filter(fn (PageSection $section): bool => $section->is_visible && $section->type->isAvailable())
+            ->keyBy(fn (PageSection $section): string => $section->type->value);
+    }
+
+    public static function pageLabel(string $page): string
+    {
+        return match ($page) {
+            self::ABOUT => __('About page'),
+            self::CAREERS => __('Careers page'),
+            default => __('Homepage'),
+        };
+    }
+
+    /**
+     * Public URL of the page this section belongs to.
+     */
+    public function pageUrl(?string $locale = null): string
+    {
+        return route(self::PAGES[$this->page] ?? 'home', ['locale' => $locale ?? app()->getLocale()]);
     }
 
     /**
