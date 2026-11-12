@@ -1,9 +1,12 @@
-@props(['title', 'description' => null, 'alternates' => []])
+@props(['title', 'description' => null, 'alternates' => [], 'robots' => null])
 
 <x-layouts.base :title="$title">
     <x-slot:meta>
         @if ($description)
             <meta name="description" content="{{ $description }}">
+        @endif
+        @if ($robots)
+            <meta name="robots" content="{{ $robots }}">
         @endif
         @foreach ($alternates as $code => $url)
             <link rel="alternate" hreflang="{{ $code }}" href="{{ $url }}">

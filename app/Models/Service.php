@@ -118,6 +118,16 @@ class Service extends Model implements Approvable
     }
 
     /**
+     * Portfolio projects that delivered this service.
+     *
+     * @return BelongsToMany<PortfolioProject, $this>
+     */
+    public function portfolioProjects(): BelongsToMany
+    {
+        return $this->belongsToMany(PortfolioProject::class, 'portfolio_project_service')->withTimestamps();
+    }
+
+    /**
      * @return MorphToMany<Media, $this>
      */
     public function cover(): MorphToMany

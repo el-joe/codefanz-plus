@@ -46,10 +46,10 @@
 | `service_features` (+translations), `service_faqs` (+translations) | |
 | `technology_categories`, `technologies` (+translations) | key UNIQUE, icon, website_url, is_visible, sort_order; `proficiency` stores only `supported`/`expertise` (admin-set). `VerifiedInProjects` is never stored: `Technology::proficiency()` computes it from relations registered with `Technology::verifiedThrough()` (portfolio registers its published-projects relation); load with `withProficiency()` |
 | `industries` (+translations) | icon, status, sort_order; translations carry name, slug, summary, `typical_solutions` JSON list, SEO fields |
-| `portfolio_projects` + translations | category_id, industry_id, type, client_name, is_client_public, project_date, live_url, android_url, ios_url, github_url, video_url, is_featured, visibility, lock_version |
-| `portfolio_categories` (+translations) | |
-| `products` + translations | pricing_model, availability, licensing, demo_enabled |
-| `product_versions` | product_id, version, released_at, changelog (translatable) |
+| `portfolio_projects` + translations | portfolio_category_id, industry_id, type (`App\Enums\ProjectType`), client_name (shown publicly only when is_client_public), project_date, live/android/ios/github URLs (https only), video_url (YouTube/Vimeo only, embedded via youtube-nocookie / Vimeo dnt), is_featured, visibility (`public`/`unlisted` — unlisted is link-only, noindex and never verifies technologies), status, sort_order, lock_version (Approvable), soft deletes; cover + ordered gallery via `mediables` collections `cover`/`gallery`. Translations: title, slug, summary, challenge, solution, results (Markdown), `key_facts` JSON list index-aligned across locales (`null` where a language is blank), SEO fields |
+| `portfolio_categories` (+translations) | sort_order; translations carry name + slug (used as `?category=` tab) |
+| `products` + translations | icon, `pricing_models` JSON list of `App\Enums\PricingModel` (subscription / one_time_license / custom_quote; first is highlighted; no prices stored), availability (available/beta/coming_soon), demo_enabled, docs_url, status, sort_order, lock_version (Approvable), soft deletes; cover + `screenshots` via `mediables`. Translations: name, slug, tagline, description (Markdown), `features` JSON list (index-aligned), licensing_notes, SEO fields |
+| `product_versions` (+`product_version_translations`) | product_id, version UNIQUE per product, released_at; translatable Markdown changelog |
 | Pivots | `service_technology`, `portfolio_project_technology`, `portfolio_project_service`, `product_technology` |
 | `testimonials` (+translations), `faqs` (+translations), `statistics` (+translations) | status, sort, is_featured |
 | `careers` (+translations), `job_applications` | |

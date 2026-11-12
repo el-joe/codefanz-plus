@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ServiceTier;
+use App\Models\PortfolioProject;
 use App\Models\Service;
 use App\Models\ServiceTranslation;
 use Illuminate\Database\Eloquent\Builder;
@@ -53,6 +54,14 @@ class ServiceController extends Controller
         return view('services.show', [
             'service' => $service,
             'translation' => $translation,
+            'projects' => PortfolioProject::query()
+                ->publiclyListed()
+                ->translatedIn($locale)
+                ->whereHas('services', fn (Builder $query) => $query->whereKey($service->getKey()))
+                ->with(PortfolioController::cardRelations())
+                ->ordered()
+                ->limit(3)
+                ->get(),
             'body' => Str::markdown((string) $translation->body, [
                 'html_input' => 'strip',
                 'allow_unsafe_links' => false,

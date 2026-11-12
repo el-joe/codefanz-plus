@@ -9,6 +9,8 @@
         ['label' => __('Services'), 'route' => 'admin.services.index', 'can' => 'viewAny', 'model' => \App\Models\Service::class],
         ['label' => __('Technologies'), 'route' => 'admin.technologies.index', 'can' => 'viewAny', 'model' => \App\Models\Technology::class, 'also' => 'admin.technology-categories.*'],
         ['label' => __('Industries'), 'route' => 'admin.industries.index', 'can' => 'viewAny', 'model' => \App\Models\Industry::class],
+        ['label' => __('Portfolio'), 'route' => 'admin.portfolio.index', 'can' => 'viewAny', 'model' => \App\Models\PortfolioProject::class, 'also' => 'admin.portfolio-categories.*'],
+        ['label' => __('Software products'), 'route' => 'admin.products.index', 'can' => 'viewAny', 'model' => \App\Models\Product::class],
         ['label' => __('Media'), 'route' => 'admin.media.index', 'can' => 'media.manage'],
         ['label' => __('Emergency controls'), 'route' => 'admin.emergency.index', 'can' => 'automation.manage'],
         ['label' => __('Users & roles'), 'route' => 'admin.users.index', 'can' => 'viewAny', 'model' => \App\Models\User::class, 'also' => 'admin.roles.*'],

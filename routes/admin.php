@@ -7,6 +7,10 @@ use App\Http\Controllers\Admin\IndustryController;
 use App\Http\Controllers\Admin\KillSwitchController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\Admin\PortfolioCategoryController;
+use App\Http\Controllers\Admin\PortfolioProjectController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProductVersionController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SecurityController;
@@ -48,6 +52,18 @@ Route::middleware('two-factor')->group(function (): void {
     Route::resource('technology-categories', TechnologyCategoryController::class)->except(['index', 'show']);
     Route::resource('industries', IndustryController::class)->except(['show']);
     Route::post('industries/{industry}/publish', [IndustryController::class, 'publish'])->name('industries.publish');
+    Route::resource('portfolio', PortfolioProjectController::class)->parameters(['portfolio' => 'project'])->except(['show']);
+    Route::post('portfolio/{project}/publish', [PortfolioProjectController::class, 'publish'])->name('portfolio.publish');
+    Route::resource('portfolio-categories', PortfolioCategoryController::class)->except(['index', 'show']);
+    Route::resource('products', ProductController::class)->except(['show']);
+    Route::post('products/{product}/publish', [ProductController::class, 'publish'])->name('products.publish');
+    Route::scopeBindings()->group(function (): void {
+        Route::get('products/{product}/versions/create', [ProductVersionController::class, 'create'])->name('products.versions.create');
+        Route::post('products/{product}/versions', [ProductVersionController::class, 'store'])->name('products.versions.store');
+        Route::get('products/{product}/versions/{version}/edit', [ProductVersionController::class, 'edit'])->name('products.versions.edit');
+        Route::put('products/{product}/versions/{version}', [ProductVersionController::class, 'update'])->name('products.versions.update');
+        Route::delete('products/{product}/versions/{version}', [ProductVersionController::class, 'destroy'])->name('products.versions.destroy');
+    });
 
     Route::resource('users', UserController::class)->except(['show', 'destroy']);
     Route::post('users/{user}/invitation', [UserController::class, 'resendInvitation'])->middleware('throttle:6,1')->name('users.invitation');

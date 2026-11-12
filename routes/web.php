@@ -5,6 +5,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IndustryController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PortfolioController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TechnologyController;
 use App\Models\Language;
@@ -36,6 +38,10 @@ Route::prefix('{locale}')
         Route::get('/services/{slug}', [ServiceController::class, 'show'])->where('slug', '[^/]+')->name('services.show');
         Route::get('/technologies', TechnologyController::class)->name('technologies.index');
         Route::get('/industries', IndustryController::class)->name('industries.index');
+        Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio.index');
+        Route::get('/portfolio/{slug}', [PortfolioController::class, 'show'])->where('slug', '[^/]+')->name('portfolio.show');
+        Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+        Route::get('/products/{slug}', [ProductController::class, 'show'])->where('slug', '[^/]+')->name('products.show');
 
         // Catch-all CMS pages: keep last so the specific routes above win.
         Route::get('/{slug}', PageController::class)->where('slug', '[^/]+')->name('pages.show');

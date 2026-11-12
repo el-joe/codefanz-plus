@@ -28,6 +28,18 @@
                                 @endforeach
                             </ul>
                         @endif
+                        @if ($industry->portfolioProjects->isNotEmpty())
+                            <div class="mt-auto flex flex-col gap-1.5 border-t border-line-subtle pt-3">
+                                <p class="text-xs font-semibold uppercase text-fg-tertiary">{{ __('Related projects') }}</p>
+                                <ul class="flex flex-col gap-1 text-sm">
+                                    @foreach ($industry->portfolioProjects as $project)
+                                        @php($projectTranslation = $project->exactTranslation(app()->getLocale()))
+                                        <li><a href="{{ route('portfolio.show', ['slug' => $projectTranslation->slug]) }}" class="font-semibold text-fg-brand hover:underline">{{ $projectTranslation->title }}</a></li>
+                                    @endforeach
+                                </ul>
+                                <a href="{{ route('portfolio.index', ['industry' => $translation->slug]) }}" class="text-xs font-semibold text-fg-secondary hover:text-fg-brand">{{ __('All :industry projects', ['industry' => $translation->name]) }}</a>
+                            </div>
+                        @endif
                     </li>
                 @endforeach
             </ul>

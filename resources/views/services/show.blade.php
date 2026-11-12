@@ -117,5 +117,13 @@
         </aside>
     </div>
 
+    @if ($projects->isNotEmpty())
+        <div class="bg-subtle">
+            <div class="mx-auto max-w-7xl px-5 py-14 lg:px-20 lg:py-20">
+                @include('portfolio._related', ['projects' => $projects, 'title' => __('Projects delivered with this service')])
+            </div>
+        </div>
+    @endif
+
     <x-site.cta-band />
 </x-layouts.public>

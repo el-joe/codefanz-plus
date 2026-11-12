@@ -150,6 +150,24 @@ class Technology extends Model
         return $this->belongsToMany(Service::class)->withTimestamps();
     }
 
+    /**
+     * @return BelongsToMany<PortfolioProject, $this>
+     */
+    public function portfolioProjects(): BelongsToMany
+    {
+        return $this->belongsToMany(PortfolioProject::class, 'portfolio_project_technology')->withTimestamps();
+    }
+
+    /**
+     * Published, publicly listed (non-trashed) projects: registered as the verification relation in AppServiceProvider.
+     *
+     * @return BelongsToMany<PortfolioProject, $this>
+     */
+    public function publishedPortfolioProjects(): BelongsToMany
+    {
+        return $this->portfolioProjects()->publiclyListed();
+    }
+
     private static function verificationAttribute(string $relation): string
     {
         return 'verified_via_'.str($relation)->snake();

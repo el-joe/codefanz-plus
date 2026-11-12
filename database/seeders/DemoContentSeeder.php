@@ -3,9 +3,15 @@
 namespace Database\Seeders;
 
 use App\Enums\ContentStatus;
+use App\Enums\PricingModel;
+use App\Enums\ProductAvailability;
+use App\Enums\ProjectType;
 use App\Enums\ServiceTier;
 use App\Enums\TechnologyProficiency;
 use App\Models\Industry;
+use App\Models\PortfolioCategory;
+use App\Models\PortfolioProject;
+use App\Models\Product;
 use App\Models\Service;
 use App\Models\Technology;
 use App\Models\TechnologyCategory;
@@ -24,6 +30,8 @@ class DemoContentSeeder extends Seeder
         $technologies = $this->technologies();
         $this->services($technologies);
         $this->industries();
+        $this->portfolio($technologies);
+        $this->products($technologies);
     }
 
     /**
@@ -134,6 +142,117 @@ class DemoContentSeeder extends Seeder
                     'en' => ['name' => $names[0], 'slug' => $slug, 'summary' => 'Sample content — replace in Admin → Industries.', 'typical_solutions' => $solutions[0]],
                     'ar' => ['name' => $names[1], 'slug' => $arSlug, 'summary' => 'محتوى تجريبي — استبدله من لوحة التحكم.', 'typical_solutions' => $solutions[1]],
                 ], Industry::TRANSLATED_FIELDS, 'name');
+        }
+    }
+
+    /**
+     * Sample case studies. Client names stay confidential and every text says it is sample content.
+     *
+     * @param  array<string, int>  $technologies
+     */
+    private function portfolio(array $technologies): void
+    {
+        $categories = [];
+
+        foreach ([['saas', 'SaaS', 'برمجيات-سحابية', 'برمجيات سحابية'], ['mobile', 'Mobile', 'تطبيقات-الجوال', 'تطبيقات الجوال'], ['e-commerce', 'E-commerce', 'التجارة-الإلكترونية', 'التجارة الإلكترونية']] as $position => [$slug, $name, $arSlug, $arName]) {
+            $category = PortfolioCategory::query()->whereHas('translations', fn ($query) => $query->where('locale', 'en')->where('slug', $slug))->first()
+                ?? PortfolioCategory::create(['sort_order' => $position]);
+            $category->syncTranslations(['en' => ['name' => $name, 'slug' => $slug], 'ar' => ['name' => $arName, 'slug' => $arSlug]], PortfolioCategory::TRANSLATED_FIELDS, 'name');
+            $categories[$slug] = $category->id;
+        }
+
+        $industries = Industry::query()->with('translations')->get()
+            ->mapWithKeys(fn (Industry $industry): array => [$industry->exactTranslation('en')?->slug => $industry->id]);
+
+        $projects = [
+            ['sample-clinic-booking-platform', 'saas', ProjectType::Saas, 'healthcare', true, ['Sample clinic booking platform', 'منصة حجز عيادات تجريبية'], 'منصة-حجز-عيادات-تجريبية', ['laravel', 'flutter']],
+            ['sample-learning-portal', 'saas', ProjectType::Web, 'education', false, ['Sample bilingual learning portal', 'بوابة تعليمية ثنائية اللغة تجريبية'], 'بوابة-تعليمية-تجريبية', ['laravel', 'typescript']],
+            ['sample-delivery-tracking-app', 'mobile', ProjectType::Mobile, null, false, ['Sample delivery tracking app', 'تطبيق تتبع توصيل تجريبي'], 'تطبيق-تتبع-توصيل-تجريبي', ['flutter', 'python']],
+        ];
+
+        foreach ($projects as $position => [$slug, $category, $type, $industry, $featured, $titles, $arSlug, $stack]) {
+            if (PortfolioProject::query()->whereHas('translations', fn ($query) => $query->where('locale', 'en')->where('slug', $slug))->exists()) {
+                continue;
+            }
+
+            $project = PortfolioProject::create([
+                'portfolio_category_id' => $categories[$category],
+                'industry_id' => $industry ? ($industries[$industry] ?? null) : null,
+                'type' => $type,
+                'client_name' => 'Sample client (not real)',
+                'is_client_public' => false,
+                'project_date' => now()->subMonths(4 + $position * 5)->toDateString(),
+                'is_featured' => $featured,
+                'status' => ContentStatus::Published,
+                'published_at' => now(),
+                'sort_order' => $position,
+            ]);
+
+            $project->syncTranslations([
+                'en' => [
+                    'title' => $titles[0], 'slug' => $slug, 'summary' => 'Sample case study — replace in Admin → Portfolio.',
+                    'challenge' => 'Sample challenge text for design review.', 'solution' => 'Sample solution text for design review.',
+                    'results' => "- Sample result one\n- Sample result two", 'key_facts' => [['label' => 'Timeline', 'value' => 'Sample: 12 weeks']],
+                ],
+                'ar' => [
+                    'title' => $titles[1], 'slug' => $arSlug, 'summary' => 'دراسة حالة تجريبية — استبدلها من لوحة التحكم.',
+                    'challenge' => 'نص تجريبي للتحدي.', 'solution' => 'نص تجريبي للحل.',
+                    'results' => "- نتيجة تجريبية أولى\n- نتيجة تجريبية ثانية", 'key_facts' => [['label' => 'المدة', 'value' => 'تجريبي: 12 أسبوعاً']],
+                ],
+            ], PortfolioProject::TRANSLATED_FIELDS, 'title');
+
+            $project->technologies()->sync(array_values(array_intersect_key($technologies, array_flip($stack))));
+        }
+    }
+
+    /**
+     * Sample software products with a version history. No prices are stored.
+     *
+     * @param  array<string, int>  $technologies
+     */
+    private function products(array $technologies): void
+    {
+        $products = [
+            ['sample-erp', 'layers', ['Sample ERP', 'نظام ERP تجريبي'], 'نظام-erp-تجريبي', ProductAvailability::Available, [PricingModel::OneTimeLicense, PricingModel::Subscription, PricingModel::CustomQuote]],
+            ['sample-queue-manager', 'users', ['Sample Queue Manager', 'نظام إدارة طوابير تجريبي'], 'نظام-طوابير-تجريبي', ProductAvailability::Beta, [PricingModel::Subscription]],
+        ];
+
+        foreach ($products as $position => [$slug, $icon, $names, $arSlug, $availability, $models]) {
+            if (Product::query()->whereHas('translations', fn ($query) => $query->where('locale', 'en')->where('slug', $slug))->exists()) {
+                continue;
+            }
+
+            $product = Product::create([
+                'icon' => $icon,
+                'pricing_models' => $models,
+                'availability' => $availability,
+                'demo_enabled' => true,
+                'status' => ContentStatus::Published,
+                'published_at' => now(),
+                'sort_order' => $position,
+            ]);
+
+            $product->syncTranslations([
+                'en' => [
+                    'name' => $names[0], 'slug' => $slug, 'tagline' => 'Sample product — replace in Admin → Software products.',
+                    'description' => 'This is demo text for design review.',
+                    'features' => [['title' => 'Sample feature one', 'description' => 'Demo description.'], ['title' => 'Sample feature two', 'description' => null]],
+                    'licensing_notes' => 'Sample licensing note. Quotes are preliminary.',
+                ],
+                'ar' => [
+                    'name' => $names[1], 'slug' => $arSlug, 'tagline' => 'منتج تجريبي — استبدله من لوحة التحكم.',
+                    'description' => 'هذا نص تجريبي للمراجعة.',
+                    'features' => [['title' => 'ميزة تجريبية أولى', 'description' => 'وصف تجريبي.'], ['title' => 'ميزة تجريبية ثانية', 'description' => null]],
+                    'licensing_notes' => 'ملاحظة ترخيص تجريبية. الأسعار مبدئية.',
+                ],
+            ], Product::TRANSLATED_FIELDS, 'name');
+
+            foreach ([['1.0', 12, '- Sample first release', '- إصدار أول تجريبي'], ['1.1', 4, '- Sample improvements', '- تحسينات تجريبية']] as [$number, $monthsAgo, $en, $ar]) {
+                $product->versions()->create(['version' => $number, 'released_at' => now()->subMonths($monthsAgo)->toDateString()])
+                    ->syncTranslations(['en' => ['changelog' => $en], 'ar' => ['changelog' => $ar]], ['changelog'], 'changelog');
+            }
+
+            $product->technologies()->sync(array_values(array_intersect_key($technologies, array_flip(['laravel', 'php']))));
         }
     }
 }
