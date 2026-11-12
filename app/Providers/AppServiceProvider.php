@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Actions\Seo\RecordSlugRedirect;
 use App\Contracts\AiProvider;
 use App\Enums\MenuLocation;
 use App\Enums\Role;
+use App\Events\LeadCreated;
 use App\Models\Career;
 use App\Models\CareerTranslation;
 use App\Models\ChangeRequest;
@@ -36,13 +38,17 @@ use App\Models\PortfolioProject;
 use App\Models\PortfolioProjectTranslation;
 use App\Models\Post;
 use App\Models\PostCategory;
+use App\Models\PostTranslation;
 use App\Models\Product;
 use App\Models\ProductTranslation;
 use App\Models\ProductVersion;
 use App\Models\Project;
 use App\Models\ProjectNote;
 use App\Models\Receipt;
+use App\Models\Redirect;
 use App\Models\Refund;
+use App\Models\SeoAudit;
+use App\Models\SeoMeta;
 use App\Models\Service;
 use App\Models\ServiceTranslation;
 use App\Models\Statistic;
@@ -54,13 +60,18 @@ use App\Models\Testimonial;
 use App\Models\TicketReply;
 use App\Models\User;
 use App\Services\Ai\AiGateway;
+use App\Services\Analytics\MeasurementProtocol;
 use App\Services\CurrentCustomer;
 use App\Services\MenuResolver;
 use App\Services\Payments\PaymentGatewayManager;
+use App\Services\Seo\RedirectMap;
+use App\Services\Seo\SeoMetaResolver;
+use App\Services\Seo\SitemapBuilder;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
@@ -133,6 +144,9 @@ class AppServiceProvider extends ServiceProvider
             'post' => Post::class,
             'post_category' => PostCategory::class,
             'tag' => Tag::class,
+            'seo_meta' => SeoMeta::class,
+            'redirect' => Redirect::class,
+            'seo_audit' => SeoAudit::class,
         ]);
 
         // Payment gateway webhooks: generous per gateway and IP; bad signatures are rejected before any work.
@@ -177,6 +191,31 @@ class AppServiceProvider extends ServiceProvider
             $model::saved(fn () => MenuResolver::flush());
             $model::deleted(fn () => MenuResolver::flush());
         }
+
+        // Sitemaps are cached as strings: any change to listed content or SEO settings rebuilds them on next request.
+        foreach ([
+            Page::class, PageTranslation::class, Service::class, ServiceTranslation::class,
+            Product::class, ProductTranslation::class, PortfolioProject::class, PortfolioProjectTranslation::class,
+            Career::class, CareerTranslation::class, Post::class, PostTranslation::class, SeoMeta::class,
+        ] as $model) {
+            $model::saved(fn () => SitemapBuilder::flush());
+            $model::deleted(fn () => SitemapBuilder::flush());
+        }
+
+        SeoMeta::saved(fn () => SeoMetaResolver::flush());
+        SeoMeta::deleted(fn () => SeoMetaResolver::flush());
+        Redirect::saved(fn () => RedirectMap::flush());
+        Redirect::deleted(fn () => RedirectMap::flush());
+
+        // A published item whose slug changes keeps its old URL working through an automatic 301.
+        foreach ([PageTranslation::class, ServiceTranslation::class, PortfolioProjectTranslation::class, ProductTranslation::class, CareerTranslation::class, PostTranslation::class] as $translation) {
+            $translation::updated(fn (Model $model) => app(RecordSlugRedirect::class)->fromTranslation($model));
+        }
+
+        // Consented GA4 Measurement Protocol event for public lead submissions (decided in the visitor's request).
+        Event::listen(LeadCreated::class, function (LeadCreated $event): void {
+            app(MeasurementProtocol::class)->leadSubmitted($event->lead, request());
+        });
 
         // A technology used in a published, publicly listed portfolio project shows as "Verified in projects".
         Technology::verifiedThrough('publishedPortfolioProjects');

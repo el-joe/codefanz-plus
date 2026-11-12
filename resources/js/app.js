@@ -11,6 +11,7 @@ import { init as initConversations } from './modules/conversation';
 import { init as initDialogs } from './modules/dialog';
 import { init as initCopy } from './modules/copy';
 import { init as initPrint } from './modules/print';
+import { init as initConsent } from './modules/consent';
 
 applyStoredTheme();
 
@@ -28,4 +29,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initDialogs();
     initCopy();
     initPrint();
+    initConsent();
 });

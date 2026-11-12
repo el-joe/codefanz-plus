@@ -25,6 +25,8 @@
         ['label' => __('Statistics'), 'route' => 'admin.statistics.index', 'can' => 'viewAny', 'model' => \App\Models\Statistic::class],
         ['label' => __('Careers'), 'route' => 'admin.careers.index', 'can' => 'viewAny', 'model' => \App\Models\Career::class],
         ['label' => __('Media'), 'route' => 'admin.media.index', 'can' => 'media.manage'],
+        ['label' => __('SEO'), 'route' => 'admin.seo.audit', 'can' => 'seo.manage', 'also' => ['admin.seo.*', 'admin.redirects.*']],
+        ['label' => __('Analytics'), 'route' => 'admin.analytics.index', 'can' => 'seo.manage'],
         ['label' => __('Emergency controls'), 'route' => 'admin.emergency.index', 'can' => 'automation.manage'],
         ['label' => __('AI usage'), 'route' => 'admin.ai-usage', 'can' => 'settings.manage'],
         ['label' => __('Users & roles'), 'route' => 'admin.users.index', 'can' => 'viewAny', 'model' => \App\Models\User::class, 'also' => 'admin.roles.*'],

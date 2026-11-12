@@ -29,3 +29,5 @@
         {{ $slot }}
     </div>
 </section>
+@php($structuredData = app(\App\Services\Seo\StructuredData::class))
+{{ $structuredData->script($structuredData->breadcrumbs([__('Home') => route('home'), ...$crumbs])) }}

@@ -32,6 +32,11 @@ class SaveCareer
                 ? Career::create([...$attributes, 'created_by' => $editor->getKey()])
                 : tap($career)->update($attributes);
 
+            // Any save makes an open SEO-editor form stale (optimistic locking).
+            if ($before !== null) {
+                $career->forceFill(['lock_version' => $career->lock_version + 1])->save();
+            }
+
             $translations = collect($data['translations'])
                 ->map(fn (array $fields): array => [
                     ...$fields,

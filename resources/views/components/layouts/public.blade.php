@@ -1,4 +1,4 @@
-@props(['title', 'description' => null, 'alternates' => [], 'robots' => null, 'image' => null, 'ogType' => 'website', 'canonical' => null])
+@props(['title', 'description' => null, 'alternates' => [], 'robots' => null, 'image' => null, 'ogType' => 'website', 'canonical' => null, 'seoable' => null])
 
 @php
     $menus = app(\App\Services\MenuResolver::class);
@@ -23,6 +23,21 @@
     $ogImage = $image instanceof \App\Models\Media
         ? ($image->variantsFor('webp')->first(fn ($variant) => $variant->width >= 1200) ?? $image->largestVariant('webp'))
         : null;
+    // SEO editor overrides (Admin → SEO): content items pass :seoable; fixed site pages are matched by route name.
+    $seoResolver = app(\App\Services\Seo\SeoMetaResolver::class);
+    $routeName = request()->route()?->getName();
+    $seoMeta = $seoable instanceof \Illuminate\Database\Eloquent\Model
+        ? $seoResolver->forModel($seoable, $locale)
+        : ($routeName && app(\App\Services\Seo\SeoTargets::class)->isStaticRoute($routeName) && request()->query() === [] ? $seoResolver->forRoute($routeName, $locale) : null);
+    if ($seoMeta) {
+        $title = $seoMeta['title'] ?: $title;
+        $description = $seoMeta['description'] ?: $description;
+        $canonical = $canonical ?: $seoMeta['canonical_url'];
+        $robots = $seoMeta['noindex'] ? 'noindex, follow' : $robots;
+    }
+    $structuredData = app(\App\Services\Seo\StructuredData::class);
+    $consent = app(\App\Services\Analytics\AnalyticsConsent::class);
+    $gaMeasurementId = $consent->shouldLoadGa4(request()) ? $consent->measurementId() : null;
 @endphp
 
 <x-layouts.base :title="$title">
@@ -59,6 +74,13 @@
             <meta property="og:image:alt" content="{{ $image->altText() }}">
         @endif
         <meta name="twitter:card" content="{{ $ogImage ? 'summary_large_image' : 'summary' }}">
+        {{ $structuredData->script($structuredData->organization()) }}
+        {{ $structuredData->script($structuredData->website()) }}
+        @if ($gaMeasurementId)
+            {{-- GA4 only after the visitor opted in; consent mode defaults to denied, then grants analytics only. --}}
+            <script async src="https://www.googletagmanager.com/gtag/js?id={{ $gaMeasurementId }}"></script>
+            <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied'});gtag('consent','update',{analytics_storage:'granted'});gtag('js',new Date());gtag('config',@json($gaMeasurementId),{anonymize_ip:true});</script>
+        @endif
         {{ $head ?? '' }}
     </x-slot:meta>
 
@@ -180,7 +202,12 @@
                 </div>
             </div>
             <div class="flex flex-col gap-4 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
-                <p class="text-sm text-fg-tertiary">© {{ now()->year }} {{ __('CodeFanz. All rights reserved.') }}</p>
+                <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
+                    <p class="text-sm text-fg-tertiary">© {{ now()->year }} {{ __('CodeFanz. All rights reserved.') }}</p>
+                    @if ($consent->isNeeded())
+                        <button type="button" hidden data-consent-open class="text-sm text-fg-secondary underline-offset-4 hover:text-fg hover:underline">{{ __('Cookie settings') }}</button>
+                    @endif
+                </div>
                 @if ($legal !== [])
                     <nav aria-label="{{ __('Legal') }}">
                         <ul class="flex flex-wrap gap-x-5 gap-y-2 text-sm">
@@ -193,4 +220,8 @@
             </div>
         </div>
     </footer>
+
+    @if ($consent->isNeeded())
+        <x-site.consent-banner :measurement-id="$consent->measurementId()" :decided="$consent->hasDecided(request())" />
+    @endif
 </x-layouts.base>

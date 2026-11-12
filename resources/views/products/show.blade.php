@@ -11,7 +11,12 @@
     :title="$translation->seo_title ?: $translation->name"
     :description="$translation->seo_description ?: ($translation->tagline ?: $translation->name)"
     :image="$cover"
+    :seoable="$product"
     :alternates="$product->translations->mapWithKeys(fn ($alt) => [$alt->locale => route('products.show', ['locale' => $alt->locale, 'slug' => $alt->slug])])->all()">
+    <x-slot:head>
+        @php($structuredData = app(\App\Services\Seo\StructuredData::class))
+        {{ $structuredData->script($structuredData->product($translation->name, $translation->tagline, route('products.show', ['slug' => $translation->slug]), $cover?->largestVariant('webp') ? url($cover->largestVariant('webp')->url()) : null)) }}
+    </x-slot:head>
     <x-site.page-hero :title="$translation->name" :lead="$translation->tagline"
                       :crumbs="[__('Products') => route('products.index'), $translation->name => null]">
         <x-slot:before>

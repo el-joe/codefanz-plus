@@ -24,6 +24,7 @@
     :description="$translation->seo_description ?: ($translation->summary ?: $translation->title)"
     :robots="$project->isPubliclyListed() ? null : 'noindex'"
     :image="$cover"
+    :seoable="$project"
     :alternates="$project->translations->mapWithKeys(fn ($alt) => [$alt->locale => route('portfolio.show', ['locale' => $alt->locale, 'slug' => $alt->slug])])->all()">
     <x-site.page-hero :title="$translation->title" :lead="$translation->summary"
                       :crumbs="[__('Portfolio') => route('portfolio.index'), $translation->title => null]">

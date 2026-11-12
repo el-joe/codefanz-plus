@@ -55,6 +55,7 @@
     :image="$cover"
     og-type="article"
     :canonical="$translation->canonical_url"
+    :seoable="$post"
     :alternates="$post->translations->mapWithKeys(fn ($alt) => [$alt->locale => route('blog.show', ['locale' => $alt->locale, 'slug' => $alt->slug])])->all()">
     <x-slot:head>
         @if ($post->published_at)

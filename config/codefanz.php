@@ -70,7 +70,14 @@ return [
             'openai_model' => ['type' => 'text', 'label' => 'OpenAI model', 'rules' => ['nullable', 'string', 'max:100', 'regex:/^[A-Za-z0-9._:-]+$/']],
             'anthropic_api_key' => ['type' => 'secret', 'label' => 'Anthropic API key', 'rules' => ['nullable', 'string', 'max:255']],
             'anthropic_model' => ['type' => 'text', 'label' => 'Anthropic model', 'rules' => ['nullable', 'string', 'max:100', 'regex:/^[A-Za-z0-9._:-]+$/']],
+            'ga4_property_id' => ['type' => 'text', 'label' => 'GA4 property ID (numbers only, for the Analytics dashboard)', 'rules' => ['nullable', 'string', 'regex:/^\d{4,20}$/']],
+            'gsc_site_url' => ['type' => 'text', 'label' => 'Search Console property (https://example.com/ or sc-domain:example.com)', 'rules' => ['nullable', 'string', 'max:255', 'regex:/^(https:\/\/[^\s]+\/|sc-domain:[a-z0-9.-]+)$/i']],
+            'google_service_account_json' => ['type' => 'secret', 'label' => 'Google service account key (JSON) for GA4 Data API and Search Console', 'rules' => ['nullable', 'string', 'max:10000', 'json']],
             'ai_monthly_budget' => ['type' => 'number', 'label' => 'AI monthly budget (USD, 0 stops all AI calls)', 'rules' => ['nullable', 'numeric', 'min:0', 'max:1000000']],
+        ],
+        // SEO (M7.2). Unset = block search engines everywhere except production.
+        'seo' => [
+            'block_indexing' => ['type' => 'select', 'label' => 'Search engine indexing', 'options' => ['block' => 'Block (robots.txt Disallow + noindex header)', 'allow' => 'Allow indexing'], 'rules' => ['nullable', 'string', 'in:block,allow']],
         ],
         // Payment gateway credentials (M6.2). Each gateway in codefanz.payments.gateways lists its own keys.
         'payments' => [
@@ -102,6 +109,7 @@ return [
 
     'integrations' => [
         'google_analytics' => ['label' => 'Google Analytics 4', 'keys' => ['ga4_measurement_id', 'ga4_api_secret']],
+        'google_apis' => ['label' => 'Google APIs (GA4 reports + Search Console)', 'keys' => ['google_service_account_json', 'ga4_property_id', 'gsc_site_url']],
         'openai' => ['label' => 'OpenAI (AI features)', 'keys' => ['openai_api_key'], 'ai_provider' => 'openai'],
         'anthropic' => ['label' => 'Anthropic (AI features)', 'keys' => ['anthropic_api_key'], 'ai_provider' => 'anthropic'],
     ],
@@ -205,6 +213,22 @@ return [
             'directory' => 'lead-attachments',
         ],
         'default_currency' => 'USD',
+    ],
+
+    /*
+    | SEO (M7.2): audit crawler limits. The crawler only requests the site's own
+    | sitemap URLs and internal links; outbound links are HEAD-checked only when
+    | check_external_links is on (5 s timeout, http/https only).
+    */
+
+    'seo' => [
+        'audit' => [
+            'max_pages' => (int) env('SEO_AUDIT_MAX_PAGES', 500),
+            'max_internal_links' => 200,
+            'check_external_links' => (bool) env('SEO_AUDIT_CHECK_EXTERNAL_LINKS', false),
+            'max_external_links' => 50,
+            'large_image_width' => 600,
+        ],
     ],
 
     'change_requests' => [

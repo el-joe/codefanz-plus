@@ -4,6 +4,7 @@
 <x-layouts.public
     :title="$translation->seo_title ?: $translation->title"
     :description="$translation->seo_description ?: (\Illuminate\Support\Str::limit(\Illuminate\Support\Str::squish(strip_tags($body)), 155) ?: $translation->title)"
+    :seoable="$translation->page"
     :alternates="$alternates->mapWithKeys(fn ($alt) => [$alt->locale => route('pages.show', ['locale' => $alt->locale, 'slug' => $alt->slug])])->all()">
     <x-site.page-hero :title="$translation->title" :crumbs="[$translation->title => null]">
         <p class="text-sm text-fg-tertiary">{{ __('Last updated: :date', ['date' => $translation->updated_at->translatedFormat('j F Y')]) }}</p>

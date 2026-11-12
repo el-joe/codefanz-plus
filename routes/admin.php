@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AiUsageController;
+use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\AuthorProfileController;
 use App\Http\Controllers\Admin\CareerController;
@@ -41,9 +42,11 @@ use App\Http\Controllers\Admin\ProjectConversationController;
 use App\Http\Controllers\Admin\ProjectDocumentController;
 use App\Http\Controllers\Admin\ProjectMilestoneController;
 use App\Http\Controllers\Admin\ProjectNoteController;
+use App\Http\Controllers\Admin\RedirectController;
 use App\Http\Controllers\Admin\RefundController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SecurityController;
+use App\Http\Controllers\Admin\SeoController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\StatisticController;
@@ -205,6 +208,19 @@ Route::middleware('two-factor')->group(function (): void {
     Route::post('posts/{post}/revisions/{revision}/restore', [PostRevisionController::class, 'restore'])->scopeBindings()->name('posts.revisions.restore');
     Route::resource('post-categories', PostCategoryController::class)->except(['show']);
     Route::resource('tags', TagController::class)->except(['index', 'show']);
+
+    Route::middleware('can:seo.manage')->group(function (): void {
+        Route::get('seo', [SeoController::class, 'audit'])->name('seo.audit');
+        Route::post('seo/audits', [SeoController::class, 'runAudit'])->middleware('throttle:6,1')->name('seo.audits.store');
+        Route::get('seo/meta', [SeoController::class, 'meta'])->name('seo.meta');
+        Route::put('seo/meta', [SeoController::class, 'updateMeta'])->name('seo.meta.update');
+        Route::get('seo/sitemap', [SeoController::class, 'sitemap'])->name('seo.sitemap');
+        Route::post('seo/issues/{issue}/ai-fix', [SeoController::class, 'aiFix'])->middleware(['can:ai.use', 'throttle:20,1'])->name('seo.issues.ai-fix');
+        Route::post('redirects/import', [RedirectController::class, 'import'])->middleware('throttle:10,1')->name('redirects.import');
+        Route::resource('redirects', RedirectController::class)->except(['show']);
+        Route::get('analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+        Route::post('analytics/sync', [AnalyticsController::class, 'sync'])->middleware('throttle:6,1')->name('analytics.sync');
+    });
 
     Route::get('home-sections', [HomeSectionController::class, 'index'])->name('home-sections.index');
     Route::get('home-sections/{section}/edit', [HomeSectionController::class, 'edit'])->name('home-sections.edit');

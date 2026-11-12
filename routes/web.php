@@ -4,6 +4,7 @@ use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AssistantController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CareerController;
+use App\Http\Controllers\ConsentController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardRedirectController;
 use App\Http\Controllers\FaqController;
@@ -34,6 +35,10 @@ Route::post('/locale/{code}', LocaleController::class)
     ->where('code', '[a-z]{2}')
     ->middleware('throttle:30,1')
     ->name('locale.switch');
+
+Route::post('/consent', ConsentController::class)
+    ->middleware('throttle:30,1')
+    ->name('consent.store');
 
 Route::get('/dashboard', DashboardRedirectController::class)
     ->middleware(['auth', 'active'])

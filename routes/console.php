@@ -20,3 +20,7 @@ Schedule::command('payments:reconcile')->dailyAt('03:10');
 
 // Approved blog articles whose scheduled time has passed.
 Schedule::command('posts:publish-scheduled')->everyMinute()->withoutOverlapping();
+
+// SEO audit crawl (queued) and the daily GA4 / Search Console snapshot pull.
+Schedule::command('seo:audit')->weeklyOn(1, '05:00');
+Schedule::command('analytics:sync')->dailyAt('06:00')->withoutOverlapping();

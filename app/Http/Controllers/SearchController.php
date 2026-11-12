@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\PageStatus;
 use App\Models\PageTranslation;
 use App\Models\PortfolioProjectTranslation;
+use App\Models\PostTranslation;
 use App\Models\ProductTranslation;
 use App\Models\ServiceTranslation;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,7 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 /**
- * Simple site search (used by the 404 page): titles of published services, public projects, products and pages
+ * Simple site search (used by the 404 page): titles of published services, public projects, products, articles and pages
  * in the current language. Results are not indexed (noindex).
  */
 class SearchController extends Controller
@@ -49,6 +50,10 @@ class SearchController extends Controller
                 ->whereHas('product', fn (Builder $query) => $query->published())
                 ->get(['name', 'slug', 'tagline'])
                 ->map(fn (ProductTranslation $row): array => ['title' => $row->name, 'summary' => $row->tagline, 'url' => route('products.show', ['slug' => $row->slug])])->all(),
+            __('Blog') => $matching(PostTranslation::query())
+                ->whereHas('post', fn (Builder $query) => $query->published())
+                ->get(['title', 'slug', 'excerpt'])
+                ->map(fn (PostTranslation $row): array => ['title' => $row->title, 'summary' => $row->excerpt, 'url' => route('blog.show', ['slug' => $row->slug])])->all(),
             __('Pages') => $matching(PageTranslation::query())
                 ->whereHas('page', fn (Builder $query) => $query->where('status', PageStatus::Published))
                 ->get(['title', 'slug'])

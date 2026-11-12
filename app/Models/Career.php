@@ -34,6 +34,7 @@ class Career extends Model
         'is_remote' => false,
         'status' => 'draft',
         'sort_order' => 0,
+        'lock_version' => 1,
     ];
 
     /**
@@ -47,6 +48,7 @@ class Career extends Model
             'is_remote' => 'boolean',
             'closes_at' => 'date',
             'sort_order' => 'integer',
+            'lock_version' => 'integer',
             'published_at' => 'datetime',
         ];
     }

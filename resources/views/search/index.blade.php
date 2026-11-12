@@ -1,6 +1,6 @@
 <x-layouts.public
     :title="$term !== '' ? __('Search results for “:term”', ['term' => $term]) : __('Search')"
-    :description="__('Search CodeFanz services, projects, products and pages.')"
+    :description="__('Search CodeFanz services, projects, products, articles and pages.')"
     robots="noindex"
     :alternates="\App\Models\Language::active()->keys()->mapWithKeys(fn ($code) => [$code => route('search', ['locale' => $code])])->all()">
     <x-site.page-hero :title="__('Search')" :crumbs="[__('Search') => null]">

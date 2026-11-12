@@ -32,6 +32,7 @@
 <x-layouts.public
     :title="$translation->seo_title ?: $translation->title"
     :description="$translation->seo_description ?: ($translation->summary ?: $translation->title)"
+    :seoable="$career"
     :alternates="$career->translations->mapWithKeys(fn ($alt) => [$alt->locale => route('careers.show', ['locale' => $alt->locale, 'slug' => $alt->slug])])->all()">
     <x-site.page-hero :title="$translation->title" :lead="$translation->summary" :crumbs="[__('Careers') => route('careers.index'), $translation->title => null]">
         <x-slot:before>

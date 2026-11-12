@@ -41,7 +41,7 @@
 | `pages` + `page_translations` | template, status, published_at, lock_version |
 | `page_sections` + `page_section_translations` | `page` key (`home`, `about`, `careers` — see `PageSection::PAGES`), type (`App\Enums\PageSectionType`, UNIQUE per page), sort_order, is_visible, settings JSON (`limit`, `cta_url`); translations: eyebrow, heading, subheading, cta_label, `points` JSON list, `items` JSON list aligned across locales. A language without a row uses the built-in default wording. Rows are structural (`PageSectionSeeder`) |
 | `menus`, `menu_items` (+translations) | `menus.location` UNIQUE (`App\Enums\MenuLocation`); items: parent_id (two levels, header only), link_type `route` (whitelisted public route + `route_params` query JSON) / `linkable` morph (page, service, product, portfolio_project, career → translated slug per locale) / `url` (https only), is_visible, open_in_new_tab, sort_order; translations: label. Resolved per locale by `App\Services\MenuResolver` into cached plain arrays (versioned key bumped on menu or linked-content writes) |
-| `redirects` | from_path UNIQUE, to_path, status_code, hits, is_active |
+| `redirects` | see §2.9 |
 | `services` + `service_translations` | parent_id (one level of sub-services), tier (`core`/`specialist`), icon (curated key, `App\Enums\ContentIcon`), status, is_featured, sort_order, lock_version; cover via `mediables` collection `cover` (no cover_media_id column) |
 | `service_features` (+translations), `service_faqs` (+translations) | |
 | `technology_categories`, `technologies` (+translations) | key UNIQUE, icon, website_url, is_visible, sort_order; `proficiency` stores only `supported`/`expertise` (admin-set). `VerifiedInProjects` is never stored: `Technology::proficiency()` computes it from relations registered with `Technology::verifiedThrough()` (portfolio registers its published-projects relation); load with `withProficiency()` |
@@ -118,10 +118,10 @@
 ### 2.9 SEO & analytics
 | Table | Notes |
 |---|---|
-| `seo_meta` | morph seoable + locale UNIQUE; title, description, focus_keyword, secondary_keywords JSON, canonical, robots, og_title, og_description, og_media_id, schema_config JSON, score, suggestions JSON |
-| `seo_audits`, `seo_audit_issues` | run metadata; issue type, url, severity, details, resolved_at |
-| `link_checks` | url, source_url, status_code, checked_at |
-| `analytics_snapshots` | source (ga4/gsc), metric set, date, dimensions JSON, values JSON — cached API pulls; UNIQUE(source, report_key, date) |
+| `seo_meta` | Per-locale SEO settings with no column on the entity translation: nullable morph `seoable` (page/service/portfolio_project/product/career/post) **or** `route_key` (fixed site pages such as `services.index`, `home`); locale, title + description (route pages only — content keeps `seo_title`/`seo_description` on its translation, posts also keep `focus_keyword`/`canonical_url` there), focus_keyword, canonical_url, noindex, lock_version, updated_by. UNIQUE(seoable_type, seoable_id, locale) and UNIQUE(route_key, locale). Written only by `App\Actions\Seo\UpdateSeoMeta` (checks and bumps the entity's `lock_version`; careers gained `lock_version` for this). OG/schema overrides from the original plan are not stored (OG follows title/description/cover) |
+| `redirects` | from_path UNIQUE (normalized decoded path, no trailing slash/query), to_path (site path or absolute https URL; NULL for 410), status_code 301/302/410, hits, last_hit_at, is_active, is_automatic (slug-change 301s), note, created_by/updated_by. Served from a cached plain array only when a request would 404; loops/chains rejected on save, auto redirects re-point older ones |
+| `seo_audits`, `seo_issues` | audits: status (queued/running/completed/failed), triggered_by, pages_crawled, health_score, summary JSON, error, started/finished_at. Issues: seo_audit_id (cascade), type (`App\Enums\SeoIssueType`), category, severity (error/warning/notice), url, locale, nullable morph seoable + route_key (manual-fix link), details JSON, resolved_at |
+| `analytics_snapshots` | source (ga4/gsc), report_key (daily, channels, landing_pages, events / daily, queries, pages, countries, devices), date (sync day), dimensions JSON (date range), values JSON (rows) — cached API pulls; UNIQUE(source, report_key, date). Last sync outcome per source lives in Settings (`analytics_status`) |
 
 ### 2.10 AI, social & governance
 | Table | Notes |
