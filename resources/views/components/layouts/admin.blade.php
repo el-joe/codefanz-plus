@@ -22,6 +22,7 @@
         ['label' => __('Careers'), 'route' => 'admin.careers.index', 'can' => 'viewAny', 'model' => \App\Models\Career::class],
         ['label' => __('Media'), 'route' => 'admin.media.index', 'can' => 'media.manage'],
         ['label' => __('Emergency controls'), 'route' => 'admin.emergency.index', 'can' => 'automation.manage'],
+        ['label' => __('AI usage'), 'route' => 'admin.ai-usage', 'can' => 'settings.manage'],
         ['label' => __('Users & roles'), 'route' => 'admin.users.index', 'can' => 'viewAny', 'model' => \App\Models\User::class, 'also' => 'admin.roles.*'],
         ['label' => __('Settings'), 'route' => 'admin.settings.index', 'can' => 'settings.manage', 'also' => 'admin.settings.*'],
         ['label' => __('Audit logs'), 'route' => 'admin.audit-logs.index', 'can' => 'audit.view'],

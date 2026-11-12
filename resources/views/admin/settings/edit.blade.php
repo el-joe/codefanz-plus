@@ -29,6 +29,9 @@
                             <x-ui.badge>{{ __('Requires credentials') }}</x-ui.badge>
                         @endif
                     </div>
+                    @if ($integration['selected'])
+                        <p class="mt-2 text-sm font-semibold text-fg-brand" data-ai-provider-selected>{{ __('Selected AI provider') }}{{ $integration['configured'] ? '' : ' · '.__('the assistant uses its guided questionnaire until a key is saved') }}</p>
+                    @endif
                     <p class="mt-2 text-xs text-fg-tertiary">{{ __('Connection tests arrive with each integration. Until then a status never claims to be live.') }}</p>
                 </x-ui.card>
             @endforeach
@@ -64,6 +67,10 @@
                                 </label>
                             @endif
                         </div>
+                    @elseif ($field['type'] === 'select')
+                        <x-ui.select :name="'settings['.$key.']'" :id="$key" :label="__($field['label'])" :options="$field['options']" :value="$values[$key] ?? null" :placeholder="__('Default')" />
+                    @elseif ($field['type'] === 'number')
+                        <x-ui.input :name="'settings['.$key.']'" :id="$key" type="number" step="0.01" min="0" :label="__($field['label'])" :value="$values[$key] ?? null" dir="ltr" />
                     @else
                         <x-ui.input :name="'settings['.$key.']'" :id="$key" :type="$field['type'] === 'email' ? 'email' : 'text'" :label="__($field['label'])" :value="$values[$key] ?? null" dir="ltr" />
                     @endif

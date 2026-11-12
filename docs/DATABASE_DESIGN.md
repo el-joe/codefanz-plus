@@ -76,8 +76,8 @@
 | `notifications` | Laravel database notifications (admin bell); data stores keys (kind, lead ulid, reference, name) so text renders in the reader's language |
 | `tags`, `taggables` | shared tagging |
 | `attachments` | morph attachable; private disk; original_name, mime, size, scanned_at |
-| `chat_conversations` | uuid, locale, visitor fingerprint hash, ip hash, status (active, summarised, confirmed, converted, abandoned), lead_id, consent flags |
-| `chat_messages` | conversation_id, role (visitor/assistant/system), content, tokens, provider, created_at — retention-pruned |
+| `chat_sessions` | AI Project Assistant conversations: ulid, token_hash (sha256 of the browser's secret token), locale, mode (ai/guided), status (active/completed), fallback_reason, brief JSON (normalized), user_turns, ip_hash (HMAC), user_agent, lead_id, last_activity_at, completed_at. `MassPrunable`: unconverted after `codefanz.assistant.retention_days` (30), converted after `lead_retention_days` (365) |
+| `chat_messages` | chat_session_id (cascade), role (user/assistant), content (plain text; model output stripped of HTML), created_at |
 | `meeting_requests` | lead_id, preferred slots JSON, status |
 
 ### 2.6 Delivery & portal
@@ -126,7 +126,7 @@
 |---|---|
 | `ai_prompts` | key, locale, template, version, is_active |
 | `ai_generations` | type, provider, model, prompt_key, input JSON, output, tokens_in/out, cost_minor, user_id/agent, status |
-| `ai_usage_daily` | provider, model, date, tokens, cost — budget enforcement |
+| `ai_usage_logs` | one row per provider call: feature, provider, model, input/output tokens, estimated_cost_minor (US cents, 4 decimals, from the `codefanz.ai.prices` table), latency_ms, status, error (short, never prompt text), user/lead/chat_session refs. Monthly sum enforces the budget (hard stop) |
 | `social_accounts` | platform, external_id, name, integration_id, capabilities JSON, status |
 | `social_posts` | campaign_id, status (Draft, PendingReview, Approved, Scheduled, Publishing, Published, Failed, Cancelled, ManualExport), scheduled_at, origin |
 | `social_post_targets` | social_post_id, social_account_id, platform_content, media JSON, status, published_url, platform_response JSON, attempts, last_error |

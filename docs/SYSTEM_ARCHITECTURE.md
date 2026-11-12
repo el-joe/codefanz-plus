@@ -52,7 +52,7 @@ milestones, documents, tickets), `Billing`, `Blog`, `Seo`, `Analytics`, `Marketi
   - `services/http.js` — fetch wrapper (CSRF header, JSON, 422 → field errors, 419/401 handling)
   - `modules/forms.js`, `modules/validation.js`, `modules/toast.js`, `modules/modal.js`, `modules/drawer.js`,
     `modules/dropdown.js`, `modules/data-table.js`, `modules/filters.js`, `modules/pagination.js`,
-    `modules/uploader.js`, `modules/kanban.js`, `modules/chat.js`, `modules/charts.js` (lazy Chart.js),
+    `modules/uploader.js`, `modules/kanban.js`, `modules/assistant.js`, `modules/charts.js` (lazy Chart.js),
     `modules/partial-nav.js` (Fetch + History API for filters/pagination only).
 - Separate Vite entry points: `app.js` (public), `admin.js`, `portal.js` — keeps public bundle minimal.
 

@@ -133,6 +133,7 @@ class LeadController extends Controller
             'contactMessage',
             'possibleDuplicateOf:id,ulid,reference,name,status',
             'customer:id,ulid,reference,created_from_lead_id',
+            'chatSession.messages',
             'activities' => fn ($query) => $query->with('user:id,name')->latest()->latest('id'),
         ]);
 

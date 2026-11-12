@@ -39,8 +39,8 @@ class ContactChannels
             $channels[] = ['key' => 'meeting', 'label' => __('Book a meeting'), 'value' => __('Video call'), 'hint' => __('Pick a time that works for you'), 'href' => $meeting, 'external' => true, 'icon' => 'calendar'];
         }
 
-        // The AI project assistant arrives in Milestone 5; shown honestly as not available yet.
-        $channels[] = ['key' => 'assistant', 'label' => __('AI Project Assistant'), 'value' => __('Coming soon'), 'hint' => __('Describe your idea step by step'), 'href' => null, 'external' => false, 'icon' => 'bot'];
+        // Always available: it falls back to a guided questionnaire when AI is not configured or paused.
+        $channels[] = ['key' => 'assistant', 'label' => __('AI Project Assistant'), 'value' => __('Free · no payment needed'), 'hint' => __('Describe your idea step by step'), 'href' => route('assistant', ['locale' => $locale]), 'external' => false, 'icon' => 'bot'];
 
         return $channels;
     }

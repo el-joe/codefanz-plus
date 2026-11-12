@@ -68,6 +68,8 @@
                         __('Estimated value') => $lead->formattedEstimatedValue(),
                         __('Reference from the site') => $lead->brief['reference'] ?? null,
                         __('Contact form subject') => isset($lead->brief['topic']) ? \App\Enums\ContactTopic::tryFrom($lead->brief['topic'])?->label() : null,
+                        __('Existing system') => $lead->brief['assistant']['existing_system'] ?? null,
+                        __('Other technologies') => implode(', ', $lead->brief['assistant']['technology_notes'] ?? []),
                     ] as $label => $value)
                         @if (filled($value))
                             <div>
@@ -93,6 +95,32 @@
                     @endif
                 @endforeach
             </x-ui.card>
+
+            @if ($lead->source === \App\Enums\LeadSource::AiAssistant)
+                <x-ui.card :title="__('Assistant transcript')">
+                    @if ($lead->chatSession)
+                        <p class="mb-4 text-xs text-fg-tertiary">
+                            {{ $lead->chatSession->mode->label() }}
+                            @if ($lead->chatSession->fallback_reason)
+                                · {{ __('AI unavailable: :reason', ['reason' => \App\Enums\AiUnavailableReason::tryFrom($lead->chatSession->fallback_reason)?->label() ?? $lead->chatSession->fallback_reason]) }}
+                            @endif
+                            · {{ __('Read-only. Estimates in the conversation are preliminary.') }}
+                        </p>
+                        <ol class="flex max-h-[32rem] flex-col gap-3 overflow-y-auto" data-lead-transcript>
+                            @foreach ($lead->chatSession->messages as $message)
+                                <li class="flex {{ $message->role === \App\Enums\ChatRole::User ? 'justify-end' : '' }}">
+                                    <div class="max-w-[85%] rounded-xl px-3 py-2 text-sm {{ $message->role === \App\Enums\ChatRole::User ? 'bg-brand-subtle text-fg' : 'bg-subtle text-fg' }}">
+                                        <p class="text-xs font-semibold text-fg-tertiary">{{ $message->role === \App\Enums\ChatRole::User ? __('Visitor') : __('Assistant') }} · <span dir="ltr">{{ $message->created_at?->format('H:i') }}</span></p>
+                                        <p class="mt-0.5 whitespace-pre-line" dir="auto">{{ $message->content }}</p>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ol>
+                    @else
+                        <p class="text-sm text-fg-secondary">{{ __('The conversation is no longer stored (retention period ended).') }}</p>
+                    @endif
+                </x-ui.card>
+            @endif
 
             <x-ui.card :title="__('Attachments')">
                 @if ($lead->attachments->isEmpty())

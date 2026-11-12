@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AiUsageController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\CareerController;
 use App\Http\Controllers\Admin\ChangeRequestController;
@@ -148,6 +149,8 @@ Route::middleware('two-factor')->group(function (): void {
         Route::get('settings/{group}', [SettingController::class, 'edit'])->whereIn('group', array_keys(config('codefanz.settings')))->name('settings.edit');
         Route::put('settings/{group}', [SettingController::class, 'update'])->whereIn('group', array_keys(config('codefanz.settings')))->name('settings.update');
     });
+
+    Route::get('ai-usage', AiUsageController::class)->middleware('can:settings.manage')->name('ai-usage');
 
     Route::get('audit-logs', AuditLogController::class)->middleware('can:audit.view')->name('audit-logs.index');
 });

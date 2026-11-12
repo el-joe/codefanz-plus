@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AboutController;
+use App\Http\Controllers\AssistantController;
 use App\Http\Controllers\CareerController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardRedirectController;
@@ -58,6 +59,11 @@ Route::prefix('{locale}')
         Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:contact')->name('contact.store');
         Route::get('/quote', [QuoteController::class, 'show'])->name('quote');
         Route::post('/quote', [QuoteController::class, 'store'])->middleware('throttle:quote')->name('quote.store');
+        Route::get('/assistant', [AssistantController::class, 'show'])->name('assistant');
+        Route::post('/assistant/sessions', [AssistantController::class, 'start'])->middleware('throttle:assistant-start')->name('assistant.start');
+        Route::post('/assistant/sessions/{chatSession}/messages', [AssistantController::class, 'message'])->middleware('throttle:assistant-message')->name('assistant.message');
+        Route::post('/assistant/sessions/{chatSession}/answers', [AssistantController::class, 'answer'])->middleware('throttle:assistant-message')->name('assistant.answer');
+        Route::post('/assistant/sessions/{chatSession}/confirm', [AssistantController::class, 'confirm'])->middleware('throttle:quote')->name('assistant.confirm');
         Route::get('/search', SearchController::class)->middleware('throttle:60,1')->name('search');
 
         // Catch-all CMS pages: keep last so the specific routes above win.

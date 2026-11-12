@@ -161,6 +161,16 @@ class Lead extends Model
     }
 
     /**
+     * The AI Project Assistant conversation this lead came from, while it is retained.
+     *
+     * @return HasOne<ChatSession, $this>
+     */
+    public function chatSession(): HasOne
+    {
+        return $this->hasOne(ChatSession::class);
+    }
+
+    /**
      * @return HasMany<LeadActivity, $this>
      */
     public function activities(): HasMany

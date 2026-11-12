@@ -77,7 +77,8 @@ test('the contact page lists only configured channels', function () {
         ->assertDontSee('data-channel="phone"', false)
         ->assertDontSee('data-channel="meeting"', false)
         ->assertSee('data-channel="assistant"', false)
-        ->assertSee('Coming soon');
+        ->assertSee('href="'.route('assistant', ['locale' => 'en']).'"', false)
+        ->assertDontSee('Coming soon');
 
     $settings = app(Settings::class);
     $settings->set('contact', 'email', 'hello@example.com');

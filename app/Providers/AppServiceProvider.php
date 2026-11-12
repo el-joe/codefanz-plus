@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Contracts\AiProvider;
 use App\Enums\MenuLocation;
 use App\Enums\Role;
 use App\Models\Career;
 use App\Models\CareerTranslation;
 use App\Models\ChangeRequest;
+use App\Models\ChatSession;
 use App\Models\ContactMessage;
 use App\Models\Customer;
 use App\Models\Faq;
@@ -34,6 +36,7 @@ use App\Models\Technology;
 use App\Models\TechnologyCategory;
 use App\Models\Testimonial;
 use App\Models\User;
+use App\Services\Ai\AiGateway;
 use App\Services\CurrentCustomer;
 use App\Services\MenuResolver;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -54,6 +57,10 @@ class AppServiceProvider extends ServiceProvider
     {
         // One per request (and per queued job): the customer a portal user is acting for.
         $this->app->scoped(CurrentCustomer::class);
+
+        // The provider selected in Settings → Integrations (a NullAiProvider until credentials are saved).
+        // Features should call AiGateway, which adds the kill switch, budget and usage logging.
+        $this->app->bind(AiProvider::class, fn ($app): AiProvider => $app->make(AiGateway::class)->provider());
     }
 
     /**
@@ -101,6 +108,20 @@ class AppServiceProvider extends ServiceProvider
             Limit::perMinute((int) config('codefanz.contact_form.per_minute'))->by('quote-minute:'.$request->ip()),
             Limit::perDay((int) config('codefanz.contact_form.per_day'))->by('quote-day:'.$request->ip()),
         ]);
+
+        // AI Project Assistant: new conversations per IP, and messages per conversation and per IP.
+        RateLimiter::for('assistant-start', fn (Request $request): Limit => Limit::perHour((int) config('codefanz.assistant.sessions_per_ip_per_hour'))->by('assistant-start:'.$request->ip()));
+
+        RateLimiter::for('assistant-message', function (Request $request): array {
+            $session = $request->route('chatSession');
+            $sessionKey = $session instanceof ChatSession ? $session->ulid : (string) $session;
+
+            return [
+                Limit::perMinute((int) config('codefanz.assistant.messages_per_session_per_minute'))->by('assistant-session:'.$sessionKey),
+                Limit::perMinute((int) config('codefanz.assistant.messages_per_ip_per_minute'))->by('assistant-ip-minute:'.$request->ip()),
+                Limit::perDay((int) config('codefanz.assistant.messages_per_ip_per_day'))->by('assistant-ip-day:'.$request->ip()),
+            ];
+        });
 
         // Resolved menus are cached per locale; any change to menus or to content they link to invalidates them.
         foreach ([

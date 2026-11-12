@@ -60,7 +60,12 @@ return [
         'integrations' => [
             'ga4_measurement_id' => ['type' => 'text', 'label' => 'GA4 measurement ID', 'rules' => ['nullable', 'string', 'regex:/^G-[A-Z0-9]{4,20}$/']],
             'ga4_api_secret' => ['type' => 'secret', 'label' => 'GA4 Measurement Protocol API secret', 'rules' => ['nullable', 'string', 'max:255']],
+            'ai_provider' => ['type' => 'select', 'label' => 'AI provider', 'options' => ['openai' => 'OpenAI', 'anthropic' => 'Anthropic'], 'rules' => ['nullable', 'string', 'in:openai,anthropic']],
+            'openai_api_key' => ['type' => 'secret', 'label' => 'OpenAI API key', 'rules' => ['nullable', 'string', 'max:255']],
+            'openai_model' => ['type' => 'text', 'label' => 'OpenAI model', 'rules' => ['nullable', 'string', 'max:100', 'regex:/^[A-Za-z0-9._:-]+$/']],
             'anthropic_api_key' => ['type' => 'secret', 'label' => 'Anthropic API key', 'rules' => ['nullable', 'string', 'max:255']],
+            'anthropic_model' => ['type' => 'text', 'label' => 'Anthropic model', 'rules' => ['nullable', 'string', 'max:100', 'regex:/^[A-Za-z0-9._:-]+$/']],
+            'ai_monthly_budget' => ['type' => 'number', 'label' => 'AI monthly budget (USD, 0 stops all AI calls)', 'rules' => ['nullable', 'numeric', 'min:0', 'max:1000000']],
         ],
     ],
 
@@ -71,7 +76,73 @@ return [
 
     'integrations' => [
         'google_analytics' => ['label' => 'Google Analytics 4', 'keys' => ['ga4_measurement_id', 'ga4_api_secret']],
-        'anthropic' => ['label' => 'Anthropic (AI Content Studio)', 'keys' => ['anthropic_api_key']],
+        'openai' => ['label' => 'OpenAI (AI features)', 'keys' => ['openai_api_key'], 'ai_provider' => 'openai'],
+        'anthropic' => ['label' => 'Anthropic (AI features)', 'keys' => ['anthropic_api_key'], 'ai_provider' => 'anthropic'],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI provider layer
+    |--------------------------------------------------------------------------
+    |
+    | The provider, models, keys and monthly budget live in Settings →
+    | Integrations; these are the defaults and technical limits. Prices are
+    | US dollars per million tokens and only feed the estimated cost in
+    | ai_usage_logs (check them against the provider's price list). Unknown
+    | models use the "default" row so the budget still applies.
+    |
+    */
+
+    'ai' => [
+        'default_provider' => env('AI_PROVIDER', 'openai'),
+        'default_models' => [
+            'openai' => env('OPENAI_MODEL', 'gpt-4.1-mini'),
+            'anthropic' => env('ANTHROPIC_MODEL', 'claude-haiku-5-5'),
+        ],
+        'default_monthly_budget_usd' => (float) env('AI_MONTHLY_BUDGET_USD', 50),
+        'timeout_seconds' => (int) env('AI_TIMEOUT_SECONDS', 30),
+        'connect_timeout_seconds' => 5,
+        // Retries only on HTTP 429 / 5xx and connection errors, with exponential backoff.
+        'retries' => 2,
+        'retry_base_ms' => 500,
+        'openai' => [
+            'base_url' => env('OPENAI_BASE_URL', 'https://api.openai.com/v1'),
+        ],
+        'anthropic' => [
+            // Same convention as the official SDKs: the host without /v1.
+            'base_url' => env('ANTHROPIC_BASE_URL', 'https://api.anthropic.com'),
+            'version' => '2023-06-01',
+            // Sent as output_config.effort when set; leave null for models that do not support it.
+            'effort' => env('ANTHROPIC_EFFORT', 'low'),
+        ],
+        'prices' => [
+            'gpt-4.1-mini' => ['input' => 0.40, 'output' => 1.60],
+            'gpt-4.1' => ['input' => 2.00, 'output' => 8.00],
+            'gpt-4o-mini' => ['input' => 0.15, 'output' => 0.60],
+            'claude-opus-5-5' => ['input' => 4.00, 'output' => 20.00],
+            'claude-sonnet-5-5' => ['input' => 2.00, 'output' => 10.00],
+            'claude-haiku-5-5' => ['input' => 0.10, 'output' => 0.50],
+            'default' => ['input' => 5.00, 'output' => 25.00],
+        ],
+    ],
+
+    /*
+    | AI Project Assistant (public, free). Limits apply per conversation and
+    | per visitor IP; conversations are pruned daily (model:prune).
+    */
+
+    'assistant' => [
+        'max_message_length' => 1000,
+        'max_turns' => 30,
+        'max_output_tokens' => 4000,
+        'history_messages' => 40,
+        'session_hours' => 24,
+        'sessions_per_ip_per_hour' => 10,
+        'messages_per_session_per_minute' => 8,
+        'messages_per_ip_per_minute' => 20,
+        'messages_per_ip_per_day' => 300,
+        'retention_days' => (int) env('ASSISTANT_RETENTION_DAYS', 30),
+        'lead_retention_days' => (int) env('ASSISTANT_LEAD_RETENTION_DAYS', 365),
     ],
 
     /*

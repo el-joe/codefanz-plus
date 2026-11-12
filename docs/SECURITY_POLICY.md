@@ -39,6 +39,8 @@ Baseline: OWASP ASVS L2 / OWASP Top 10.
 - Inputs length-limited and validated; outputs rendered as text (escaped).
 - No pricing/delivery promises; estimates labeled "preliminary".
 - Prompt-injection: untrusted content (chat, radar descriptions, articles) is always passed as data, never merged into system instructions; AI output can only create drafts/change requests.
+- All provider calls go through `App\Services\Ai\AiGateway`: per-feature kill switch (`ai_assistant` for the public assistant, `ai_automation` for Content Studio/Radar), monthly budget hard stop, and `ai_usage_logs` rows that never contain prompts or responses (errors are short codes such as "HTTP 503").
+- Public assistant: conversations are bound to the browser by a random token (only its hash is stored), IPs are stored as HMAC hashes, messages are length-limited and capped per conversation, rate limited per conversation and per IP; model structured output is re-validated against the quote-form enums and stripped of HTML before storage, and the browser renders it with `textContent`. Contact details are confirmed by the visitor in a form before a lead is created.
 
 ## 9. Logging, audit & privacy
 - `audit_logs` append-only; sensitive fields redacted.

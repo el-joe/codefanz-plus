@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateSettingsRequest;
+use App\Services\Ai\AiGateway;
 use App\Services\AuditLogger;
 use App\Services\Settings;
 use Illuminate\Http\RedirectResponse;
@@ -90,17 +91,20 @@ class SettingController extends Controller
     }
 
     /**
-     * @return array<string, array{label: string, configured: bool, partial: bool}>
+     * @return array<string, array{label: string, configured: bool, partial: bool, selected: bool}>
      */
     private function integrationStatuses(): array
     {
-        return collect(config('codefanz.integrations'))->map(function (array $integration): array {
+        $selectedProvider = app(AiGateway::class)->providerName()->value;
+
+        return collect(config('codefanz.integrations'))->map(function (array $integration) use ($selectedProvider): array {
             $saved = collect($integration['keys'])->filter(fn (string $key): bool => $this->settings->has('integrations', $key))->count();
 
             return [
                 'label' => $integration['label'],
                 'configured' => $saved === count($integration['keys']),
                 'partial' => $saved > 0 && $saved < count($integration['keys']),
+                'selected' => ($integration['ai_provider'] ?? null) === $selectedProvider,
             ];
         })->all();
     }
