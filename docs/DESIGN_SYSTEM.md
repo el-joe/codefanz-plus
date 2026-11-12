@@ -183,6 +183,7 @@ Blade components mirroring the Figma library live in `resources/views/components
 | `x-ui.button`, `x-ui.input`, `x-ui.badge`, `x-ui.alert`, `x-ui.card`, `x-ui.empty-state`, `x-ui.logo` | Semantic tokens only; `x-ui.input` accepts array names (`translations[ar][title]`) and maps errors to dot notation |
 | `x-layouts.base` / `auth` / `admin` / `public` | `public` takes `title`, `description` and `alternates` (locale → URL) for hreflang, canonical and the language switch |
 | `x-language-switch` | Uses `alternates` on localized pages so switching keeps the visitor on the translated page |
+| `.prose-article` (app.css) | Article body styles shared by the public article and the A11 TipTap editor: H2–H4, lists, quote, `aside[data-callout=info\|tip\|warning]`, LTR code blocks, tables, privacy video embeds |
 | `x-media.picture` | `<picture>`: AVIF `srcset`, then WebP, `<img>` fallback with width/height, lazy by default (`eager` for hero images), localized alt |
 
 ## Next

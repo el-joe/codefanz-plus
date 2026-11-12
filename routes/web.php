@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AssistantController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CareerController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardRedirectController;
@@ -59,6 +60,11 @@ Route::prefix('{locale}')
         Route::get('/portfolio/{slug}', [PortfolioController::class, 'show'])->where('slug', '[^/]+')->name('portfolio.show');
         Route::get('/products', [ProductController::class, 'index'])->name('products.index');
         Route::get('/products/{slug}', [ProductController::class, 'show'])->where('slug', '[^/]+')->name('products.show');
+        Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+        Route::get('/blog/feed', [BlogController::class, 'feed'])->name('blog.feed');
+        Route::get('/blog/category/{slug}', [BlogController::class, 'category'])->where('slug', '[^/]+')->name('blog.category');
+        Route::get('/blog/tag/{slug}', [BlogController::class, 'tag'])->where('slug', '[^/]+')->name('blog.tag');
+        Route::get('/blog/{slug}', [BlogController::class, 'show'])->where('slug', '[^/]+')->name('blog.show');
         Route::get('/careers', [CareerController::class, 'index'])->name('careers.index');
         Route::get('/careers/{slug}', [CareerController::class, 'show'])->where('slug', '[^/]+')->name('careers.show');
         Route::get('/faq', FaqController::class)->name('faq.index');

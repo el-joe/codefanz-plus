@@ -28,12 +28,12 @@ test('the section manager lists every section type once, in order', function () 
     $this->actingAs($this->editor)->get(route('admin.home-sections.index'))
         ->assertSuccessful()
         ->assertSeeInOrder(['Hero', 'Services', 'Technologies', 'Featured projects', 'Statistics', 'Testimonials', 'Latest articles', 'Call to action'])
-        ->assertSee('Coming soon');
+        ->assertDontSee('Coming soon');
 
     $this->actingAs($this->editor)->get(route('admin.home-sections.index'));
 
     expect(PageSection::query()->count())->toBe(count(PageSectionType::forPage(PageSection::HOME)))
-        ->and(PageSection::query()->where('type', 'latest_articles')->value('is_visible'))->toBeFalsy();
+        ->and(PageSection::query()->where('type', 'latest_articles')->value('is_visible'))->toBeTruthy();
 });
 
 test('an editor edits section copy, items and options per language', function () {

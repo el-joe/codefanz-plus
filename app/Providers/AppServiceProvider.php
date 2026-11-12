@@ -34,6 +34,8 @@ use App\Models\PaymentLink;
 use App\Models\PortfolioCategory;
 use App\Models\PortfolioProject;
 use App\Models\PortfolioProjectTranslation;
+use App\Models\Post;
+use App\Models\PostCategory;
 use App\Models\Product;
 use App\Models\ProductTranslation;
 use App\Models\ProductVersion;
@@ -45,6 +47,7 @@ use App\Models\Service;
 use App\Models\ServiceTranslation;
 use App\Models\Statistic;
 use App\Models\SupportTicket;
+use App\Models\Tag;
 use App\Models\Technology;
 use App\Models\TechnologyCategory;
 use App\Models\Testimonial;
@@ -127,6 +130,9 @@ class AppServiceProvider extends ServiceProvider
             'receipt' => Receipt::class,
             'refund' => Refund::class,
             'credit_note' => CreditNote::class,
+            'post' => Post::class,
+            'post_category' => PostCategory::class,
+            'tag' => Tag::class,
         ]);
 
         // Payment gateway webhooks: generous per gateway and IP; bad signatures are rejected before any work.

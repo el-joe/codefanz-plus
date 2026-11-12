@@ -1,4 +1,4 @@
-@props(['title', 'description' => null, 'alternates' => [], 'robots' => null, 'image' => null, 'ogType' => 'website'])
+@props(['title', 'description' => null, 'alternates' => [], 'robots' => null, 'image' => null, 'ogType' => 'website', 'canonical' => null])
 
 @php
     $menus = app(\App\Services\MenuResolver::class);
@@ -39,7 +39,7 @@
         @isset($alternates[\App\Models\Language::defaultCode()])
             <link rel="alternate" hreflang="x-default" href="{{ $alternates[\App\Models\Language::defaultCode()] }}">
         @endisset
-        <link rel="canonical" href="{{ url()->current() }}">
+        <link rel="canonical" href="{{ $canonical ?: url()->current() }}">
         <meta property="og:site_name" content="CodeFanz">
         <meta property="og:type" content="{{ $ogType }}">
         <meta property="og:title" content="{{ $title }}">
@@ -59,6 +59,7 @@
             <meta property="og:image:alt" content="{{ $image->altText() }}">
         @endif
         <meta name="twitter:card" content="{{ $ogImage ? 'summary_large_image' : 'summary' }}">
+        {{ $head ?? '' }}
     </x-slot:meta>
 
     <header class="relative z-30 border-b border-line-subtle bg-surface">

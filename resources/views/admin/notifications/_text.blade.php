@@ -33,6 +33,15 @@
     @case('refund.status')
         {{ __('Refund :reference is now :status', ['reference' => $notification->data['reference'] ?? '', 'status' => \App\Enums\RefundStatus::tryFrom($notification->data['status'] ?? '')?->label() ?? '']) }}
         @break
+    @case('post.submitted')
+        {{ __(':name submitted “:title” for review', ['name' => $notification->data['name'] ?? '', 'title' => $notification->data['title'] ?? '']) }}
+        @break
+    @case('post.approved')
+        {{ __(':name approved “:title”', ['name' => $notification->data['name'] ?? '', 'title' => $notification->data['title'] ?? '']) }}
+        @break
+    @case('post.changes_requested')
+        {{ __(':name requested changes to “:title”', ['name' => $notification->data['name'] ?? '', 'title' => $notification->data['title'] ?? '']) }}
+        @break
     @default
         {{ __('Notification') }}
 @endswitch

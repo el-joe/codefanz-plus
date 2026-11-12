@@ -39,6 +39,8 @@ class User extends Authenticatable implements HasLocalePreference
             'last_login_at' => 'datetime',
             'is_active' => 'boolean',
             'password' => 'hashed',
+            'author_title' => 'array',
+            'author_bio' => 'array',
         ];
     }
 
@@ -129,5 +131,25 @@ class User extends Authenticatable implements HasLocalePreference
             ->take(2)
             ->map(fn (string $part): string => mb_strtoupper(mb_substr($part, 0, 1)))
             ->implode('');
+    }
+
+    /**
+     * Public author job title on blog articles (current locale, falling back to English).
+     */
+    public function authorTitle(?string $locale = null): ?string
+    {
+        $titles = $this->author_title ?? [];
+
+        return ($titles[$locale ?? app()->getLocale()] ?? null) ?: (($titles['en'] ?? null) ?: null);
+    }
+
+    /**
+     * Public author bio on blog articles (current locale, falling back to English).
+     */
+    public function authorBio(?string $locale = null): ?string
+    {
+        $bios = $this->author_bio ?? [];
+
+        return ($bios[$locale ?? app()->getLocale()] ?? null) ?: (($bios['en'] ?? null) ?: null);
     }
 }

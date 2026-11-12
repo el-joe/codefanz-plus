@@ -17,3 +17,6 @@ Schedule::command('tickets:close-resolved')->dailyAt('02:30');
 // Payment links past their expiry; milestone paid amounts re-derived from the ledger as a safety net.
 Schedule::command('payments:expire-links')->hourly();
 Schedule::command('payments:reconcile')->dailyAt('03:10');
+
+// Approved blog articles whose scheduled time has passed.
+Schedule::command('posts:publish-scheduled')->everyMinute()->withoutOverlapping();

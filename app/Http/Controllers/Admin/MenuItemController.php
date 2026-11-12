@@ -10,6 +10,7 @@ use App\Models\Menu;
 use App\Models\MenuItem;
 use App\Models\Page;
 use App\Models\PortfolioProject;
+use App\Models\Post;
 use App\Models\Product;
 use App\Models\Service;
 use App\Services\AuditLogger;
@@ -118,6 +119,7 @@ class MenuItemController extends Controller
                 __('Software products') => $group(Product::class, 'name'),
                 __('Portfolio') => $group(PortfolioProject::class, 'title'),
                 __('Careers') => $group(Career::class, 'title'),
+                __('Blog articles') => $group(Post::class, 'title'),
             ]),
         ];
     }

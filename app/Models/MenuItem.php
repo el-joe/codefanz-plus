@@ -38,6 +38,7 @@ class MenuItem extends Model
         'industries.index' => 'Industries',
         'careers.index' => 'Careers',
         'faq.index' => 'FAQ',
+        'blog.index' => 'Blog',
         'testimonials.index' => 'Testimonials',
         'about' => 'About Us',
         'contact' => 'Contact',
@@ -53,6 +54,7 @@ class MenuItem extends Model
         'product' => 'Software products',
         'portfolio_project' => 'Portfolio',
         'career' => 'Careers',
+        'post' => 'Blog articles',
     ];
 
     /**

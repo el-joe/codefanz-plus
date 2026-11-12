@@ -34,5 +34,25 @@
                 <div><x-ui.button>{{ __('Change password') }}</x-ui.button></div>
             </form>
         </x-ui.card>
+
+        @can(\App\Enums\Permission::ContentManage->value)
+            <x-ui.card :title="__('Public author profile')" class="lg:col-span-2">
+                <form method="POST" action="{{ route('admin.profile.author') }}" class="flex flex-col gap-4">
+                    @csrf
+                    @method('PUT')
+                    <p class="text-sm text-fg-secondary">{{ __('Shown under the blog articles you write. Leave empty to show only your name.') }}</p>
+                    <div class="grid gap-6 md:grid-cols-2">
+                        @foreach (\App\Models\Language::active() as $code => $language)
+                            <div class="flex flex-col gap-4" lang="{{ $code }}" dir="{{ $language['direction'] }}">
+                                <p class="text-sm font-semibold text-fg-tertiary">{{ $language['native_name'] }}</p>
+                                <x-ui.input :name="'author_title['.$code.']'" :id="'author-title-'.$code" :label="__('Job title')" :value="($user->author_title ?? [])[$code] ?? null" maxlength="100" />
+                                @include('admin._textarea', ['name' => "author_bio[{$code}]", 'id' => "author-bio-{$code}", 'label' => __('Short bio'), 'value' => ($user->author_bio ?? [])[$code] ?? null, 'rows' => 3, 'max' => 600])
+                            </div>
+                        @endforeach
+                    </div>
+                    <div><x-ui.button>{{ __('Save author profile') }}</x-ui.button></div>
+                </form>
+            </x-ui.card>
+        @endcan
     </div>
 </x-layouts.admin>

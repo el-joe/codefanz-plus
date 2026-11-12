@@ -9,6 +9,7 @@ use App\Models\Faq;
 use App\Models\Industry;
 use App\Models\PageSection;
 use App\Models\PortfolioProject;
+use App\Models\Post;
 use App\Models\Product;
 use App\Models\Service;
 use App\Models\Statistic;
@@ -82,6 +83,7 @@ class HomeController extends Controller
             PageSectionType::Testimonials => Testimonial::query()
                 ->publiclyVisible()->where('is_featured', true)->translatedIn()
                 ->with(['translations', 'avatar.variants'])->ordered()->limit($limit)->get(),
+            PageSectionType::LatestArticles => Post::query()->published()->translatedIn()->with(Post::cardRelations())->latestPublished()->limit($limit)->get(),
             PageSectionType::Faq => Faq::query()->published()->translatedIn()->with('translations')->orderByDesc('is_featured')->ordered()->limit($limit)->get(),
             default => null,
         };

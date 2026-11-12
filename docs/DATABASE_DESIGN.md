@@ -109,10 +109,11 @@
 ### 2.8 Blog
 | Table | Notes |
 |---|---|
-| `posts` + `post_translations` (title, slug, excerpt, body, reading_minutes, toc JSON, SEO fields) | author_id, status (Draft, AiDraft, PendingReview, Approved, Scheduled, Published, Rejected, Archived), scheduled_at, published_at, is_featured, canonical_url, lock_version, origin (human/ai/mcp) |
-| `post_revisions` | post_id, locale, snapshot JSON, user_id/agent, created_at |
-| `categories` (+translations), `post_tag` via `taggables` | |
-| `editorial_checklists` | post_id, item, is_checked, checked_by |
+| `posts` + `post_translations` | posts: ulid (admin route key), author_id, post_category_id, status (draft/in_review/changes_requested/approved/scheduled/published/archived), origin (human/ai — AI drafts need a reviewer other than their author), is_featured, is_single_language, scheduled_for, published_at, submitted_by/at, reviewed_by/at, approved_at, review_note, lock_version, soft deletes. Public = `published` AND `published_at <= now`. Translations: title, slug (UNIQUE locale+slug; `feed/category/tag/page` reserved), excerpt, body (sanitized HTML — the `PostTranslation::body` mutator runs `HtmlSanitizer` + `ArticleBody`, so every write path is sanitized), toc JSON (H2/H3 anchors), word_count, reading_minutes, seo_title, seo_description, focus_keyword, canonical_url |
+| `post_revisions` | post_id, user_id/actor_label, reason (created/saved/restored/change_request), restored_from_id, lock_version, snapshot JSON (all translations + category/tags/cover/flags), created_at only; immutable. Restore = new revision |
+| `post_categories` (+`post_category_translations`: name, slug, description), `tags` (+`tag_translations`), `post_tag` pivot | |
+| `post_checklist_items` | post_id + item UNIQUE, is_manual, is_passed, detail, checked_by/at — automatic checks re-evaluated on every save plus manual editor confirmations |
+| `users.author_title`, `users.author_bio` | JSON per locale; public author box on articles |
 
 ### 2.9 SEO & analytics
 | Table | Notes |

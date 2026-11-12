@@ -14,6 +14,7 @@
         ['label' => __('Pages'), 'route' => 'admin.pages.index', 'can' => 'viewAny', 'model' => \App\Models\Page::class],
         ['label' => __('Page sections'), 'route' => 'admin.home-sections.index', 'can' => 'viewAny', 'model' => \App\Models\PageSection::class],
         ['label' => __('Navigation & menus'), 'route' => 'admin.menus.index', 'can' => 'viewAny', 'model' => \App\Models\MenuItem::class],
+        ['label' => __('Blog'), 'route' => 'admin.posts.index', 'can' => 'viewAny', 'model' => \App\Models\Post::class, 'also' => ['admin.post-categories.*', 'admin.tags.*']],
         ['label' => __('Services'), 'route' => 'admin.services.index', 'can' => 'viewAny', 'model' => \App\Models\Service::class],
         ['label' => __('Technologies'), 'route' => 'admin.technologies.index', 'can' => 'viewAny', 'model' => \App\Models\Technology::class, 'also' => 'admin.technology-categories.*'],
         ['label' => __('Industries'), 'route' => 'admin.industries.index', 'can' => 'viewAny', 'model' => \App\Models\Industry::class],

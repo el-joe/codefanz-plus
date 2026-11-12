@@ -12,6 +12,7 @@ use App\Models\MenuItem;
 use App\Models\Page;
 use App\Models\PageTranslation;
 use App\Models\PortfolioProject;
+use App\Models\Post;
 use App\Models\Product;
 use App\Models\Service;
 use Illuminate\Database\Eloquent\Model;
@@ -40,6 +41,7 @@ class MenuResolver
         'product' => 'products.show',
         'portfolio_project' => 'portfolio.show',
         'career' => 'careers.show',
+        'post' => 'blog.show',
     ];
 
     /**
@@ -176,6 +178,7 @@ class MenuResolver
         return match (true) {
             $linkable instanceof Page => $linkable->status === PageStatus::Published,
             $linkable instanceof Career => $linkable->isOpen(),
+            $linkable instanceof Post => $linkable->isPubliclyVisible(),
             default => $linkable->getAttribute('status') === ContentStatus::Published,
         };
     }
@@ -192,10 +195,10 @@ class MenuResolver
         }
 
         $routes = match ($location) {
-            MenuLocation::Header => ['services.index' => __('Services'), 'portfolio.index' => __('Portfolio'), 'products.index' => __('Products'), 'technologies.index' => __('Technologies'), 'about' => __('About')],
+            MenuLocation::Header => ['services.index' => __('Services'), 'portfolio.index' => __('Portfolio'), 'products.index' => __('Products'), 'technologies.index' => __('Technologies'), 'blog.index' => __('Blog'), 'about' => __('About')],
             MenuLocation::FooterServices => ['services.index' => __('All services'), 'technologies.index' => __('Technologies'), 'industries.index' => __('Industries')],
             MenuLocation::FooterCompany => ['about' => __('About Us'), 'portfolio.index' => __('Portfolio'), 'careers.index' => __('Careers'), 'testimonials.index' => __('Testimonials'), 'contact' => __('Contact')],
-            MenuLocation::FooterResources => ['products.index' => __('Products'), 'industries.index' => __('Industries'), 'faq.index' => __('FAQ')],
+            MenuLocation::FooterResources => ['blog.index' => __('Blog'), 'products.index' => __('Products'), 'industries.index' => __('Industries'), 'faq.index' => __('FAQ')],
         };
 
         return collect($routes)

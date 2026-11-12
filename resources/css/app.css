@@ -231,3 +231,115 @@
         }
     }
 }
+
+/* Article body (blog articles and the editor): sanitized HTML from App\Services\Blog\HtmlSanitizer. */
+@layer components {
+    .prose-article {
+        @apply flex flex-col gap-5 text-base leading-relaxed text-fg-secondary lg:text-lg;
+    }
+
+    .prose-article > * {
+        @apply my-0;
+    }
+
+    .prose-article h2 {
+        @apply mt-4 scroll-mt-24 text-2xl font-bold text-fg;
+    }
+
+    .prose-article h3 {
+        @apply mt-2 scroll-mt-24 text-xl font-semibold text-fg;
+    }
+
+    .prose-article h4 {
+        @apply text-lg font-semibold text-fg;
+    }
+
+    .prose-article a {
+        @apply font-medium text-fg-brand underline underline-offset-2;
+    }
+
+    .prose-article strong,
+    .prose-article b {
+        @apply font-semibold text-fg;
+    }
+
+    .prose-article ul {
+        @apply flex list-disc flex-col gap-2 ps-6 marker:text-fg-brand;
+    }
+
+    .prose-article ol {
+        @apply flex list-decimal flex-col gap-2 ps-6 marker:text-fg-brand;
+    }
+
+    .prose-article blockquote {
+        @apply border-s-4 border-line-brand ps-4 text-fg italic;
+    }
+
+    .prose-article :not(pre) > code {
+        @apply rounded bg-muted px-1.5 py-0.5 font-mono text-[0.9em] text-fg;
+    }
+
+    .prose-article pre {
+        @apply overflow-x-auto rounded-xl bg-ink-950 p-5 font-mono text-sm leading-6 text-ink-50;
+        direction: ltr;
+        text-align: left;
+    }
+
+    .prose-article pre code {
+        @apply bg-transparent p-0 text-inherit;
+    }
+
+    .prose-article aside[data-callout] {
+        @apply flex flex-col gap-2 rounded-xl border border-line-info bg-info-subtle p-4 text-base text-fg;
+    }
+
+    .prose-article aside[data-callout='tip'] {
+        @apply border-line-success bg-success-subtle;
+    }
+
+    .prose-article aside[data-callout='warning'] {
+        @apply border-line-warning bg-warning-subtle;
+    }
+
+    .prose-article img {
+        @apply h-auto max-w-full rounded-xl border border-line;
+    }
+
+    .prose-article figcaption {
+        @apply mt-2 text-sm text-fg-tertiary;
+    }
+
+    .prose-article table {
+        @apply w-full border-collapse text-sm;
+    }
+
+    .prose-article th,
+    .prose-article td {
+        @apply border border-line px-3 py-2 text-start align-top;
+    }
+
+    .prose-article th {
+        @apply bg-subtle font-semibold text-fg;
+    }
+
+    .prose-article th p,
+    .prose-article td p {
+        @apply m-0;
+    }
+
+    .prose-article iframe {
+        @apply aspect-video h-auto w-full rounded-xl border border-line;
+    }
+
+    .prose-article hr {
+        @apply border-line;
+    }
+
+    .cf-editor.prose-article {
+        @apply gap-3 text-base lg:text-base;
+    }
+
+    .cf-editor .selectedCell {
+        @apply bg-brand-subtle;
+    }
+}

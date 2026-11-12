@@ -91,17 +91,18 @@ enum PageSectionType: string
             self::Industries => __('Published industries'),
             self::Statistics => __('Published statistics'),
             self::Testimonials => __('Featured testimonials with client consent'),
-            self::LatestArticles => __('Blog articles (available in Milestone 7)'),
+            self::LatestArticles => __('Latest published blog articles'),
             self::Faq => __('Featured FAQs first'),
         };
     }
 
     /**
-     * Sections that cannot be shown yet because their content type does not exist.
+     * Sections that cannot be shown yet because their content type does not exist (every type is available since
+     * the blog shipped in Milestone 7; kept for future section types).
      */
     public function isAvailable(): bool
     {
-        return $this !== self::LatestArticles;
+        return true;
     }
 
     /**
@@ -122,7 +123,7 @@ enum PageSectionType: string
             self::WhyUs => [__('Why CodeFanz', [], $locale), __('A partner that engineers for the long run', [], $locale), null, __('Start Your Project', [], $locale)],
             self::Statistics => [null, __('CodeFanz in numbers', [], $locale), null, null],
             self::Testimonials => [__('Client stories', [], $locale), __('What our clients say', [], $locale), null, __('Read more client stories', [], $locale)],
-            self::LatestArticles => [__('Blog', [], $locale), __('Latest from our blog', [], $locale), null, null],
+            self::LatestArticles => [__('Blog', [], $locale), __('Latest from our blog', [], $locale), null, __('Read the blog', [], $locale)],
             self::Faq => [__('FAQ', [], $locale), __('Questions, answered', [], $locale), null, __('See all questions', [], $locale)],
             self::Cta => [null, __('Have an idea? Let’s build it together.', [], $locale), __('Get a free preliminary estimate within 48 hours. No payment required.', [], $locale), __('Start Your Project', [], $locale)],
             self::AboutIntro => [__('About CodeFanz', [], $locale), __('Engineering digital products that last', [], $locale), __('CodeFanz is a software development company helping startups and established businesses design, build and scale web, mobile and AI-powered products.', [], $locale), null],
@@ -152,6 +153,7 @@ enum PageSectionType: string
             self::Statistics => ['default' => 4, 'max' => 8],
             self::Testimonials => ['default' => 3, 'max' => 9],
             self::Faq => ['default' => 5, 'max' => 12],
+            self::LatestArticles => ['default' => 3, 'max' => 9],
             default => null,
         };
     }

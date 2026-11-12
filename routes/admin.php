@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AiUsageController;
 use App\Http\Controllers\Admin\AuditLogController;
+use App\Http\Controllers\Admin\AuthorProfileController;
 use App\Http\Controllers\Admin\CareerController;
 use App\Http\Controllers\Admin\ChangeRequestController;
 use App\Http\Controllers\Admin\ContactMessageController;
@@ -28,6 +29,10 @@ use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\PaymentLinkController;
 use App\Http\Controllers\Admin\PortfolioCategoryController;
 use App\Http\Controllers\Admin\PortfolioProjectController;
+use App\Http\Controllers\Admin\PostCategoryController;
+use App\Http\Controllers\Admin\PostController;
+use App\Http\Controllers\Admin\PostRevisionController;
+use App\Http\Controllers\Admin\PostWorkflowController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductVersionController;
 use App\Http\Controllers\Admin\ProfileController;
@@ -43,6 +48,7 @@ use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\StatisticController;
 use App\Http\Controllers\Admin\SupportTicketController;
+use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\TechnologyCategoryController;
 use App\Http\Controllers\Admin\TechnologyController;
 use App\Http\Controllers\Admin\TestimonialController;
@@ -52,6 +58,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('security', SecurityController::class)->middleware('password.confirm')->name('security');
 Route::get('profile', ProfileController::class)->name('profile');
+Route::put('profile/author', AuthorProfileController::class)->name('profile.author');
 
 Route::middleware('two-factor')->group(function (): void {
     Route::get('/', DashboardController::class)->name('dashboard');
@@ -178,6 +185,26 @@ Route::middleware('two-factor')->group(function (): void {
         Route::put('products/{product}/versions/{version}', [ProductVersionController::class, 'update'])->name('products.versions.update');
         Route::delete('products/{product}/versions/{version}', [ProductVersionController::class, 'destroy'])->name('products.versions.destroy');
     });
+
+    Route::get('posts', [PostController::class, 'index'])->name('posts.index');
+    Route::get('posts/create', [PostController::class, 'create'])->name('posts.create');
+    Route::post('posts', [PostController::class, 'store'])->name('posts.store');
+    Route::post('posts/checklist', [PostController::class, 'checklist'])->middleware('throttle:120,1')->name('posts.checklist');
+    Route::get('posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
+    Route::put('posts/{post}', [PostController::class, 'update'])->name('posts.update');
+    Route::delete('posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+    Route::post('posts/{post}/submit', [PostWorkflowController::class, 'submit'])->name('posts.submit');
+    Route::post('posts/{post}/approve', [PostWorkflowController::class, 'approve'])->name('posts.approve');
+    Route::post('posts/{post}/request-changes', [PostWorkflowController::class, 'requestChanges'])->name('posts.request-changes');
+    Route::post('posts/{post}/publish', [PostWorkflowController::class, 'publish'])->name('posts.publish');
+    Route::post('posts/{post}/schedule', [PostWorkflowController::class, 'schedule'])->name('posts.schedule');
+    Route::post('posts/{post}/unschedule', [PostWorkflowController::class, 'unschedule'])->name('posts.unschedule');
+    Route::post('posts/{post}/archive', [PostWorkflowController::class, 'archive'])->name('posts.archive');
+    Route::post('posts/{post}/reopen', [PostWorkflowController::class, 'reopen'])->name('posts.reopen');
+    Route::get('posts/{post}/revisions', [PostRevisionController::class, 'index'])->name('posts.revisions.index');
+    Route::post('posts/{post}/revisions/{revision}/restore', [PostRevisionController::class, 'restore'])->scopeBindings()->name('posts.revisions.restore');
+    Route::resource('post-categories', PostCategoryController::class)->except(['show']);
+    Route::resource('tags', TagController::class)->except(['index', 'show']);
 
     Route::get('home-sections', [HomeSectionController::class, 'index'])->name('home-sections.index');
     Route::get('home-sections/{section}/edit', [HomeSectionController::class, 'edit'])->name('home-sections.edit');

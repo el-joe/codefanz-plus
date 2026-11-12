@@ -19,6 +19,8 @@ use App\Enums\MenuLocation;
 use App\Enums\MilestoneStatus;
 use App\Enums\PageSectionType;
 use App\Enums\PageStatus;
+use App\Enums\PostOrigin;
+use App\Enums\PostStatus;
 use App\Enums\PricingModel;
 use App\Enums\ProductAvailability;
 use App\Enums\ProjectStatus;
@@ -45,15 +47,20 @@ use App\Models\PageTranslation;
 use App\Models\PaymentLink;
 use App\Models\PortfolioCategory;
 use App\Models\PortfolioProject;
+use App\Models\Post;
+use App\Models\PostCategory;
+use App\Models\PostTranslation;
 use App\Models\Product;
 use App\Models\Project;
 use App\Models\Service;
 use App\Models\Statistic;
 use App\Models\SupportTicket;
+use App\Models\Tag;
 use App\Models\Technology;
 use App\Models\TechnologyCategory;
 use App\Models\Testimonial;
 use App\Models\User;
+use App\Services\Blog\PostRevisions;
 use App\Services\DocumentNumbers;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -86,6 +93,69 @@ class DemoContentSeeder extends Seeder
         $this->customers();
         $this->delivery();
         $this->billing();
+        $this->blog();
+    }
+
+    /**
+     * Clearly-sample bilingual blog articles (one featured, one AI-origin draft waiting for review).
+     */
+    private function blog(): void
+    {
+        if (PostTranslation::query()->where('slug', 'sample-scoping-an-ai-feature')->exists()) {
+            return;
+        }
+
+        $author = User::query()->whereHas('roles', fn ($query) => $query->whereIn('name', [Role::SuperAdmin->value, Role::ContentManager->value, Role::Administrator->value]))->orderBy('id')->first();
+        $categories = [];
+
+        foreach ([['engineering', 'Sample: Engineering', 'تجريبي: الهندسة', 'تجريبي-الهندسة'], ['ai-automation', 'Sample: AI & Automation', 'تجريبي: الذكاء الاصطناعي والأتمتة', 'تجريبي-الذكاء-الاصطناعي']] as $position => [$slug, $en, $ar, $arSlug]) {
+            $category = PostCategory::query()->create(['sort_order' => $position]);
+            $category->translations()->createMany([
+                ['locale' => 'en', 'name' => $en, 'slug' => 'sample-'.$slug],
+                ['locale' => 'ar', 'name' => $ar, 'slug' => $arSlug],
+            ]);
+            $categories[$slug] = $category->getKey();
+        }
+
+        $tag = Tag::query()->create();
+        $tag->translations()->createMany([
+            ['locale' => 'en', 'name' => 'Sample tag', 'slug' => 'sample-tag'],
+            ['locale' => 'ar', 'name' => 'وسم تجريبي', 'slug' => 'وسم-تجريبي'],
+        ]);
+
+        $bodyEn = '<p>Sample article for design review — replace it in Admin → Blog. Scoping an AI feature starts with the decision it supports.</p>'
+            .'<h2>Start with the decision, not the model</h2><p>Write down the decision and who makes it. See our <a href="/en/services">services</a>.</p>'
+            .'<aside data-callout="tip"><p>Rule of thumb: AI drafts — a human approves.</p></aside>'
+            .'<h2>Check your data readiness</h2><ul><li>Where does the data live?</li><li>Is it in Arabic, English or both?</li></ul>'
+            .'<pre><code>// Every AI output becomes a reviewable draft</code></pre><h3>Define how you will evaluate</h3><p>Collect real examples and run them on every change.</p>';
+        $bodyAr = '<p>مقال تجريبي للمراجعة — استبدله من لوحة التحكم ← المدونة. يبدأ تحديد نطاق ميزة الذكاء الاصطناعي بالقرار الذي تدعمه.</p>'
+            .'<h2>ابدأ بالقرار وليس بالنموذج</h2><p>اكتب القرار ومن يتخذه. اطّلع على <a href="/ar/services">خدماتنا</a>.</p>'
+            .'<aside data-callout="tip"><p>قاعدة عامة: الذكاء الاصطناعي يكتب المسودة والإنسان يعتمدها.</p></aside>'
+            .'<h2>تحقق من جاهزية بياناتك</h2><ul><li>أين توجد البيانات؟</li><li>هل هي بالعربية أم الإنجليزية أم كلتيهما؟</li></ul>';
+
+        $articles = [
+            ['sample-scoping-an-ai-feature', 'ai-automation', true, PostStatus::Published, PostOrigin::Human, 2, ['Sample: how to scope an AI feature without blowing your budget', 'تجريبي: كيف تحدد نطاق ميزة ذكاء اصطناعي دون تجاوز الميزانية'], 'تجريبي-نطاق-ميزة-ذكاء-اصطناعي'],
+            ['sample-laravel-vs-node', 'engineering', false, PostStatus::Published, PostOrigin::Human, 6, ['Sample: Laravel vs. Node.js for your next SaaS', 'تجريبي: لارافيل أم Node.js لمنتجك القادم'], 'تجريبي-لارافيل-أم-نود'],
+            ['sample-arabic-first-apps', 'engineering', false, PostStatus::Published, PostOrigin::Human, 9, ['Sample: designing Arabic-first apps — RTL lessons', 'تجريبي: تصميم تطبيقات عربية أولًا — دروس الاتجاه من اليمين لليسار'], 'تجريبي-تطبيقات-عربية-أولا'],
+            ['sample-ai-draft-human-in-the-loop', 'ai-automation', false, PostStatus::InReview, PostOrigin::Ai, 0, ['Sample AI draft: human-in-the-loop approval workflows', 'مسودة ذكاء اصطناعي تجريبية: سير عمل الاعتماد البشري'], 'تجريبي-مسودة-اعتماد-بشري'],
+        ];
+
+        foreach ($articles as [$slug, $category, $featured, $status, $origin, $daysAgo, $titles, $arSlug]) {
+            $post = Post::query()->create([
+                'author_id' => $author?->getKey(),
+                'post_category_id' => $categories[$category],
+                'status' => $status,
+                'origin' => $origin,
+                'is_featured' => $featured,
+                'published_at' => $status === PostStatus::Published ? now()->subDays($daysAgo) : null,
+                'submitted_at' => $status === PostStatus::InReview ? now() : null,
+                'created_by' => $author?->getKey(),
+            ]);
+            $post->translations()->create(['locale' => 'en', 'title' => $titles[0], 'slug' => $slug, 'excerpt' => 'Sample excerpt for design review — replace it in Admin → Blog.', 'body' => $bodyEn, 'focus_keyword' => 'AI feature', 'seo_description' => 'Sample article for design review. Replace it with a real article in Admin → Blog.']);
+            $post->translations()->create(['locale' => 'ar', 'title' => $titles[1], 'slug' => $arSlug, 'excerpt' => 'مقتطف تجريبي للمراجعة — استبدله من لوحة التحكم.', 'body' => $bodyAr]);
+            $post->tags()->attach($tag);
+            app(PostRevisions::class)->record($post, $author, 'created');
+        }
     }
 
     /**
