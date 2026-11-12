@@ -37,7 +37,7 @@ enum Role: string
     }
 
     /**
-     * Roles that can be assigned from the staff admin. Client accounts are invited from the portal.
+     * Roles that can be assigned from the staff admin. Client accounts are invited from a customer's page.
      *
      * @return list<self>
      */
@@ -63,13 +63,13 @@ enum Role: string
                     Permission::PaymentsRefundApprove,
                 ], true),
             )),
-            self::ProjectManager => [Permission::AdminAccess, Permission::LeadsView, Permission::ProjectsManage, Permission::PaymentsCreateLinks, Permission::SupportManage],
-            self::SalesManager => [Permission::AdminAccess, Permission::LeadsView, Permission::LeadsManage, Permission::RadarView],
+            self::ProjectManager => [Permission::AdminAccess, Permission::LeadsView, Permission::CustomersView, Permission::CustomersManage, Permission::ProjectsManage, Permission::PaymentsCreateLinks, Permission::SupportManage],
+            self::SalesManager => [Permission::AdminAccess, Permission::LeadsView, Permission::LeadsManage, Permission::CustomersView, Permission::CustomersManage, Permission::RadarView],
             self::ContentManager => [Permission::AdminAccess, Permission::ContentManage, Permission::ContentApprove, Permission::MediaManage, Permission::AiUse],
             self::SeoSpecialist => [Permission::AdminAccess, Permission::SeoManage, Permission::SeoApprove, Permission::AiUse],
             self::SocialMediaManager => [Permission::AdminAccess, Permission::SocialManage, Permission::SocialApprove, Permission::MediaManage, Permission::AiUse],
             self::Developer => [Permission::AdminAccess, Permission::ProjectsManage, Permission::SupportManage],
-            self::FinanceManager => [Permission::AdminAccess, Permission::PaymentsCreateLinks, Permission::PaymentsRefundApprove],
+            self::FinanceManager => [Permission::AdminAccess, Permission::CustomersView, Permission::PaymentsCreateLinks, Permission::PaymentsRefundApprove],
             self::SupportAgent => [Permission::AdminAccess, Permission::SupportManage],
             self::Client => [],
         };

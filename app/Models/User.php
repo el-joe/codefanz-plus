@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CustomerStatus;
 use App\Enums\Permission;
 use App\Enums\Role;
 use Database\Factories\UserFactory;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -57,6 +59,29 @@ class User extends Authenticatable implements HasLocalePreference
     {
         $query->where('is_active', true)
             ->whereHas('roles.permissions', fn (Builder $permissions) => $permissions->where('name', Permission::LeadsManage->value));
+    }
+
+    /**
+     * Customer accounts this user is (or was) linked to as a portal user, with the membership on the pivot.
+     *
+     * @return BelongsToMany<Customer, $this, CustomerUser>
+     */
+    public function customers(): BelongsToMany
+    {
+        return $this->belongsToMany(Customer::class)
+            ->using(CustomerUser::class)
+            ->withPivot(['id', 'role', 'invited_at', 'revoked_at'])
+            ->withTimestamps();
+    }
+
+    /**
+     * Customers this user may open in the portal right now: membership not revoked and customer active.
+     *
+     * @return BelongsToMany<Customer, $this, CustomerUser>
+     */
+    public function portalCustomers(): BelongsToMany
+    {
+        return $this->customers()->wherePivotNull('revoked_at')->where('customers.status', CustomerStatus::Active->value);
     }
 
     public function isStaff(): bool

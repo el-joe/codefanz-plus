@@ -139,6 +139,8 @@
                                         @case(\App\Enums\LeadActivityType::System)
                                             @if (($activity->meta['event'] ?? null) === 'created')
                                                 {{ __('Lead created from :source', ['source' => \App\Enums\LeadSource::tryFrom($activity->meta['source'] ?? '')?->label() ?? '—']) }}
+                                            @elseif (($activity->meta['event'] ?? null) === 'converted')
+                                                {{ __('Converted into customer :reference', ['reference' => $activity->meta['reference'] ?? '']) }}
                                             @else
                                                 {{ $activity->body }}
                                             @endif
@@ -205,6 +207,19 @@
                         @include('admin.leads._move-form', ['lead' => $lead])
                     @else
                         <p class="text-sm text-fg-secondary">{{ __('Won leads are final.') }}</p>
+                    @endif
+                    @if ($lead->status === \App\Enums\LeadStatus::Won)
+                        <div class="mt-4 border-t border-line-subtle pt-4" data-lead-customer>
+                            @if ($lead->customer)
+                                @can('view', $lead->customer)
+                                    <a href="{{ route('admin.customers.show', $lead->customer) }}" class="text-sm font-semibold text-fg-brand hover:underline">{{ __('View customer :reference', ['reference' => $lead->customer->reference]) }}</a>
+                                @else
+                                    <p class="text-sm text-fg-secondary">{{ __('Converted into customer :reference', ['reference' => $lead->customer->reference]) }}</p>
+                                @endcan
+                            @elsecan('create', \App\Models\Customer::class)
+                                <x-ui.button size="sm" :href="route('admin.customers.create', ['lead' => $lead->ulid])">{{ __('Convert to customer') }}</x-ui.button>
+                            @endif
+                        </div>
                     @endif
                 </x-ui.card>
 

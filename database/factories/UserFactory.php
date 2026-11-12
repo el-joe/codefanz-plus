@@ -2,7 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Enums\CustomerUserRole;
 use App\Enums\Role;
+use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -58,6 +60,24 @@ class UserFactory extends Factory
             'two_factor_recovery_codes' => encrypt(json_encode(['recovery-code-1'])),
             'two_factor_confirmed_at' => now(),
         ]);
+    }
+
+    /**
+     * A portal user (role "client"). Link it to a customer with CustomerFactory::withPortalUser() or forCustomer().
+     */
+    public function client(): static
+    {
+        return $this->role(Role::Client);
+    }
+
+    /**
+     * A client user with an active membership in the given customer.
+     */
+    public function forCustomer(Customer $customer, CustomerUserRole $role = CustomerUserRole::Member): static
+    {
+        return $this->client()->afterCreating(
+            fn (User $user) => $customer->users()->attach($user, ['role' => $role, 'invited_at' => now()]),
+        );
     }
 
     /**

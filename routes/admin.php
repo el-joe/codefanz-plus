@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\CareerController;
 use App\Http\Controllers\Admin\ChangeRequestController;
 use App\Http\Controllers\Admin\ContactMessageController;
+use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\CustomerPortalUserController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FaqCategoryController;
 use App\Http\Controllers\Admin\FaqController;
@@ -74,6 +76,14 @@ Route::middleware('two-factor')->group(function (): void {
         Route::post('leads/{lead}/assignment', LeadAssignmentController::class)->name('leads.assign');
         Route::post('leads/{lead}/activities', [LeadActivityController::class, 'store'])->name('leads.activities.store');
         Route::get('leads/{lead}/attachments/{attachment}', [LeadAttachmentController::class, 'show'])->scopeBindings()->name('leads.attachments.show');
+    });
+
+    Route::middleware('can:viewAny,App\Models\Customer')->group(function (): void {
+        Route::resource('customers', CustomerController::class);
+        Route::post('customers/{customer}/portal-users', [CustomerPortalUserController::class, 'store'])->middleware('throttle:20,1')->name('customers.portal-users.store');
+        Route::post('customers/{customer}/portal-users/{user}/invitation', [CustomerPortalUserController::class, 'resend'])->middleware('throttle:6,1')->name('customers.portal-users.invitation');
+        Route::delete('customers/{customer}/portal-users/{user}/access', [CustomerPortalUserController::class, 'revoke'])->name('customers.portal-users.revoke');
+        Route::post('customers/{customer}/portal-users/{user}/access', [CustomerPortalUserController::class, 'restore'])->name('customers.portal-users.restore');
     });
 
     Route::middleware('can:leads.view')->group(function (): void {

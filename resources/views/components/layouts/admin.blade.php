@@ -6,6 +6,7 @@
         ['label' => __('Overview'), 'route' => 'admin.dashboard', 'can' => 'admin.access'],
         ['label' => __('Approvals'), 'route' => 'admin.approvals.index', 'can' => 'viewAny', 'model' => \App\Models\ChangeRequest::class, 'count' => $pendingApprovalsCount ?? null],
         ['label' => __('Leads'), 'route' => 'admin.leads.index', 'can' => 'viewAny', 'model' => \App\Models\Lead::class, 'also' => 'admin.leads.*'],
+        ['label' => __('Customers'), 'route' => 'admin.customers.index', 'can' => 'viewAny', 'model' => \App\Models\Customer::class],
         ['label' => __('Contact inbox'), 'route' => 'admin.contact-messages.index', 'can' => 'leads.view'],
         ['label' => __('Pages'), 'route' => 'admin.pages.index', 'can' => 'viewAny', 'model' => \App\Models\Page::class],
         ['label' => __('Page sections'), 'route' => 'admin.home-sections.index', 'can' => 'viewAny', 'model' => \App\Models\PageSection::class],

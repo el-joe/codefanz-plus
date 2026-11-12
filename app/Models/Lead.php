@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -147,6 +148,16 @@ class Lead extends Model
     public function technologies(): BelongsToMany
     {
         return $this->belongsToMany(Technology::class);
+    }
+
+    /**
+     * The customer account this lead was converted into, if any.
+     *
+     * @return HasOne<Customer, $this>
+     */
+    public function customer(): HasOne
+    {
+        return $this->hasOne(Customer::class, 'created_from_lead_id');
     }
 
     /**

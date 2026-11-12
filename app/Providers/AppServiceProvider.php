@@ -8,6 +8,7 @@ use App\Models\Career;
 use App\Models\CareerTranslation;
 use App\Models\ChangeRequest;
 use App\Models\ContactMessage;
+use App\Models\Customer;
 use App\Models\Faq;
 use App\Models\FaqCategory;
 use App\Models\Industry;
@@ -33,6 +34,7 @@ use App\Models\Technology;
 use App\Models\TechnologyCategory;
 use App\Models\Testimonial;
 use App\Models\User;
+use App\Services\CurrentCustomer;
 use App\Services\MenuResolver;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
@@ -50,7 +52,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // One per request (and per queued job): the customer a portal user is acting for.
+        $this->app->scoped(CurrentCustomer::class);
     }
 
     /**
@@ -84,6 +87,7 @@ class AppServiceProvider extends ServiceProvider
             'page_section' => PageSection::class,
             'contact_message' => ContactMessage::class,
             'lead' => Lead::class,
+            'customer' => Customer::class,
         ]);
 
         // Public contact form: a few messages a minute and a daily cap per visitor IP.

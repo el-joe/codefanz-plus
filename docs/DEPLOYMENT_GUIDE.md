@@ -16,7 +16,9 @@ Redis · Supervisor (queue workers) · cron (scheduler) · Certbot (Let's Encryp
 2. `composer install --no-dev --optimize-autoloader`
 3. `npm ci && npm run build`
 4. Link shared `storage/` and `.env`
-5. `php artisan migrate --force` (**review migration plan first; destructive changes need approval + backup**)
+5. `php artisan migrate --force` (**review migration plan first; destructive changes need approval + backup**),
+   then `php artisan db:seed --class=RolesAndPermissionsSeeder --force` whenever `App\Enums\Permission`/`Role` change
+   (idempotent; e.g. M5 slice 2 added `customers.view`/`customers.manage`)
 6. `php artisan optimize` (config/route/view/event cache)
 7. Atomic symlink switch `current → releases/<timestamp>`, reload PHP-FPM
 8. `php artisan queue:restart`
@@ -37,3 +39,10 @@ Redis · Supervisor (queue workers) · cron (scheduler) · Certbot (Let's Encryp
 
 ## 7. Production checklist
 See Phase 20 of the master prompt; tracked in `IMPLEMENTATION_ROADMAP.md` at M12.
+
+## 8. Local demo data
+
+`php artisan db:seed --class=DemoContentSeeder` (never in production) adds sample content, sample leads and a sample
+customer with one portal user, `client.demo@example.test`. Its password is random on purpose: to sign in locally,
+open `/forgot-password`, request a link for that address and open it from the local mail log
+(`MAIL_MAILER=log` → `storage/logs/laravel.log`) to choose a password, then sign in — you land on `/portal`.

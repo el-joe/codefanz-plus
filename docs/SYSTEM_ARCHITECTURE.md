@@ -71,8 +71,28 @@ milestones, documents, tickets), `Billing`, `Blog`, `Seo`, `Analytics`, `Marketi
 - Sanctum personal access tokens for `/api/v1` and MCP clients, with abilities (`mcp:read`, `mcp:draft`,
   `mcp:approve`, `mcp:execute`).
 - RBAC: roles × granular permissions (`spatie/laravel-permission`, pending approval). Users may hold many roles.
-- Clients are users with the `client` role linked to a `customers` record; all portal queries scoped through
-  policies + query scopes (`whereBelongsToCustomer`). Isolation is tested.
+- Clients are users with the `client` role linked to one or more `customers` through `customer_user`
+  (role owner/member, `revoked_at`). Public registration is off; staff invite portal users from the customer page
+  (`ClientInvitation`, password-broker link in the user's language). Fortify's home `/dashboard` sends staff to
+  `/admin` and everyone else to `/portal`; clients have no permissions, so `can:admin.access` returns 403.
+
+### 5.1 Client portal isolation
+
+- `/portal` routes run `web, auth, active, locale.preference, portal`. The `portal` middleware
+  (`EnsurePortalAccess`) redirects staff to `/admin` and returns 403 unless the user has a non-revoked membership
+  in an **active** customer.
+- `App\Services\CurrentCustomer` (scoped per request) holds the customer the user is acting for. It is read
+  from the session (`portal.customer`, a ulid) and **re-validated against the memberships on every request**;
+  a stale or forged value falls back to the user's first accessible customer. The account switcher
+  (`POST /portal/account`) only accepts customers from `User::portalCustomers()` (404 otherwise).
+- Client-owned models (projects, invoices, documents, tickets…) carry `customer_id` and use the
+  `App\Models\Concerns\BelongsToCustomer` trait. Portal code always queries through
+  `Model::query()->forCurrentCustomer()` (explicit scope, not global, so admin screens still see everything).
+- Portal policies use `App\Policies\Concerns\ChecksCustomerOwnership::ownedByCurrentCustomer($user, $record)`
+  for single records (record belongs to the current customer **and** the membership is still active).
+- Switching portal access off for a user's last customer deactivates the user and deletes their sessions/tokens;
+  the `active` middleware signs them out on the next request. Isolation is covered by
+  `tests/Feature/Portal/ClientPortalTest.php`.
 
 ## 6. Approval engine (Governance)
 

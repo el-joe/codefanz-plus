@@ -4,6 +4,9 @@ namespace Database\Seeders;
 
 use App\Enums\BudgetRange;
 use App\Enums\ContentStatus;
+use App\Enums\CustomerStatus;
+use App\Enums\CustomerType;
+use App\Enums\CustomerUserRole;
 use App\Enums\EmploymentType;
 use App\Enums\LeadActivityType;
 use App\Enums\LeadPriority;
@@ -16,9 +19,11 @@ use App\Enums\PageStatus;
 use App\Enums\PricingModel;
 use App\Enums\ProductAvailability;
 use App\Enums\ProjectType;
+use App\Enums\Role;
 use App\Enums\ServiceTier;
 use App\Enums\TechnologyProficiency;
 use App\Models\Career;
+use App\Models\Customer;
 use App\Models\Faq;
 use App\Models\FaqCategory;
 use App\Models\Industry;
@@ -36,7 +41,9 @@ use App\Models\Statistic;
 use App\Models\Technology;
 use App\Models\TechnologyCategory;
 use App\Models\Testimonial;
+use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 /**
  * Clearly-sample bilingual catalog content for local demos and design reviews.
@@ -62,6 +69,7 @@ class DemoContentSeeder extends Seeder
         $this->aboutAndCareersSections();
         $this->legalPages();
         $this->leads();
+        $this->customers();
     }
 
     /**
@@ -630,5 +638,42 @@ class DemoContentSeeder extends Seeder
             $lead->services()->sync($services->shuffle()->take(1)->all());
             $lead->activities()->create(['type' => LeadActivityType::System, 'meta' => ['event' => 'created', 'source' => $source->value]]);
         }
+    }
+
+    /**
+     * A sample customer converted from the sample won lead, with one portal user (client.demo@example.test).
+     * The password is random: sign in locally through "Forgot password" (see docs/DEPLOYMENT_GUIDE.md).
+     */
+    private function customers(): void
+    {
+        if (Customer::query()->where('email', 'customer.demo@example.test')->exists()) {
+            return;
+        }
+
+        $lead = Lead::query()->where('status', LeadStatus::Won)->where('email', 'like', '%@example.test')->doesntHave('customer')->first();
+
+        $customer = Customer::create([
+            'type' => CustomerType::Company,
+            'status' => CustomerStatus::Active,
+            'company_name' => 'Sample Foods (demo customer)',
+            'contact_name' => 'Sample Client',
+            'email' => 'customer.demo@example.test',
+            'country' => 'EG',
+            'billing_city' => 'Cairo',
+            'preferred_locale' => 'ar',
+            'notes' => 'Sample customer for layout review only. Not a real account.',
+            'created_from_lead_id' => $lead?->getKey(),
+        ]);
+
+        $user = User::query()->firstOrCreate(['email' => 'client.demo@example.test'], [
+            'name' => 'Sample Client',
+            'password' => Str::password(40),
+            'locale' => 'ar',
+            'timezone' => 'Africa/Cairo',
+            'is_active' => true,
+        ]);
+        $user->syncRoles([Role::Client->value]);
+
+        $customer->users()->syncWithoutDetaching([$user->getKey() => ['role' => CustomerUserRole::Owner, 'invited_at' => now()]]);
     }
 }

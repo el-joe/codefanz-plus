@@ -6,6 +6,9 @@ use App\Enums\Permission;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Fortify's home: staff go to the admin, everyone else to the client portal (which checks their access).
+ */
 class DashboardRedirectController extends Controller
 {
     public function __invoke(Request $request): RedirectResponse
@@ -14,7 +17,6 @@ class DashboardRedirectController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
-        return redirect()->route('home', ['locale' => app()->getLocale()])
-            ->with('toast', __('The client portal opens with your first project.'));
+        return redirect()->route('portal.dashboard');
     }
 }

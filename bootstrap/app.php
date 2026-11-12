@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\AssignRequestId;
+use App\Http\Middleware\EnsurePortalAccess;
 use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\RequireTwoFactor;
 use App\Http\Middleware\SetLocaleFromPreference;
@@ -21,6 +22,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->prefix('admin')
                 ->name('admin.')
                 ->group(base_path('routes/admin.php'));
+
+            Route::middleware(['web', 'auth', 'active', 'locale.preference', 'portal'])
+                ->prefix('portal')
+                ->name('portal.')
+                ->group(base_path('routes/portal.php'));
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
@@ -28,6 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'active' => EnsureUserIsActive::class,
             'two-factor' => RequireTwoFactor::class,
+            'portal' => EnsurePortalAccess::class,
             'locale.route' => SetLocaleFromRoute::class,
             'locale.preference' => SetLocaleFromPreference::class,
         ]);
