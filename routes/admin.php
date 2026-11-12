@@ -54,6 +54,11 @@ use App\Http\Controllers\Admin\SecurityController;
 use App\Http\Controllers\Admin\SeoController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\SocialAccountController;
+use App\Http\Controllers\Admin\SocialCalendarController;
+use App\Http\Controllers\Admin\SocialMetricsController;
+use App\Http\Controllers\Admin\SocialPostController;
+use App\Http\Controllers\Admin\SocialWorkflowController;
 use App\Http\Controllers\Admin\StatisticController;
 use App\Http\Controllers\Admin\SupportTicketController;
 use App\Http\Controllers\Admin\TagController;
@@ -99,6 +104,38 @@ Route::middleware('two-factor')->group(function (): void {
         Route::post('prompts/{template}/test', [PromptTemplateController::class, 'test'])->middleware('throttle:10,1')->name('prompts.test');
         Route::get('brand-voice', [BrandProfileController::class, 'edit'])->name('brand-voice.edit');
         Route::put('brand-voice', [BrandProfileController::class, 'update'])->name('brand-voice.update');
+    });
+
+    // Social media (M8.2): composer, approval workflow, calendar, manual export, accounts and metrics.
+    Route::middleware('can:social.manage')->prefix('social')->name('social.')->group(function (): void {
+        Route::redirect('/', 'social/posts')->name('index');
+        Route::get('posts', [SocialPostController::class, 'index'])->name('posts.index');
+        Route::get('posts/create', [SocialPostController::class, 'create'])->name('posts.create');
+        Route::post('posts', [SocialPostController::class, 'store'])->name('posts.store');
+        Route::get('posts/{post}', [SocialPostController::class, 'show'])->name('posts.show');
+        Route::get('posts/{post}/edit', [SocialPostController::class, 'edit'])->name('posts.edit');
+        Route::put('posts/{post}', [SocialPostController::class, 'update'])->name('posts.update');
+        Route::get('posts/{post}/media/{media}', [SocialPostController::class, 'media'])->name('posts.media');
+        Route::post('posts/{post}/submit', [SocialWorkflowController::class, 'submit'])->name('posts.submit');
+        Route::post('posts/{post}/approve', [SocialWorkflowController::class, 'approve'])->name('posts.approve');
+        Route::post('posts/{post}/request-changes', [SocialWorkflowController::class, 'requestChanges'])->name('posts.request-changes');
+        Route::post('posts/{post}/schedule', [SocialWorkflowController::class, 'schedule'])->name('posts.schedule');
+        Route::post('posts/{post}/reschedule', [SocialWorkflowController::class, 'reschedule'])->middleware('throttle:120,1')->name('posts.reschedule');
+        Route::post('posts/{post}/unschedule', [SocialWorkflowController::class, 'unschedule'])->name('posts.unschedule');
+        Route::post('posts/{post}/publish-now', [SocialWorkflowController::class, 'publishNow'])->middleware('throttle:20,1')->name('posts.publish-now');
+        Route::post('posts/{post}/cancel', [SocialWorkflowController::class, 'cancel'])->name('posts.cancel');
+        Route::post('variants/{variant}/retry', [SocialWorkflowController::class, 'retry'])->middleware('throttle:20,1')->name('variants.retry');
+        Route::post('variants/{variant}/posted', [SocialWorkflowController::class, 'posted'])->name('variants.posted');
+        Route::get('calendar', SocialCalendarController::class)->name('calendar');
+        Route::get('accounts', [SocialAccountController::class, 'index'])->name('accounts.index');
+        Route::post('accounts', [SocialAccountController::class, 'store'])->name('accounts.store');
+        Route::get('connect/{provider}', [SocialAccountController::class, 'connect'])->middleware('throttle:10,1')->name('accounts.connect');
+        Route::get('oauth/{provider}/callback', [SocialAccountController::class, 'callback'])->middleware('throttle:10,1')->name('oauth.callback');
+        Route::post('accounts/{account}/verify', [SocialAccountController::class, 'verify'])->middleware('throttle:20,1')->name('accounts.verify');
+        Route::post('accounts/{account}/manual', [SocialAccountController::class, 'manual'])->name('accounts.manual');
+        Route::delete('accounts/{account}', [SocialAccountController::class, 'destroy'])->name('accounts.destroy');
+        Route::get('metrics', [SocialMetricsController::class, 'index'])->name('metrics.index');
+        Route::post('metrics/refresh', [SocialMetricsController::class, 'refresh'])->middleware('throttle:6,1')->name('metrics.refresh');
     });
 
     Route::middleware('can:media.manage')->group(function (): void {

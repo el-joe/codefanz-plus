@@ -115,7 +115,7 @@ re-verifies approval, approver permission, scope, and the target's version befor
 |---|---|
 | `PaymentGateway` | Stripe (M6.2); Paymob, PayTabs, Fawry (M6.3) |
 | `AiProvider` | OpenAI (Responses API); future adapters |
-| `SocialPublisher` | Facebook Page, Instagram, LinkedIn, X, TikTok, YouTube, Pinterest, `ManualExport` |
+| `SocialPublisher` | LinkedIn Pages, Facebook Pages, Instagram (container → publish), X — resolved by `SocialPublisherManager`; TikTok, YouTube (and any account without API access) use the manual export path in `SocialDelivery` |
 | `RadarConnector` | Upwork API, RSS feed, IMAP saved-search email, Manual import |
 | `AnalyticsSource` | GA4 Data API, Search Console API |
 | `Notifier` channels | mail, database, Telegram |

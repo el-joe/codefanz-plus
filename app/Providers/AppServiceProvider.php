@@ -54,6 +54,9 @@ use App\Models\SeoAudit;
 use App\Models\SeoMeta;
 use App\Models\Service;
 use App\Models\ServiceTranslation;
+use App\Models\SocialAccount;
+use App\Models\SocialPost;
+use App\Models\SocialPostVariant;
 use App\Models\Statistic;
 use App\Models\SupportTicket;
 use App\Models\Tag;
@@ -153,6 +156,9 @@ class AppServiceProvider extends ServiceProvider
             'seo_meta' => SeoMeta::class,
             'redirect' => Redirect::class,
             'seo_audit' => SeoAudit::class,
+            'social_account' => SocialAccount::class,
+            'social_post' => SocialPost::class,
+            'social_post_variant' => SocialPostVariant::class,
         ]);
 
         // Payment gateway webhooks: generous per gateway and IP; bad signatures are rejected before any work.

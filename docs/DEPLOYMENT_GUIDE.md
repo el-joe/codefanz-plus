@@ -26,6 +26,7 @@ Redis · Supervisor (queue workers) · cron (scheduler) · Certbot (Let's Encryp
 
 ## 4. Process configuration (to be provided as files in M12)
 - Supervisor programs: `codefanz-queue-payments`, `codefanz-queue-default`, `codefanz-queue-media`, `codefanz-queue-ai`, `codefanz-queue-social`, `codefanz-queue-radar`.
+- Social publishing (M8.2): the `social` queue worker runs `PublishSocialPost`, token refresh and metrics jobs; the scheduler runs `social:publish-due` (every minute), `social:refresh-tokens` (15 min) and `social:fetch-metrics` (6 h). Register each OAuth app's redirect URI shown on Admin → Social → Accounts (`/admin/social/oauth/{linkedin|meta|x}/callback`). Meta downloads images from signed `/social-media/{uuid}` URLs, so `APP_URL` must be the public HTTPS host.
 - Cron: `* * * * * cd /var/www/codefanz/current && php artisan schedule:run >> /dev/null 2>&1`
 - Nginx server block: HTTP→HTTPS redirect, HSTS, gzip/brotli, long cache for `/build/*` assets, `client_max_body_size` aligned with upload limits.
 

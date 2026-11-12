@@ -48,6 +48,15 @@
     @case('change_request.decided')
         {{ __(':name decided on :reference: :status', ['name' => $notification->data['name'] ?? '', 'reference' => $notification->data['reference'] ?? '', 'status' => \App\Enums\ChangeRequestStatus::tryFrom($notification->data['status'] ?? '')?->label() ?? '']) }}
         @break
+    @case('social_post.submitted')
+        {{ __(':name submitted the social post “:title” for approval', ['name' => $notification->data['name'] ?? '', 'title' => $notification->data['title'] ?? '']) }}
+        @break
+    @case('social_post.approved')
+        {{ __(':name approved “:title”', ['name' => $notification->data['name'] ?? '', 'title' => $notification->data['title'] ?? '']) }}
+        @break
+    @case('social_post.changes_requested')
+        {{ __(':name requested changes to “:title”', ['name' => $notification->data['name'] ?? '', 'title' => $notification->data['title'] ?? '']) }}
+        @break
     @default
         {{ __('Notification') }}
 @endswitch

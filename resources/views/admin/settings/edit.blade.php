@@ -1,5 +1,5 @@
 @php
-    $groupLabels = ['general' => __('General'), 'contact' => __('Contact'), 'integrations' => __('Integrations'), 'seo' => __('SEO'), 'payments' => __('Payments'), 'ai' => __('AI limits')];
+    $groupLabels = ['general' => __('General'), 'contact' => __('Contact'), 'integrations' => __('Integrations'), 'seo' => __('SEO'), 'payments' => __('Payments'), 'ai' => __('AI limits'), 'social' => __('Social apps')];
     $languages = \App\Models\Language::active();
 @endphp
 

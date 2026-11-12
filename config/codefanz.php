@@ -86,6 +86,15 @@ return [
             'project_assistant_monthly_tokens' => ['type' => 'number', 'label' => 'AI Project Assistant tokens per month', 'rules' => ['nullable', 'integer', 'min:0', 'max:1000000000']],
             'radar_monthly_tokens' => ['type' => 'number', 'label' => 'Freelance Radar tokens per month', 'rules' => ['nullable', 'integer', 'min:0', 'max:1000000000']],
         ],
+        // Social apps (M8.2): the OAuth apps accounts connect through. Redirect URIs are listed on Social → Accounts.
+        'social' => [
+            'linkedin_client_id' => ['type' => 'text', 'section' => 'linkedin', 'label' => 'LinkedIn client ID', 'rules' => ['nullable', 'string', 'max:100', 'regex:/^[A-Za-z0-9_-]+$/']],
+            'linkedin_client_secret' => ['type' => 'secret', 'section' => 'linkedin', 'label' => 'LinkedIn client secret', 'rules' => ['nullable', 'string', 'max:255']],
+            'meta_app_id' => ['type' => 'text', 'section' => 'meta', 'label' => 'Meta app ID (Facebook Pages + Instagram)', 'rules' => ['nullable', 'string', 'max:40', 'regex:/^\\d+$/']],
+            'meta_app_secret' => ['type' => 'secret', 'section' => 'meta', 'label' => 'Meta app secret', 'rules' => ['nullable', 'string', 'max:255']],
+            'x_client_id' => ['type' => 'text', 'section' => 'x', 'label' => 'X OAuth 2.0 client ID', 'rules' => ['nullable', 'string', 'max:100', 'regex:/^[A-Za-z0-9_-]+$/']],
+            'x_client_secret' => ['type' => 'secret', 'section' => 'x', 'label' => 'X OAuth 2.0 client secret', 'rules' => ['nullable', 'string', 'max:255']],
+        ],
         // SEO (M7.2). Unset = block search engines everywhere except production.
         'seo' => [
             'block_indexing' => ['type' => 'select', 'label' => 'Search engine indexing', 'options' => ['block' => 'Block (robots.txt Disallow + noindex header)', 'allow' => 'Allow indexing'], 'rules' => ['nullable', 'string', 'in:block,allow']],
@@ -334,6 +343,65 @@ return [
         'link_default_days' => 14,
         'invoice_due_days' => 14,
         'receipt_link_hours' => 72,
+    ],
+
+    /*
+    | Social media (M8.2). App credentials live in Settings → Social apps; the
+    | API versions are pinned so response shapes do not change underneath us.
+    | Rate limits are per platform across all accounts (posts per minute);
+    | publish retries back off exponentially and only for transient errors
+    | (HTTP 429 / 5xx / connection failures). Tokens are refreshed when they
+    | expire within refresh_before_minutes.
+    */
+
+    'social' => [
+        'providers' => [
+            'linkedin' => [
+                'label' => 'LinkedIn',
+                'credentials' => ['linkedin_client_id', 'linkedin_client_secret'],
+                'authorize_url' => 'https://www.linkedin.com/oauth/v2/authorization',
+                'token_url' => 'https://www.linkedin.com/oauth/v2/accessToken',
+                'api_url' => env('LINKEDIN_API_URL', 'https://api.linkedin.com'),
+                'version' => env('LINKEDIN_API_VERSION', '202410'),
+                // Community Management API (Pages posting + statistics); needs LinkedIn's product approval.
+                'scopes' => ['r_organization_social', 'w_organization_social', 'rw_organization_admin'],
+                'pkce' => false,
+            ],
+            'meta' => [
+                'label' => 'Meta (Facebook + Instagram)',
+                'credentials' => ['meta_app_id', 'meta_app_secret'],
+                'authorize_url' => 'https://www.facebook.com/'.env('META_GRAPH_VERSION', 'v21.0').'/dialog/oauth',
+                'graph_url' => env('META_GRAPH_URL', 'https://graph.facebook.com'),
+                'version' => env('META_GRAPH_VERSION', 'v21.0'),
+                'scopes' => ['pages_show_list', 'pages_read_engagement', 'pages_manage_posts', 'read_insights', 'instagram_basic', 'instagram_content_publish', 'instagram_manage_insights', 'business_management'],
+                'pkce' => false,
+            ],
+            'x' => [
+                'label' => 'X',
+                'credentials' => ['x_client_id', 'x_client_secret'],
+                'authorize_url' => 'https://x.com/i/oauth2/authorize',
+                'api_url' => env('X_API_URL', 'https://api.x.com'),
+                'scopes' => ['tweet.read', 'tweet.write', 'users.read', 'offline.access', 'media.write'],
+                'pkce' => true,
+            ],
+        ],
+        'oauth_state_minutes' => 10,
+        'refresh_before_minutes' => [
+            'linkedin' => 60 * 24 * 7,
+            'x' => 30,
+            'meta' => 0,
+        ],
+        'rate_limits' => [
+            'linkedin_page' => 10,
+            'facebook_page' => 10,
+            'instagram_business' => 5,
+            'x' => 5,
+        ],
+        'publish_tries' => 5,
+        'publish_backoff' => [60, 300, 900, 3600],
+        'metrics_window_days' => 90,
+        'timeout_seconds' => 30,
+        'connect_timeout_seconds' => 5,
     ],
 
     'support' => [

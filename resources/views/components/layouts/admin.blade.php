@@ -28,6 +28,7 @@
         ['label' => __('SEO'), 'route' => 'admin.seo.audit', 'can' => 'seo.manage', 'also' => ['admin.seo.*', 'admin.redirects.*']],
         ['label' => __('Analytics'), 'route' => 'admin.analytics.index', 'can' => 'seo.manage'],
         ['label' => __('AI Studio'), 'route' => 'admin.ai-studio.index', 'can' => 'ai.use', 'also' => ['admin.ai-studio.*', 'admin.prompts.*', 'admin.brand-voice.*']],
+        ['label' => __('Social'), 'route' => 'admin.social.posts.index', 'can' => 'social.manage', 'also' => 'admin.social.*'],
         ['label' => __('AI governance'), 'route' => 'admin.ai-governance', 'can' => 'automation.manage'],
         ['label' => __('Emergency controls'), 'route' => 'admin.emergency.index', 'can' => 'automation.manage'],
         ['label' => __('AI usage'), 'route' => 'admin.ai-usage', 'can' => 'settings.manage'],

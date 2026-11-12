@@ -24,3 +24,9 @@ Schedule::command('posts:publish-scheduled')->everyMinute()->withoutOverlapping(
 // SEO audit crawl (queued) and the daily GA4 / Search Console snapshot pull.
 Schedule::command('seo:audit')->weeklyOn(1, '05:00');
 Schedule::command('analytics:sync')->dailyAt('06:00')->withoutOverlapping();
+
+// Social media (M8.2): approved posts due now are queued (queue "social"), tokens refreshed before they expire,
+// metrics pulled for posts published through the APIs.
+Schedule::command('social:publish-due')->everyMinute()->withoutOverlapping();
+Schedule::command('social:refresh-tokens')->everyFifteenMinutes()->withoutOverlapping();
+Schedule::command('social:fetch-metrics')->everySixHours()->withoutOverlapping();

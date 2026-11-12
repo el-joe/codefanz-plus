@@ -3,6 +3,7 @@
 use App\Http\Controllers\PaymentWebhookController;
 use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\SocialMediaController;
 use App\Http\Middleware\AddRobotsHeader;
 use App\Http\Middleware\AssignRequestId;
 use App\Http\Middleware\EnsurePortalAccess;
@@ -34,6 +35,12 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->where('gateway', '[a-z0-9_-]+')
                 ->middleware('throttle:webhooks')
                 ->name('webhooks.payments');
+
+            // Social images fetched by Meta (Facebook / Instagram) while publishing: signed, expiring, no session.
+            Route::get('social-media/{media}', SocialMediaController::class)
+                ->whereUuid('media')
+                ->middleware(['signed', 'throttle:120,1'])
+                ->name('social.media');
 
             Route::middleware(['web', 'auth', 'active', 'locale.preference', 'can:admin.access'])
                 ->prefix('admin')

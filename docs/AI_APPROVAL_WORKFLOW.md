@@ -72,6 +72,22 @@ flags, the checks re-verified at apply time (version, permission, not own propos
 Reject / Request changes / Approve / Approve & apply, and a link to the generation record. Bulk approval skips
 AI-origin requests with guardrail flags, the reviewer's own proposals and requests needing another permission.
 
+## 4c. Social publishing (M8.2)
+
+- Social posts use their own editorial workflow rather than change requests: draft → in review → approved
+  (`social.approve`) → scheduled → publishing → published / failed / exported manually. Editing an approved or
+  scheduled post sends it back to draft.
+- "Generate with AI" runs the `social_post` template through `GenerateContent` / `AiGateway` (kill switches
+  `ai_social` + `ai_automation`, budget, caps) and fills the variants as an `origin = ai` draft. The person who
+  generated it can never approve, schedule, publish or retry it — enforced in `SocialPostWorkflow`, so it also
+  applies to super admins.
+- Only approved posts can be scheduled (also from the calendar) or published now. `social:publish-due` and the
+  `PublishSocialPost` job re-check the approval and the kill switches (`social_publishing` for everything,
+  `ai_automation` for AI-origin posts) inside the row lock right before calling a platform.
+- Accounts that cannot publish through an API (manual mode, app not approved, token expired, TikTok/YouTube)
+  get "ready for manual export"; a post only counts as published when the platform returns an id, or when a
+  person pastes the live URL ("mark as posted manually", audited). Nothing is ever simulated.
+
 ## 5. Audit record (every operation)
 
 actor identity (user / AI agent / MCP client) · operation · target resource · before state · proposed state ·
