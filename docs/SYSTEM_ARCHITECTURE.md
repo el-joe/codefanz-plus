@@ -93,6 +93,14 @@ milestones, documents, tickets), `Billing`, `Blog`, `Seo`, `Analytics`, `Marketi
 - Switching portal access off for a user's last customer deactivates the user and deletes their sessions/tokens;
   the `active` middleware signs them out on the next request. Isolation is covered by
   `tests/Feature/Portal/ClientPortalTest.php`.
+- Delivery modules (M6.1) take plain ulid/uuid route parameters and resolve them in the controller with
+  `forCurrentCustomer()` (milestones through their already-scoped project), so a record of another customer is
+  always a **404**, never a 403 that would confirm it exists. Portal queries only ever select client-visible
+  notes (`Project::clientUpdates()`), client-visible documents (`Document::clientVisible()`) and public ticket
+  replies (`SupportTicket::publicReplies()`); internal records are never loaded into portal views or JSON.
+  Covered by `tests/Feature/Portal/PortalDeliveryTest.php` and `tests/Feature/SupportTicketTest.php`.
+- Conversations refresh by polling (`resources/js/modules/conversation.js`, every `codefanz.projects.poll_seconds`
+  = 20 s, paused while the tab is hidden) — no websockets. Messages are plain text rendered with `textContent`.
 
 ## 6. Approval engine (Governance)
 

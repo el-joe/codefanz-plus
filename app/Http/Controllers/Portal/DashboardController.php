@@ -2,21 +2,53 @@
 
 namespace App\Http\Controllers\Portal;
 
+use App\Enums\MilestoneStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Conversation;
+use App\Models\Milestone;
+use App\Models\Project;
+use App\Models\SupportTicket;
 use App\Services\CurrentCustomer;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Portal home (P04). Projects, invoices and messages arrive in Milestone 6; until then their cards show empty states.
+ * Portal home (P04): real counts for the current customer (active projects, open tickets, unread messages),
+ * the most recent active project, upcoming milestones and the latest conversations. Invoices arrive in M6.2.
  */
 class DashboardController extends Controller
 {
     public function __invoke(Request $request, CurrentCustomer $currentCustomer): View
     {
+        $user = $request->user();
+
+        $conversations = Conversation::query()
+            ->forCurrentCustomer()
+            ->whereHas('project')
+            ->with(['project:id,ulid,name', 'latestMessage.author:id,name'])
+            ->withUnreadCountFor($user)
+            ->whereNotNull('last_message_at')
+            ->orderByDesc('last_message_at')
+            ->get();
+
+        $activeProjectIds = Project::query()->forCurrentCustomer()->active()->pluck('id');
+
         return view('portal.dashboard', [
             'customer' => $currentCustomer->get(),
-            'unreadNotificationCount' => $request->user()->unreadNotifications()->count(),
+            'unreadNotificationCount' => $user->unreadNotifications()->count(),
+            'activeProjectCount' => $activeProjectIds->count(),
+            'openTicketCount' => SupportTicket::query()->forCurrentCustomer()->open()->count(),
+            'unreadMessageCount' => (int) $conversations->sum('unread_count'),
+            'activeProject' => Project::query()->forCurrentCustomer()->active()->with('milestones:id,project_id,title,status,due_date,sort_order')->latest('updated_at')->first(),
+            'upcomingMilestones' => Milestone::query()
+                ->whereIn('project_id', $activeProjectIds)
+                ->whereIn('status', [MilestoneStatus::Pending, MilestoneStatus::InProgress, MilestoneStatus::AwaitingApproval])
+                ->with('project:id,ulid,name')
+                ->orderByRaw('due_date is null')
+                ->orderBy('due_date')
+                ->limit(5)
+                ->get(),
+            'recentConversations' => $conversations->take(4),
         ]);
     }
 }

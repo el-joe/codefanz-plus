@@ -116,6 +116,7 @@ class CustomerController extends Controller
             'lead:id,ulid,reference,name',
             'creator:id,name',
             'users' => fn ($query) => $query->orderBy('name'),
+            'projects' => fn ($query) => $query->latest()->latest('id'),
         ]);
 
         return view('admin.customers.show', [

@@ -64,13 +64,13 @@ enum Role: string
                 ], true),
             )),
             self::ProjectManager => [Permission::AdminAccess, Permission::LeadsView, Permission::CustomersView, Permission::CustomersManage, Permission::ProjectsManage, Permission::PaymentsCreateLinks, Permission::SupportManage],
-            self::SalesManager => [Permission::AdminAccess, Permission::LeadsView, Permission::LeadsManage, Permission::CustomersView, Permission::CustomersManage, Permission::RadarView],
+            self::SalesManager => [Permission::AdminAccess, Permission::LeadsView, Permission::LeadsManage, Permission::CustomersView, Permission::CustomersManage, Permission::ProjectsView, Permission::RadarView],
             self::ContentManager => [Permission::AdminAccess, Permission::ContentManage, Permission::ContentApprove, Permission::MediaManage, Permission::AiUse],
             self::SeoSpecialist => [Permission::AdminAccess, Permission::SeoManage, Permission::SeoApprove, Permission::AiUse],
             self::SocialMediaManager => [Permission::AdminAccess, Permission::SocialManage, Permission::SocialApprove, Permission::MediaManage, Permission::AiUse],
             self::Developer => [Permission::AdminAccess, Permission::ProjectsManage, Permission::SupportManage],
-            self::FinanceManager => [Permission::AdminAccess, Permission::CustomersView, Permission::PaymentsCreateLinks, Permission::PaymentsRefundApprove],
-            self::SupportAgent => [Permission::AdminAccess, Permission::SupportManage],
+            self::FinanceManager => [Permission::AdminAccess, Permission::CustomersView, Permission::ProjectsView, Permission::PaymentsCreateLinks, Permission::PaymentsRefundApprove],
+            self::SupportAgent => [Permission::AdminAccess, Permission::ProjectsView, Permission::SupportManage],
             self::Client => [],
         };
     }

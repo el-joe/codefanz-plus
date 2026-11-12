@@ -7,6 +7,7 @@ import { init as initNav } from './modules/nav';
 import { init as initFaqSearch } from './modules/faq-search';
 import { init as initStepper } from './modules/stepper';
 import { init as initAssistant } from './modules/assistant';
+import { init as initConversations } from './modules/conversation';
 
 applyStoredTheme();
 
@@ -20,4 +21,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initFaqSearch();
     initStepper();
     initAssistant();
+    initConversations();
 });

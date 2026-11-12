@@ -6,6 +6,24 @@
     @case('lead.assigned')
         {{ __('Lead :reference was assigned to you', ['reference' => $notification->data['reference'] ?? '']) }}
         @break
+    @case('conversation.message')
+        {{ __(':name sent a message about :project', ['name' => $notification->data['name'] ?? '', 'project' => $notification->data['project_name'] ?? '']) }}
+        @break
+    @case('milestone.approved')
+        {{ __(':name approved “:title”', ['name' => $notification->data['name'] ?? '', 'title' => $notification->data['title'] ?? '']) }}
+        @break
+    @case('milestone.changes_requested')
+        {{ __(':name requested changes to “:title”', ['name' => $notification->data['name'] ?? '', 'title' => $notification->data['title'] ?? '']) }}
+        @break
+    @case('ticket.opened')
+        {{ __('New support ticket :reference', ['reference' => $notification->data['reference'] ?? '']) }}
+        @break
+    @case('ticket.replied')
+        {{ __('New reply on ticket :reference', ['reference' => $notification->data['reference'] ?? '']) }}
+        @break
+    @case('ticket.status')
+        {{ __('Ticket :reference was updated by :name', ['reference' => $notification->data['reference'] ?? '', 'name' => $notification->data['name'] ?? '']) }}
+        @break
     @default
         {{ __('Notification') }}
 @endswitch

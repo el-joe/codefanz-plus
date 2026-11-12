@@ -10,7 +10,10 @@ use App\Models\CareerTranslation;
 use App\Models\ChangeRequest;
 use App\Models\ChatSession;
 use App\Models\ContactMessage;
+use App\Models\Conversation;
+use App\Models\ConversationMessage;
 use App\Models\Customer;
+use App\Models\Document;
 use App\Models\Faq;
 use App\Models\FaqCategory;
 use App\Models\Industry;
@@ -20,6 +23,7 @@ use App\Models\Media;
 use App\Models\Menu;
 use App\Models\MenuItem;
 use App\Models\MenuItemTranslation;
+use App\Models\Milestone;
 use App\Models\Page;
 use App\Models\PageSection;
 use App\Models\PageTranslation;
@@ -29,12 +33,16 @@ use App\Models\PortfolioProjectTranslation;
 use App\Models\Product;
 use App\Models\ProductTranslation;
 use App\Models\ProductVersion;
+use App\Models\Project;
+use App\Models\ProjectNote;
 use App\Models\Service;
 use App\Models\ServiceTranslation;
 use App\Models\Statistic;
+use App\Models\SupportTicket;
 use App\Models\Technology;
 use App\Models\TechnologyCategory;
 use App\Models\Testimonial;
+use App\Models\TicketReply;
 use App\Models\User;
 use App\Services\Ai\AiGateway;
 use App\Services\CurrentCustomer;
@@ -95,6 +103,14 @@ class AppServiceProvider extends ServiceProvider
             'contact_message' => ContactMessage::class,
             'lead' => Lead::class,
             'customer' => Customer::class,
+            'project' => Project::class,
+            'milestone' => Milestone::class,
+            'project_note' => ProjectNote::class,
+            'document' => Document::class,
+            'conversation' => Conversation::class,
+            'conversation_message' => ConversationMessage::class,
+            'support_ticket' => SupportTicket::class,
+            'ticket_reply' => TicketReply::class,
         ]);
 
         // Public contact form: a few messages a minute and a daily cap per visitor IP.

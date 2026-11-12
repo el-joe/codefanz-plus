@@ -9,6 +9,7 @@ enum Permission: string
     case LeadsManage = 'leads.manage';
     case CustomersView = 'customers.view';
     case CustomersManage = 'customers.manage';
+    case ProjectsView = 'projects.view';
     case ProjectsManage = 'projects.manage';
     case PaymentsCreateLinks = 'payments.create-links';
     case PaymentsRefundApprove = 'payments.refund-approve';

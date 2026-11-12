@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Portal;
 
+use App\Http\Controllers\Concerns\FollowsNotificationLinks;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,6 +14,8 @@ use Illuminate\View\View;
  */
 class NotificationController extends Controller
 {
+    use FollowsNotificationLinks;
+
     public function index(Request $request): View
     {
         $filter = $request->query('filter') === 'unread' ? 'unread' : 'all';
@@ -31,7 +34,7 @@ class NotificationController extends Controller
         $record = $request->user()->notifications()->whereKey($notification)->firstOrFail();
         $record->markAsRead();
 
-        return redirect()->route('portal.notifications.index');
+        return redirect()->to($this->notificationPath($record->data['url'] ?? null, '/portal/') ?? route('portal.notifications.index'));
     }
 
     public function readAll(Request $request): RedirectResponse

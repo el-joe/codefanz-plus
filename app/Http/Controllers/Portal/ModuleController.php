@@ -8,14 +8,15 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Placeholder for portal modules that arrive in Milestone 6. Shows an honest "nothing here yet" state, never sample data.
+ * Placeholder for portal modules that arrive in Milestone 6 slice 2 (invoices, payments). Shows an honest
+ * "nothing here yet" state, never sample data.
  */
 class ModuleController extends Controller
 {
     /**
      * @var list<string>
      */
-    public const MODULES = ['projects', 'invoices', 'payments', 'documents', 'conversations', 'support'];
+    public const MODULES = ['invoices', 'payments'];
 
     public function __invoke(Request $request, CurrentCustomer $currentCustomer): View
     {

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\BudgetRange;
+use App\Enums\ClientVisibility;
 use App\Enums\ContentStatus;
 use App\Enums\CustomerStatus;
 use App\Enums\CustomerType;
@@ -14,14 +15,19 @@ use App\Enums\LeadSource;
 use App\Enums\LeadStatus;
 use App\Enums\MenuLinkType;
 use App\Enums\MenuLocation;
+use App\Enums\MilestoneStatus;
 use App\Enums\PageSectionType;
 use App\Enums\PageStatus;
 use App\Enums\PricingModel;
 use App\Enums\ProductAvailability;
+use App\Enums\ProjectStatus;
 use App\Enums\ProjectType;
 use App\Enums\Role;
 use App\Enums\ServiceTier;
 use App\Enums\TechnologyProficiency;
+use App\Enums\TicketCategory;
+use App\Enums\TicketPriority;
+use App\Enums\TicketStatus;
 use App\Models\Career;
 use App\Models\Customer;
 use App\Models\Faq;
@@ -30,14 +36,17 @@ use App\Models\Industry;
 use App\Models\Lead;
 use App\Models\Menu;
 use App\Models\MenuItem;
+use App\Models\Milestone;
 use App\Models\Page;
 use App\Models\PageSection;
 use App\Models\PageTranslation;
 use App\Models\PortfolioCategory;
 use App\Models\PortfolioProject;
 use App\Models\Product;
+use App\Models\Project;
 use App\Models\Service;
 use App\Models\Statistic;
+use App\Models\SupportTicket;
 use App\Models\Technology;
 use App\Models\TechnologyCategory;
 use App\Models\Testimonial;
@@ -70,6 +79,7 @@ class DemoContentSeeder extends Seeder
         $this->legalPages();
         $this->leads();
         $this->customers();
+        $this->delivery();
     }
 
     /**
@@ -675,5 +685,68 @@ class DemoContentSeeder extends Seeder
         $user->syncRoles([Role::Client->value]);
 
         $customer->users()->syncWithoutDetaching([$user->getKey() => ['role' => CustomerUserRole::Owner, 'invited_at' => now()]]);
+    }
+
+    /**
+     * A sample delivery project for the demo customer: milestones (one awaiting the client's approval, one blocked
+     * by a dependency), a client update and an internal note, the general thread with one message and a ticket.
+     */
+    private function delivery(): void
+    {
+        $customer = Customer::query()->where('email', 'customer.demo@example.test')->first();
+
+        if ($customer === null || Project::query()->where('customer_id', $customer->getKey())->exists()) {
+            return;
+        }
+
+        $staff = User::query()->whereHas('roles', fn ($query) => $query->whereIn('name', [Role::SuperAdmin->value, Role::ProjectManager->value]))->orderBy('id')->first();
+
+        $project = Project::create([
+            'customer_id' => $customer->getKey(),
+            'lead_id' => $customer->created_from_lead_id,
+            'name' => 'Sample booking platform (demo project)',
+            'description' => 'Sample project for layout review only. Not real work.',
+            'type' => ProjectType::Web,
+            'status' => ProjectStatus::InProgress,
+            'start_date' => now()->subMonth()->toDateString(),
+            'due_date' => now()->addMonths(2)->toDateString(),
+            'project_manager_id' => $staff?->getKey(),
+            'budget_minor' => 1_500_000,
+            'currency' => 'USD',
+        ]);
+
+        $milestones = collect([
+            ['UI/UX design (sample)', MilestoneStatus::Completed, 400_000],
+            ['Backend development (sample)', MilestoneStatus::AwaitingApproval, 600_000],
+            ['Launch (sample)', MilestoneStatus::Pending, 500_000],
+        ])->map(fn (array $row, int $index) => Milestone::create([
+            'project_id' => $project->getKey(),
+            'sort_order' => $index + 1,
+            'title' => $row[0],
+            'status' => $row[1],
+            'amount_minor' => $row[2],
+            'currency' => 'USD',
+            'due_date' => now()->addWeeks(($index + 1) * 3)->toDateString(),
+        ]));
+        $milestones[2]->dependencies()->attach($milestones[1]);
+
+        $project->notes()->create(['user_id' => $staff?->getKey(), 'visibility' => ClientVisibility::Client, 'body' => 'Sample update: the backend is ready for your review.']);
+        $project->notes()->create(['user_id' => $staff?->getKey(), 'visibility' => ClientVisibility::Internal, 'body' => 'Sample internal note: never shown to the client.']);
+
+        $conversation = $project->conversations()->create(['customer_id' => $customer->getKey(), 'created_by' => $staff?->getKey()]);
+        $message = $conversation->messages()->create(['user_id' => $staff?->getKey(), 'from_client' => false, 'body' => 'Hello! This is a sample message from your project team.']);
+        $conversation->forceFill(['last_message_at' => $message->created_at])->save();
+
+        $ticket = SupportTicket::create([
+            'customer_id' => $customer->getKey(),
+            'project_id' => $project->getKey(),
+            'opened_by' => $customer->users()->value('users.id'),
+            'subject' => 'Sample ticket: question about the staging link',
+            'category' => TicketCategory::Question,
+            'priority' => TicketPriority::Normal,
+            'status' => TicketStatus::Open,
+            'last_activity_at' => now(),
+        ]);
+        $ticket->replies()->create(['user_id' => $ticket->opened_by, 'from_client' => true, 'body' => 'Sample question for layout review.']);
     }
 }

@@ -185,4 +185,26 @@ return [
         'expires_after_days' => (int) env('CHANGE_REQUEST_EXPIRY_DAYS', 14),
     ],
 
+    /*
+    | Project delivery (M6): documents reuse the lead attachment allow-list
+    | (detected MIME type and extension must both match) and the private disk.
+    | Conversations are polled by the browser; support tickets marked resolved
+    | close automatically after the given number of days (tickets:close-resolved).
+    */
+
+    'projects' => [
+        'documents' => [
+            'disk' => env('MEDIA_PRIVATE_DISK', 'local'),
+            'directory' => 'project-documents',
+        ],
+        'message_max_length' => 5000,
+        'poll_seconds' => 20,
+        'default_currency' => 'USD',
+    ],
+
+    'support' => [
+        'auto_close_after_days' => (int) env('SUPPORT_AUTO_CLOSE_DAYS', 7),
+        'reply_max_length' => 5000,
+    ],
+
 ];

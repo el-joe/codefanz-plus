@@ -84,6 +84,27 @@ class User extends Authenticatable implements HasLocalePreference
         return $this->customers()->wherePivotNull('revoked_at')->where('customers.status', CustomerStatus::Active->value);
     }
 
+    /**
+     * Delivery projects this staff member works on.
+     *
+     * @return BelongsToMany<Project, $this>
+     */
+    public function projects(): BelongsToMany
+    {
+        return $this->belongsToMany(Project::class, 'project_members')->withPivot('role')->withTimestamps();
+    }
+
+    /**
+     * Active staff who can be put on a project team or assigned a ticket.
+     *
+     * @param  Builder<User>  $query
+     */
+    public function scopeHoldingPermission(Builder $query, Permission $permission): void
+    {
+        $query->where('is_active', true)
+            ->whereHas('roles.permissions', fn (Builder $permissions) => $permissions->where('name', $permission->value));
+    }
+
     public function isStaff(): bool
     {
         return $this->roles->contains(fn ($role): bool => $role->name !== Role::Client->value);

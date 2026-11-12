@@ -244,6 +244,9 @@
                                 @else
                                     <p class="text-sm text-fg-secondary">{{ __('Converted into customer :reference', ['reference' => $lead->customer->reference]) }}</p>
                                 @endcan
+                                @can('create', \App\Models\Project::class)
+                                    <x-ui.button size="sm" variant="secondary" class="mt-2" :href="route('admin.projects.create', ['lead' => $lead->ulid])">{{ __('Start a project') }}</x-ui.button>
+                                @endcan
                             @elsecan('create', \App\Models\Customer::class)
                                 <x-ui.button size="sm" :href="route('admin.customers.create', ['lead' => $lead->ulid])">{{ __('Convert to customer') }}</x-ui.button>
                             @endif

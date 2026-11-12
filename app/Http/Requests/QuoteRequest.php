@@ -7,6 +7,7 @@ use App\Enums\ContactMethod;
 use App\Enums\ProjectPlatform;
 use App\Enums\ProjectTimeline;
 use App\Http\Requests\Concerns\GuardsAgainstSpam;
+use App\Http\Requests\Concerns\ValidatesUploadedFiles;
 use App\Models\Language;
 use App\Models\Service;
 use App\Services\Countries;
@@ -21,6 +22,7 @@ use Illuminate\Validation\Validator;
 class QuoteRequest extends FormRequest
 {
     use GuardsAgainstSpam;
+    use ValidatesUploadedFiles;
 
     /**
      * Fields per step, so the page can reopen the first step that has an error.
@@ -45,7 +47,6 @@ class QuoteRequest extends FormRequest
     public function rules(): array
     {
         $attachments = config('codefanz.leads.attachments');
-        $extensions = implode(',', $attachments['extensions']);
         $servicesOffered = Service::query()->published()->exists();
 
         return [
@@ -71,8 +72,7 @@ class QuoteRequest extends FormRequest
             'deadline' => ['nullable', 'date_format:Y-m-d', 'after:today'],
 
             'attachments' => ['nullable', 'array', 'max:'.$attachments['max_files']],
-            // `mimes` checks the detected content type, `extensions` the file name; both must match the allow-list.
-            'attachments.*' => ['file', 'mimes:'.$extensions, 'extensions:'.$extensions, 'max:'.$attachments['max_kb']],
+            'attachments.*' => $this->uploadedFileRules(),
             'preferred_contact' => ['required', Rule::enum(ContactMethod::class)],
             'preferred_locale' => ['required', Rule::in(Language::active()->keys()->all())],
             'consent' => ['accepted'],

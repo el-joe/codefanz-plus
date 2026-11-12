@@ -83,6 +83,27 @@
                 @endcan
             </x-ui.card>
 
+            @can('viewAny', \App\Models\Project::class)
+                <x-ui.card :title="__('Projects')">
+                    @can('create', \App\Models\Project::class)
+                        <x-slot:action><x-ui.button size="sm" :href="route('admin.projects.create', ['customer' => $customer->ulid])">{{ __('New project') }}</x-ui.button></x-slot:action>
+                    @endcan
+                    @if ($customer->projects->isEmpty())
+                        <p class="text-sm text-fg-secondary">{{ __('No projects for this customer yet.') }}</p>
+                    @else
+                        <ul class="flex flex-col divide-y divide-line-subtle" data-customer-projects>
+                            @foreach ($customer->projects as $project)
+                                <li class="flex items-center gap-3 py-2.5">
+                                    <a href="{{ route('admin.projects.show', $project) }}" class="min-w-0 flex-1 truncate text-sm font-semibold text-fg hover:text-fg-brand" dir="auto">{{ $project->name }}</a>
+                                    <span class="font-mono text-xs text-fg-tertiary" dir="ltr">{{ $project->reference }}</span>
+                                    <x-ui.badge :tone="$project->status->tone()">{{ $project->status->label() }}</x-ui.badge>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </x-ui.card>
+            @endcan
+
             @if (filled($customer->notes))
                 <x-ui.card :title="__('Internal notes')">
                     <p class="whitespace-pre-line text-sm text-fg" dir="auto">{{ $customer->notes }}</p>

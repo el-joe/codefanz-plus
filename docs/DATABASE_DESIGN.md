@@ -83,14 +83,14 @@
 ### 2.6 Delivery & portal
 | Table | Notes |
 |---|---|
-| `projects` | number UNIQUE (`PRJ-2026-0001`), customer_id, lead_id, title, description, total_value_minor, currency, start_date, due_date, status, internal_notes, client_notes, soft deletes. Index (customer_id, status) |
-| `project_members` | project_id, user_id, role |
-| `milestones` | project_id, title, description, amount_minor, due_date, status, approval_status, client_notes, internal_notes, sort, paid_minor (denormalised cache, recomputed from ledger) |
-| `milestone_dependencies` | milestone_id, depends_on_id; UNIQUE pair; cycle check in action |
-| `milestone_deliverables` | milestone_id, title, is_done |
-| `documents` | morph (project/milestone), title, visibility (internal/client), media/attachment link, version |
-| `conversations`, `conversation_messages` | project-scoped client ↔ team threads, read receipts |
-| `support_tickets`, `ticket_replies` | customer_id, project_id, number UNIQUE, priority, status, assigned_to |
+| `projects` | ulid UNIQUE, reference UNIQUE (`PR-2026-00042`, from the id after insert), customer_id (restrict), lead_id (nullOnDelete), name, description (client-visible), type (`ProjectType`), status (`ProjectStatus`: planning, in_progress, on_hold, review, completed, cancelled), start_date, due_date, project_manager_id, budget_minor + currency, show_budget_to_client, show_team_to_client, lock_version, created_by/updated_by, soft deletes. Index (customer_id, status), (status, due_date). A project never moves to another customer |
+| `project_members` | project_id, user_id (staff), role (free-text label); UNIQUE pair |
+| `milestones` | ulid, project_id (cascade), sort_order, title, description, due_date, status (`MilestoneStatus`: pending, in_progress, awaiting_approval, approved, completed), amount_minor + currency, paid_minor (denormalised cache, recomputed from the ledger in M6.2; never written from forms), client_feedback, started_at/submitted_at/approved_at/approved_by/completed_at, lock_version |
+| `milestone_dependencies` | milestone_id, depends_on_id; UNIQUE pair; same-project + cycle check in `SaveMilestone`; `ChangeMilestoneStatus` refuses to start a milestone until every dependency is completed |
+| `project_notes` | project_id, user_id, visibility (`ClientVisibility`: internal / client), body. Internal notes are never queried by portal code |
+| `documents` | uuid (download URLs), project_id, customer_id (portal scope), conversation_message_id (message attachments), title, category (`DocumentCategory`), visibility (internal/client), version (same title in the same project = next version; UNIQUE(project_id, title, version)), disk (private), path (random name), original_name, mime, size, uploaded_by, uploaded_by_client |
+| `conversations`, `conversation_messages`, `conversation_reads` | Project threads (ulid, customer_id, subject — null = the general thread, last_message_at); plain-text messages with `from_client`; per-user read marker (`last_read_message_id`) for unread counts |
+| `support_tickets`, `ticket_replies` | ulid, reference UNIQUE (`TK-2026-00042`), customer_id, project_id (nullOnDelete), opened_by, subject, category, priority, status (`TicketStatus`: open, awaiting_customer, awaiting_support, resolved, closed), assigned_to (support.manage), first_response_at, resolved_at, closed_at, last_activity_at, soft deletes. Replies: from_client, is_internal (staff notes, never shown in the portal). `tickets:close-resolved` closes tickets resolved for `SUPPORT_AUTO_CLOSE_DAYS` (7) |
 
 ### 2.7 Billing (immutable ledger)
 | Table | Notes |

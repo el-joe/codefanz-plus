@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\FollowsNotificationLinks;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,6 +15,8 @@ use Illuminate\View\View;
  */
 class NotificationController extends Controller
 {
+    use FollowsNotificationLinks;
+
     public function index(Request $request): View
     {
         return view('admin.notifications.index', [
@@ -29,9 +32,11 @@ class NotificationController extends Controller
 
         $lead = $record->data['lead'] ?? null;
 
-        return is_string($lead)
-            ? redirect()->route('admin.leads.show', $lead)
-            : redirect()->route('admin.notifications.index');
+        if (is_string($lead)) {
+            return redirect()->route('admin.leads.show', $lead);
+        }
+
+        return redirect()->to($this->notificationPath($record->data['url'] ?? null, '/admin/') ?? route('admin.notifications.index'));
     }
 
     public function readAll(Request $request): RedirectResponse

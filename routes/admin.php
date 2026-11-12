@@ -28,11 +28,17 @@ use App\Http\Controllers\Admin\PortfolioProjectController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductVersionController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\ProjectController;
+use App\Http\Controllers\Admin\ProjectConversationController;
+use App\Http\Controllers\Admin\ProjectDocumentController;
+use App\Http\Controllers\Admin\ProjectMilestoneController;
+use App\Http\Controllers\Admin\ProjectNoteController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SecurityController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\StatisticController;
+use App\Http\Controllers\Admin\SupportTicketController;
 use App\Http\Controllers\Admin\TechnologyCategoryController;
 use App\Http\Controllers\Admin\TechnologyController;
 use App\Http\Controllers\Admin\TestimonialController;
@@ -85,6 +91,35 @@ Route::middleware('two-factor')->group(function (): void {
         Route::post('customers/{customer}/portal-users/{user}/invitation', [CustomerPortalUserController::class, 'resend'])->middleware('throttle:6,1')->name('customers.portal-users.invitation');
         Route::delete('customers/{customer}/portal-users/{user}/access', [CustomerPortalUserController::class, 'revoke'])->name('customers.portal-users.revoke');
         Route::post('customers/{customer}/portal-users/{user}/access', [CustomerPortalUserController::class, 'restore'])->name('customers.portal-users.restore');
+    });
+
+    Route::middleware('can:viewAny,App\Models\Project')->group(function (): void {
+        Route::resource('projects', ProjectController::class);
+        Route::post('projects/{project}/notes', [ProjectNoteController::class, 'store'])->name('projects.notes.store');
+        Route::post('projects/{project}/documents', [ProjectDocumentController::class, 'store'])->middleware('throttle:30,1')->name('projects.documents.store');
+        Route::post('projects/{project}/conversations', [ProjectConversationController::class, 'store'])->middleware('throttle:30,1')->name('projects.conversations.store');
+        Route::get('documents/{document}/download', [ProjectDocumentController::class, 'download'])->name('documents.download');
+
+        Route::scopeBindings()->group(function (): void {
+            Route::get('projects/{project}/milestones/create', [ProjectMilestoneController::class, 'create'])->name('projects.milestones.create');
+            Route::post('projects/{project}/milestones', [ProjectMilestoneController::class, 'store'])->name('projects.milestones.store');
+            Route::get('projects/{project}/milestones/{milestone}/edit', [ProjectMilestoneController::class, 'edit'])->name('projects.milestones.edit');
+            Route::put('projects/{project}/milestones/{milestone}', [ProjectMilestoneController::class, 'update'])->name('projects.milestones.update');
+            Route::post('projects/{project}/milestones/{milestone}/status', [ProjectMilestoneController::class, 'status'])->name('projects.milestones.status');
+            Route::post('projects/{project}/milestones/{milestone}/move', [ProjectMilestoneController::class, 'move'])->name('projects.milestones.move');
+            Route::delete('projects/{project}/milestones/{milestone}', [ProjectMilestoneController::class, 'destroy'])->name('projects.milestones.destroy');
+            Route::patch('projects/{project}/documents/{document}', [ProjectDocumentController::class, 'update'])->name('projects.documents.update');
+            Route::delete('projects/{project}/documents/{document}', [ProjectDocumentController::class, 'destroy'])->name('projects.documents.destroy');
+            Route::post('projects/{project}/conversations/{conversation}/messages', [ProjectConversationController::class, 'message'])->middleware('throttle:60,1')->name('projects.conversations.messages.store');
+            Route::get('projects/{project}/conversations/{conversation}/messages', [ProjectConversationController::class, 'messages'])->middleware('throttle:120,1')->name('projects.conversations.messages.index');
+        });
+    });
+
+    Route::middleware('can:viewAny,App\Models\SupportTicket')->group(function (): void {
+        Route::get('tickets', [SupportTicketController::class, 'index'])->name('tickets.index');
+        Route::get('tickets/{ticket}', [SupportTicketController::class, 'show'])->name('tickets.show');
+        Route::post('tickets/{ticket}/replies', [SupportTicketController::class, 'reply'])->middleware('throttle:60,1')->name('tickets.reply');
+        Route::put('tickets/{ticket}', [SupportTicketController::class, 'update'])->name('tickets.update');
     });
 
     Route::middleware('can:leads.view')->group(function (): void {

@@ -24,12 +24,12 @@
     ];
     $nav = [
         ['key' => 'dashboard', 'label' => __('Dashboard'), 'route' => 'portal.dashboard'],
-        ['key' => 'projects', 'label' => __('My Projects'), 'route' => 'portal.projects.index'],
+        ['key' => 'projects', 'label' => __('My Projects'), 'route' => 'portal.projects.index', 'also' => 'portal.projects.*'],
         ['key' => 'invoices', 'label' => __('Invoices'), 'route' => 'portal.invoices.index'],
         ['key' => 'payments', 'label' => __('Payments'), 'route' => 'portal.payments.index'],
-        ['key' => 'documents', 'label' => __('Documents'), 'route' => 'portal.documents.index'],
-        ['key' => 'conversations', 'label' => __('Conversations'), 'route' => 'portal.conversations.index'],
-        ['key' => 'support', 'label' => __('Support'), 'route' => 'portal.support.index'],
+        ['key' => 'documents', 'label' => __('Documents'), 'route' => 'portal.documents.index', 'also' => 'portal.documents.*'],
+        ['key' => 'conversations', 'label' => __('Conversations'), 'route' => 'portal.conversations.index', 'also' => 'portal.conversations.*'],
+        ['key' => 'support', 'label' => __('Support'), 'route' => 'portal.support.index', 'also' => 'portal.support.*'],
         ['key' => 'notifications', 'label' => __('Notifications'), 'route' => 'portal.notifications.index', 'count' => $unreadNotificationCount],
         ['key' => 'profile', 'label' => __('Profile & Settings'), 'route' => 'portal.profile', 'also' => 'portal.security'],
     ];
