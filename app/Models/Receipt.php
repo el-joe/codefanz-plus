@@ -13,7 +13,7 @@ use LogicException;
 /**
  * Receipt for a verified payment (one per payment, numbered RCP-YYYY-NNNNN). Issued by VerifyPayment.
  */
-#[Fillable(['payment_id', 'number', 'customer_id', 'customer_snapshot', 'amount_minor', 'currency', 'issued_at'])]
+#[Fillable(['payment_id', 'number', 'customer_id', 'customer_snapshot', 'seller_snapshot', 'amount_minor', 'currency', 'issued_at'])]
 class Receipt extends Model
 {
     use BelongsToCustomer, HasUlids;
@@ -37,7 +37,7 @@ class Receipt extends Model
      */
     protected function casts(): array
     {
-        return ['customer_snapshot' => 'array', 'amount_minor' => 'integer', 'issued_at' => 'datetime'];
+        return ['customer_snapshot' => 'array', 'seller_snapshot' => 'array', 'amount_minor' => 'integer', 'issued_at' => 'datetime'];
     }
 
     /**

@@ -158,3 +158,36 @@ function stripeEvent(string $type, string $sessionId = 'cs_test_1', string $even
         'data' => ['object' => ['id' => $sessionId, 'object' => 'checkout.session', 'status' => 'complete', 'payment_status' => 'paid', ...$object]],
     ];
 }
+
+/*
+| Payments (M6.3): Paymob, PayTabs and Fawry test credentials in Settings.
+*/
+
+function configurePaymob(): void
+{
+    $settings = app(Settings::class);
+    $settings->set('payments', 'paymob_secret_key', 'egy_sk_test_codefanz', encrypted: true);
+    $settings->set('payments', 'paymob_public_key', 'egy_pk_test_codefanz');
+    $settings->set('payments', 'paymob_api_key', 'paymobApiKey123', encrypted: true);
+    $settings->set('payments', 'paymob_hmac_secret', 'PAYMOBHMACSECRET', encrypted: true);
+    $settings->set('payments', 'paymob_integration_ids', '4097558, 4097559');
+    $settings->set('payments', 'paymob_mode', 'test');
+}
+
+function configurePayTabs(string $region = 'EGY'): void
+{
+    $settings = app(Settings::class);
+    $settings->set('payments', 'paytabs_profile_id', '98765');
+    $settings->set('payments', 'paytabs_server_key', 'SJNPAYTABSKEY-123', encrypted: true);
+    $settings->set('payments', 'paytabs_region', $region);
+    $settings->set('payments', 'paytabs_mode', 'test');
+}
+
+function configureFawry(string $method = 'PAYATFAWRY'): void
+{
+    $settings = app(Settings::class);
+    $settings->set('payments', 'fawry_merchant_code', 'FAWRYMERCHANT1');
+    $settings->set('payments', 'fawry_secure_key', 'fawry-secure-key', encrypted: true);
+    $settings->set('payments', 'fawry_payment_method', $method);
+    $settings->set('payments', 'fawry_mode', 'test');
+}

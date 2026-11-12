@@ -14,7 +14,7 @@
         @endforeach
     </div>
 
-    @include('admin.payments._tabs')
+    @include('admin.payments._tabs', ['exportFilters' => $filters])
 
     <form method="GET" action="{{ route('admin.payments.index') }}" class="flex flex-wrap items-end gap-3" role="search">
         <div class="w-full sm:w-72">

@@ -7,16 +7,17 @@ use App\Models\Invoice;
 use App\Models\User;
 use App\Services\AuditLogger;
 use App\Services\DocumentNumbers;
+use App\Services\SellerDetails;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 /**
  * Issue a draft: take the next gap-free number (locked counter, same transaction), freeze the customer's name,
- * address and tax id, and lock the invoice against further edits.
+ * address and tax id and the seller's details, and lock the invoice against further edits.
  */
 class IssueInvoice
 {
-    public function __construct(private AuditLogger $audit, private DocumentNumbers $numbers) {}
+    public function __construct(private AuditLogger $audit, private DocumentNumbers $numbers, private SellerDetails $seller) {}
 
     /**
      * @throws ValidationException
@@ -38,6 +39,7 @@ class IssueInvoice
                 'number' => $this->numbers->next(DocumentNumbers::INVOICE),
                 'status' => InvoiceStatus::Issued,
                 'customer_snapshot' => Invoice::snapshotOf($invoice->customer),
+                'seller_snapshot' => $this->seller->snapshot(),
                 'issued_at' => now(),
                 'issued_by' => $actor->getKey(),
             ])->save();

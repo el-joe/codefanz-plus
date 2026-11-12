@@ -10,6 +10,7 @@ use App\Http\Controllers\Concerns\RendersBillingDocuments;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\PaymentLink;
+use App\Services\AuditLogger;
 use App\Services\Money;
 use App\Services\Payments\PaymentGatewayManager;
 use Illuminate\Database\Eloquent\Builder;
@@ -18,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Payments & transactions (A05): KPIs, the transactions ledger with gateway, fee, net and how each payment was
@@ -31,25 +33,9 @@ class PaymentController extends Controller
     {
         Gate::authorize('viewAny', Payment::class);
 
-        $filters = $request->validate([
-            'q' => ['nullable', 'string', 'max:120'],
-            'status' => ['nullable', Rule::enum(PaymentStatus::class)],
-            'gateway' => ['nullable', Rule::in($gateways->keys())],
-        ]);
+        $filters = $this->filters($request, $gateways);
 
-        $payments = Payment::query()
-            ->with(['customer:id,ulid,company_name', 'project:id,ulid,name,reference', 'milestone:id,title'])
-            ->when($filters['q'] ?? null, function (Builder $query, string $term): void {
-                $like = '%'.addcslashes($term, '%_\\').'%';
-                $query->where(fn (Builder $query) => $query
-                    ->where('reference', 'like', $like)
-                    ->orWhereHas('customer', fn (Builder $customer) => $customer->where('company_name', 'like', $like))
-                    ->orWhereHas('project', fn (Builder $project) => $project->where('name', 'like', $like)));
-            })
-            ->when($filters['status'] ?? null, fn (Builder $query, string $status) => $query->where('status', $status))
-            ->when($filters['gateway'] ?? null, fn (Builder $query, string $gateway) => $query->where('gateway', $gateway))
-            ->latest()
-            ->latest('id')
+        $payments = $this->filteredQuery($filters)
             ->paginate(25)
             ->withQueryString();
 
@@ -61,6 +47,61 @@ class PaymentController extends Controller
         ]);
     }
 
+    /**
+     * Streamed CSV of the filtered transactions. Text cells that a spreadsheet would run as a formula are prefixed
+     * with an apostrophe (CSV injection), and the export is audited.
+     */
+    public function export(Request $request, PaymentGatewayManager $gateways, AuditLogger $audit): StreamedResponse
+    {
+        Gate::authorize('viewAny', Payment::class);
+
+        $filters = $this->filters($request, $gateways);
+        $audit->record(operation: 'payments.exported', user: $request->user(), after: ['filters' => $filters]);
+
+        return response()->streamDownload(function () use ($filters): void {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\u{FEFF}");
+            fputcsv($out, ['Reference', 'Date', 'Client', 'Project', 'Milestone', 'Gateway', 'Gateway reference', 'Status', 'Currency', 'Amount', 'Fee', 'Net', 'Refunded', 'Paid at', 'Verified via'], escape: '');
+
+            foreach ($this->filteredQuery($filters)->reorder()->lazyById(500) as $payment) {
+                fputcsv($out, array_map(self::csvCell(...), [
+                    $payment->reference,
+                    $payment->created_at?->toDateTimeString(),
+                    $payment->customer?->company_name,
+                    $payment->project?->name,
+                    $payment->milestone?->title,
+                    $payment->gatewayLabel(),
+                    $payment->gateway_payment_id,
+                    $payment->status->value,
+                    $payment->currency,
+                    Money::toDecimal($payment->amount_minor),
+                    Money::toDecimal($payment->fee_minor),
+                    Money::toDecimal($payment->net_minor),
+                    Money::toDecimal($payment->refunded_minor),
+                    $payment->paid_at?->toDateTimeString(),
+                    $payment->verified_via?->value,
+                ]), escape: '');
+            }
+
+            fclose($out);
+        }, 'payments-'.now()->format('Y-m-d-His').'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    /**
+     * Neutralise spreadsheet formulas: cells starting with = + - @ tab or carriage return get a leading apostrophe.
+     * Plain decimal amounts (always non-negative here) are left as numbers.
+     */
+    public static function csvCell(mixed $value): string
+    {
+        $text = (string) ($value ?? '');
+
+        if (preg_match('/^-?\d+(\.\d+)?$/', $text) === 1 && ! str_starts_with($text, '-')) {
+            return $text;
+        }
+
+        return $text !== '' && in_array($text[0], ['=', '+', '-', '@', "\t", "\r"], true) ? "'".$text : $text;
+    }
+
     public function show(Payment $payment): View
     {
         Gate::authorize('view', $payment);
@@ -68,9 +109,10 @@ class PaymentController extends Controller
         $payment->load([
             'customer:id,ulid,company_name', 'project:id,ulid,name,reference', 'milestone:id,title',
             'link:id,ulid,reference,description,status,expires_at', 'receipt', 'events.user:id,name',
+            'refunds.requester:id,name', 'refunds.decider:id,name', 'refunds.creditNote:id,ulid,refund_id,number',
         ]);
 
-        return view('admin.payments.show', ['payment' => $payment]);
+        return view('admin.payments.show', ['payment' => $payment, 'refundable' => $payment->refundableMinor()]);
     }
 
     /**
@@ -96,6 +138,39 @@ class PaymentController extends Controller
         $payment->load('receipt');
 
         return $this->receiptDocument($request, $payment, route('admin.payments.show', $payment));
+    }
+
+    /**
+     * @return array{q?: string, status?: string, gateway?: string}
+     */
+    private function filters(Request $request, PaymentGatewayManager $gateways): array
+    {
+        return $request->validate([
+            'q' => ['nullable', 'string', 'max:120'],
+            'status' => ['nullable', Rule::enum(PaymentStatus::class)],
+            'gateway' => ['nullable', Rule::in($gateways->keys())],
+        ]);
+    }
+
+    /**
+     * @param  array{q?: string, status?: string, gateway?: string}  $filters
+     * @return Builder<Payment>
+     */
+    private function filteredQuery(array $filters): Builder
+    {
+        return Payment::query()
+            ->with(['customer:id,ulid,company_name', 'project:id,ulid,name,reference', 'milestone:id,title'])
+            ->when($filters['q'] ?? null, function (Builder $query, string $term): void {
+                $like = '%'.addcslashes($term, '%_\\').'%';
+                $query->where(fn (Builder $query) => $query
+                    ->where('reference', 'like', $like)
+                    ->orWhereHas('customer', fn (Builder $customer) => $customer->where('company_name', 'like', $like))
+                    ->orWhereHas('project', fn (Builder $project) => $project->where('name', 'like', $like)));
+            })
+            ->when($filters['status'] ?? null, fn (Builder $query, string $status) => $query->where('status', $status))
+            ->when($filters['gateway'] ?? null, fn (Builder $query, string $gateway) => $query->where('gateway', $gateway))
+            ->latest()
+            ->latest('id');
     }
 
     /**

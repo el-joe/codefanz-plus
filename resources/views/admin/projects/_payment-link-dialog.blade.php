@@ -6,7 +6,9 @@
         'incomplete' => __('Incomplete'),
         'sandbox' => __('Sandbox'),
         'live_unverified' => __('Live · not verified'),
+        'connected' => __('Connected'),
     ];
+    $defaultGateways = array_keys(array_filter($linkDialog['gateways'], fn ($gateway) => $gateway['configured'])) ?: array_slice(array_keys($linkDialog['gateways']), 0, 1);
     $milestoneOptions = $project->milestones->filter(fn ($milestone) => ($linkDialog['remaining'][$milestone->ulid] ?? 0) > 0);
     $defaultExpiry = now()->addDays((int) config('codefanz.payments.link_default_days', 14))->toDateString();
 @endphp
@@ -60,13 +62,14 @@
             <div class="flex flex-col gap-2">
                 @foreach ($linkDialog['gateways'] as $key => $gateway)
                     <label class="flex items-center gap-2 text-sm">
-                        <input type="checkbox" name="gateways[]" value="{{ $key }}" class="size-4 accent-brand" @checked(in_array($key, old('gateways', [$key]), true))>
+                        <input type="checkbox" name="gateways[]" value="{{ $key }}" class="size-4 accent-brand" @checked(in_array($key, old('gateways', $defaultGateways), true))>
                         <span class="font-semibold">{{ $gateway['label'] }}</span>
-                        <x-ui.badge :tone="$gateway['configured'] ? ($gateway['status'] === 'sandbox' ? 'info' : 'warning') : 'neutral'" :dot="false">{{ $gatewayStatusLabels[$gateway['status']] }}</x-ui.badge>
+                        <x-ui.badge :tone="$gateway['configured'] ? (in_array($gateway['status'], ['sandbox', 'connected'], true) ? ($gateway['status'] === 'connected' ? 'success' : 'info') : 'warning') : 'neutral'" :dot="false">{{ $gatewayStatusLabels[$gateway['status']] }}</x-ui.badge>
+                        <span class="text-xs text-fg-tertiary" dir="ltr" data-gateway-currencies="{{ $key }}">{{ implode(' · ', $gateway['currencies']) }}</span>
                     </label>
                 @endforeach
             </div>
-            <p class="mt-2 text-xs text-fg-tertiary">{{ __('Only gateways with saved credentials are offered to the client. More providers arrive with the next payments release.') }}</p>
+            <p class="mt-2 text-xs text-fg-tertiary">{{ __('Only gateways with saved credentials are offered to the client. Each gateway accepts only the currencies listed next to it.') }}</p>
         </fieldset>
 
         <x-ui.alert tone="info" :title="__('Secure by design')">

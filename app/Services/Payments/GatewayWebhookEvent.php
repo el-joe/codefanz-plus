@@ -4,7 +4,8 @@ namespace App\Services\Payments;
 
 /**
  * An authenticated webhook delivery. `gatewayPaymentId` and `paymentUlid` identify our payment when the event
- * is about one; `payload` is the sanitized body that gets stored in webhook_events.
+ * is about one; `gatewayRefundId` identifies a refund the gateway reports on; `payload` is the sanitized body
+ * that gets stored in webhook_events.
  */
 final readonly class GatewayWebhookEvent
 {
@@ -18,5 +19,6 @@ final readonly class GatewayWebhookEvent
         public ?string $paymentUlid,
         public array $payload,
         public bool $concernsPayment,
+        public ?string $gatewayRefundId = null,
     ) {}
 }

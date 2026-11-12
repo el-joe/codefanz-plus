@@ -3,12 +3,15 @@
 namespace App\Services\Payments;
 
 use App\Contracts\PaymentGateway;
+use App\Contracts\RetrievesGatewayRefunds;
+use App\Contracts\TestsGatewayConnection;
 use App\Enums\GatewayMode;
 use App\Enums\PaymentStatus;
 use App\Exceptions\InvalidWebhookSignature;
 use App\Exceptions\PaymentGatewayException;
 use App\Models\Payment;
 use App\Models\PaymentLink;
+use App\Models\Refund;
 use App\Services\Settings;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\ConnectionException;
@@ -27,10 +30,12 @@ use Illuminate\Support\Str;
  * - Verification: GET /v1/checkout/sessions/{id} expanded to the charge's balance transaction for the fee.
  * - Webhooks: `Stripe-Signature: t=…,v1=…` is HMAC-SHA256 of "{t}.{raw body}" with the endpoint's signing
  *   secret; deliveries outside the timestamp tolerance are rejected (replay protection).
+ * - Refunds: POST /v1/refunds (idempotency key per payment + amount); `refund.*` webhooks are confirmed with
+ *   GET /v1/refunds/{id}. Connection test: GET /v1/balance (read-only).
  *
  * Credentials (Settings → Payments): stripe_secret_key, stripe_webhook_secret, stripe_mode.
  */
-class StripeGateway implements PaymentGateway
+class StripeGateway implements PaymentGateway, RetrievesGatewayRefunds, TestsGatewayConnection
 {
     /**
      * @param  array<string, mixed>  $config
@@ -186,6 +191,7 @@ class StripeGateway implements PaymentGateway
 
         $object = is_array($event['data']['object'] ?? null) ? $event['data']['object'] : [];
         $isSession = ($object['object'] ?? null) === 'checkout.session';
+        $isRefund = ($object['object'] ?? null) === 'refund' && is_string($object['id'] ?? null);
 
         return new GatewayWebhookEvent(
             eventId: $event['id'],
@@ -194,6 +200,7 @@ class StripeGateway implements PaymentGateway
             paymentUlid: $isSession && is_string($object['client_reference_id'] ?? null) ? $object['client_reference_id'] : null,
             payload: $this->sanitize($event, $object),
             concernsPayment: $isSession && str_starts_with($event['type'], 'checkout.session.'),
+            gatewayRefundId: $isRefund ? $object['id'] : null,
         );
     }
 
@@ -211,7 +218,40 @@ class StripeGateway implements PaymentGateway
             'metadata' => ['payment_ulid' => $payment->ulid],
         ], idempotencyKey: 'refund-'.$payment->ulid.'-'.$amountMinor.'-'.$payment->refunded_minor);
 
-        return new GatewayRefund((string) $response->json('id'), (string) $response->json('status'), (int) $response->json('amount'));
+        return $this->refundResult($response->json());
+    }
+
+    public function refundStatus(Refund $refund): GatewayRefund
+    {
+        if (! is_string($refund->gateway_refund_id) || $refund->gateway_refund_id === '') {
+            throw new PaymentGatewayException('Refund has no gateway id');
+        }
+
+        return $this->refundResult($this->send('get', '/v1/refunds/'.rawurlencode($refund->gateway_refund_id), [])->json());
+    }
+
+    public function testConnection(): void
+    {
+        $this->send('get', '/v1/balance', []);
+    }
+
+    /**
+     * @param  mixed  $refund  decoded Stripe Refund object
+     */
+    private function refundResult(mixed $refund): GatewayRefund
+    {
+        if (! is_array($refund) || ! is_string($refund['id'] ?? null)) {
+            throw new PaymentGatewayException('Unexpected refund response');
+        }
+
+        // https://docs.stripe.com/api/refunds/object#refund_object-status
+        $status = match ($refund['status'] ?? null) {
+            'succeeded' => GatewayRefund::SUCCEEDED,
+            'failed', 'canceled' => GatewayRefund::FAILED,
+            default => GatewayRefund::PENDING,
+        };
+
+        return new GatewayRefund($refund['id'], $status, (int) ($refund['amount'] ?? 0), is_string($refund['failure_reason'] ?? null) ? $refund['failure_reason'] : null);
     }
 
     /**
@@ -259,7 +299,7 @@ class StripeGateway implements PaymentGateway
         return [
             ...Arr::only($event, ['id', 'type', 'created', 'livemode', 'api_version']),
             'object' => array_filter([
-                ...Arr::only($object, ['id', 'object', 'status', 'payment_status', 'amount_total', 'currency', 'client_reference_id', 'mode']),
+                ...Arr::only($object, ['id', 'object', 'status', 'payment_status', 'amount_total', 'amount', 'currency', 'client_reference_id', 'mode']),
                 'payment_intent' => is_array($object['payment_intent'] ?? null) ? ($object['payment_intent']['id'] ?? null) : ($object['payment_intent'] ?? null),
                 'metadata' => is_array($object['metadata'] ?? null) ? Arr::only($object['metadata'], ['payment_ulid', 'payment_reference', 'link_reference']) : null,
             ], fn ($value): bool => $value !== null),

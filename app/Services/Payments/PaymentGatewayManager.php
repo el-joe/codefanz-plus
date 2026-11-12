@@ -3,10 +3,12 @@
 namespace App\Services\Payments;
 
 use App\Contracts\PaymentGateway;
+use App\Contracts\TestsGatewayConnection;
 use App\Enums\GatewayMode;
 use App\Exceptions\UnknownPaymentGateway;
 use App\Models\PaymentLink;
 use App\Services\Settings;
+use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Container\Container;
 
 /**
@@ -87,10 +89,11 @@ class PaymentGatewayManager
     }
 
     /**
-     * Honest integration status per gateway for the settings and payment-link screens. A gateway is never
-     * reported as verified live: there is no connection test yet, only saved credentials and the chosen mode.
+     * Honest integration status per gateway for the settings and payment-link screens. "Connected" appears only
+     * after the driver's connection test succeeded with the credentials saved now (any credential change clears
+     * it); otherwise a gateway is at most "Sandbox" or "Live · not verified".
      *
-     * @return array<string, array{label: string, status: string, configured: bool, mode: string, webhook_url: string}>
+     * @return array<string, array{label: string, status: string, configured: bool, mode: string, webhook_url: string, verified_at: ?CarbonImmutable, testable: bool, currencies: list<string>}>
      */
     public function statuses(): array
     {
@@ -100,10 +103,12 @@ class PaymentGatewayManager
             $driver = $this->driver($key);
             $credentials = (array) config("codefanz.payments.gateways.{$key}.credentials", []);
             $saved = collect($credentials)->filter(fn (string $credential): bool => $this->settings->has('payments', $credential))->count();
+            $verifiedAt = $saved === count($credentials) ? $this->verifiedAt($key) : null;
 
             $status = match (true) {
                 $saved === 0 => 'requires_credentials',
                 $saved < count($credentials) => 'incomplete',
+                $verifiedAt !== null => 'connected',
                 $driver->mode() === GatewayMode::Live => 'live_unverified',
                 default => 'sandbox',
             };
@@ -114,9 +119,57 @@ class PaymentGatewayManager
                 'configured' => $driver->isConfigured(),
                 'mode' => $driver->mode()->value,
                 'webhook_url' => route('webhooks.payments', $key),
+                'verified_at' => $verifiedAt,
+                'testable' => $driver instanceof TestsGatewayConnection,
+                'currencies' => array_values(array_filter((array) config('codefanz.payments.currencies'), fn (string $currency): bool => $driver->supportsCurrency($currency))),
             ];
         }
 
         return $statuses;
+    }
+
+    /**
+     * Gateway keys that cannot take payments in this currency.
+     *
+     * @param  list<string>  $keys
+     * @return list<string>
+     */
+    public function unsupportedFor(array $keys, string $currency): array
+    {
+        return array_values(array_filter($keys, fn (string $key): bool => $this->has($key) && ! $this->driver($key)->supportsCurrency($currency)));
+    }
+
+    public function verifiedAt(string $key): ?CarbonImmutable
+    {
+        $value = $this->settings->get('payments', $key.'_verified_at');
+
+        return is_string($value) && $value !== '' ? CarbonImmutable::parse($value) : null;
+    }
+
+    public function recordVerification(string $key): void
+    {
+        $this->settings->set('payments', $key.'_verified_at', now()->toIso8601String());
+    }
+
+    /**
+     * Clear the connection test of every gateway whose credentials or mode were among the changed setting keys.
+     *
+     * @param  list<string>  $changedKeys
+     * @return list<string> the gateways whose verification was cleared
+     */
+    public function forgetVerificationsFor(array $changedKeys): array
+    {
+        $cleared = [];
+
+        foreach ($this->keys() as $key) {
+            $watched = [...(array) config("codefanz.payments.gateways.{$key}.credentials", []), (string) config("codefanz.payments.gateways.{$key}.mode_key"), $key.'_region'];
+
+            if (array_intersect($watched, $changedKeys) !== [] && $this->settings->has('payments', $key.'_verified_at')) {
+                $this->settings->forget('payments', $key.'_verified_at');
+                $cleared[] = $key;
+            }
+        }
+
+        return $cleared;
     }
 }

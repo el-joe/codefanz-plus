@@ -14,6 +14,7 @@
             <dt class="text-ink-500">{{ __('Date') }}</dt><dd class="font-semibold">{{ ($payment->paid_at ?? $receipt->issued_at)->translatedFormat('j M Y') }}</dd>
             <dt class="text-ink-500">{{ __('Payment') }}</dt><dd class="font-mono font-semibold" dir="ltr">{{ $payment->reference }}</dd>
             <dt class="text-ink-500">{{ __('Method') }}</dt><dd class="font-semibold">{{ $payment->methodLabel() }} · {{ $payment->gatewayLabel() }}</dd>
+            @if (filled($payment->metadata['offline_reference'] ?? null))<dt class="text-ink-500">{{ __('Reference number') }}</dt><dd class="font-mono font-semibold" dir="ltr">{{ $payment->metadata['offline_reference'] }}</dd>@endif
             @if ($payment->link)<dt class="text-ink-500">{{ __('Payment link') }}</dt><dd class="font-mono font-semibold" dir="ltr">{{ $payment->link->reference }}</dd>@endif
         </dl>
     </div>

@@ -1,5 +1,7 @@
 @php($paid = $payment->status === \App\Enums\PaymentStatus::Paid)
 @php($failed = in_array($payment->status, [\App\Enums\PaymentStatus::Failed, \App\Enums\PaymentStatus::Cancelled], true))
+@php($offlineReference = $payment->metadata['offline_reference'] ?? null)
+@php($offlineExpiresAt = isset($payment->metadata['offline_reference_expires_at']) ? \Illuminate\Support\Carbon::parse($payment->metadata['offline_reference_expires_at']) : null)
 
 <x-layouts.checkout :title="$paid ? __('Payment confirmed') : __('Confirming your payment')">
     <x-ui.card class="mx-auto max-w-lg text-center shadow-sm" data-payment-result="{{ $payment->status->value }}">
@@ -7,7 +9,17 @@
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/>@if ($paid)<path d="m8 12 3 3 5-6"/>@elseif ($failed)<path d="m15 9-6 6M9 9l6 6"/>@else<path d="M12 7v5l3 2"/>@endif</svg>
         </span>
 
-        @if ($paid)
+        @if (! $paid && ! $failed && $offlineReference)
+            <h1 class="mt-4 text-2xl font-semibold text-fg">{{ __('Pay with your Fawry reference number') }}</h1>
+            <p class="mt-2 text-sm text-fg-secondary">{{ __('Pay this amount at any Fawry outlet or in the myFawry app using the reference number below. We confirm the payment as soon as Fawry notifies us and we verify it.') }}</p>
+            <div class="mt-5 rounded-xl border-2 border-dashed border-line-strong px-4 py-4" data-offline-reference>
+                <p class="text-xs text-fg-tertiary">{{ __('Reference number') }}</p>
+                <p class="mt-1 font-mono text-3xl font-bold tracking-wider text-fg" dir="ltr">{{ $offlineReference }}</p>
+                @if ($offlineExpiresAt)
+                    <p class="mt-2 text-sm text-fg-secondary" data-offline-reference-expiry>{{ __('Pay before :date', ['date' => $offlineExpiresAt->translatedFormat('j M Y, H:i')]) }}</p>
+                @endif
+            </div>
+        @elseif ($paid)
             <h1 class="mt-4 text-2xl font-semibold text-fg">{{ __('Payment confirmed') }}</h1>
             <p class="mt-2 text-sm text-fg-secondary">{{ __('We verified your payment with the gateway. A receipt is ready for you.') }}</p>
         @elseif ($failed)

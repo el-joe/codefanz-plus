@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Contracts\TestsGatewayConnection;
+use App\Exceptions\PaymentGatewayException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateSettingsRequest;
 use App\Services\Ai\AiGateway;
@@ -9,6 +11,7 @@ use App\Services\AuditLogger;
 use App\Services\Payments\PaymentGatewayManager;
 use App\Services\Settings;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
@@ -44,7 +47,7 @@ class SettingController extends Controller
         ]);
     }
 
-    public function update(UpdateSettingsRequest $request, string $group, AuditLogger $audit): RedirectResponse
+    public function update(UpdateSettingsRequest $request, string $group, AuditLogger $audit, PaymentGatewayManager $gateways): RedirectResponse
     {
         $input = $request->validated('settings') ?? [];
         $clear = $request->validated('clear') ?? [];
@@ -85,11 +88,52 @@ class SettingController extends Controller
             }
         }
 
+        // New payment credentials have not been tested: drop the "Connected" verification of the gateways concerned.
+        if ($group === 'payments' && $after !== []) {
+            $cleared = $gateways->forgetVerificationsFor(array_keys($after));
+
+            if ($cleared !== []) {
+                $after['connection_verification_cleared'] = $cleared;
+            }
+        }
+
         if ($after !== []) {
             $audit->record(operation: "settings.{$group}.updated", user: $request->user(), before: $before, after: $after);
         }
 
         return redirect()->route('admin.settings.edit', $group)->with('toast', __('Settings saved.'));
+    }
+
+    /**
+     * "Test connection": a harmless authenticated call to the gateway. Success records the verification date shown
+     * on the status card; failure is reported with a short, secret-free reason. Both are audited.
+     */
+    public function testGateway(Request $request, string $gateway, PaymentGatewayManager $gateways, AuditLogger $audit): RedirectResponse
+    {
+        abort_unless($gateways->has($gateway), 404);
+
+        $driver = $gateways->driver($gateway);
+
+        if (! $driver instanceof TestsGatewayConnection) {
+            return back()->with('toast', __(':gateway has no connection test.', ['gateway' => $gateways->label($gateway)]));
+        }
+
+        if (! $driver->isConfigured()) {
+            return back()->with('toast', __('Save every :gateway credential before testing the connection.', ['gateway' => $gateways->label($gateway)]));
+        }
+
+        try {
+            $driver->testConnection();
+        } catch (PaymentGatewayException $exception) {
+            $audit->record(operation: 'settings.payments.connection_tested', user: $request->user(), after: ['gateway' => $gateway, 'mode' => $driver->mode()->value, 'error' => $exception->getMessage()], result: 'failure');
+
+            return back()->with('toast', __(':gateway connection failed: :error', ['gateway' => $gateways->label($gateway), 'error' => $exception->getMessage()]));
+        }
+
+        $gateways->recordVerification($gateway);
+        $audit->record(operation: 'settings.payments.connection_tested', user: $request->user(), after: ['gateway' => $gateway, 'mode' => $driver->mode()->value]);
+
+        return back()->with('toast', __(':gateway connection verified.', ['gateway' => $gateways->label($gateway)]));
     }
 
     /**

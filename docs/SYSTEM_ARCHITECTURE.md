@@ -113,7 +113,7 @@ re-verifies approval, approver permission, scope, and the target's version befor
 
 | Contract | Adapters (initial) |
 |---|---|
-| `PaymentGateway` | Stripe (M6.2); Paymob, PayTabs, Fawry next |
+| `PaymentGateway` | Stripe (M6.2); Paymob, PayTabs, Fawry (M6.3) |
 | `AiProvider` | OpenAI (Responses API); future adapters |
 | `SocialPublisher` | Facebook Page, Instagram, LinkedIn, X, TikTok, YouTube, Pinterest, `ManualExport` |
 | `RadarConnector` | Upwork API, RSS feed, IMAP saved-search email, Manual import |
@@ -126,6 +126,17 @@ re-verifies approval, approver permission, scope, and the target's version befor
 driver class + config entry + its credential fields in `codefanz.settings.payments`; routes
 (`/webhooks/payments/{gateway}`, outside the web group), `StartCheckout`, `HandleGatewayWebhook` and
 `VerifyPayment` stay unchanged. Drivers never write the ledger: `VerifyPayment` is the only path to Paid.
+Optional driver contracts: `TestsGatewayConnection` (Settings → Payments "Test connection", a harmless authenticated
+call; the card shows "Connected (verified …)" until a credential changes) and `RetrievesGatewayRefunds` (refund
+webhooks are confirmed through the API). Drivers throw `ManualRefundRequired` when a payment cannot be refunded by
+API (cash at Fawry/Paymob kiosks). Each driver declares its currencies (PayTabs per region); payment links and
+checkouts only offer gateways that support the link currency.
+
+**Refunds (M6.3).** Four-eyes: `RequestRefund` (payments.create-links or finance; capped under a payment lock) →
+`DecideRefund` by a `payments.refund-approve` holder who is not the requester → `ProcessRefund` calls the gateway →
+`CompleteRefund` (only path to Refunded/PartiallyRefunded: `transitionTo` + payment_events, gap-free credit note
+CN-YYYY-NNNNN, milestone recompute, audit, notifications), or `manual_required` → finance records the external
+reference. Refund webhooks go through `SyncGatewayRefund` and are no-ops once the refund is settled.
 
 Every adapter declares `capabilities()` (e.g. supports refunds, supports scheduling) so UI shows only real
 options. Credentials live in `integration_credentials` encrypted with Laravel's encrypter (`encrypted` cast).

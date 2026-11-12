@@ -8,10 +8,12 @@ use App\Models\Project;
 use App\Services\Money;
 use App\Services\Payments\PaymentGatewayManager;
 use Carbon\CarbonInterface;
+use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 /**
  * Create payment link dialog (A04). The remaining-balance cap is enforced again in CreatePaymentLink under a lock.
@@ -50,6 +52,32 @@ class StorePaymentLinkRequest extends FormRequest
             'usage' => ['required', Rule::in(['single', 'reusable'])],
             'gateways' => ['required', 'array', 'min:1'],
             'gateways.*' => ['string', Rule::in(app(PaymentGatewayManager::class)->keys())],
+        ];
+    }
+
+    /**
+     * Every allowed gateway must support the link's currency (the per-gateway currency matrix).
+     *
+     * @return array<int, Closure(Validator): void>
+     */
+    public function after(): array
+    {
+        return [
+            function (Validator $validator): void {
+                if ($validator->errors()->hasAny(['currency', 'gateways', 'gateways.*'])) {
+                    return;
+                }
+
+                $gateways = app(PaymentGatewayManager::class);
+                $unsupported = $gateways->unsupportedFor(array_values((array) $this->input('gateways', [])), (string) $this->input('currency'));
+
+                if ($unsupported !== []) {
+                    $validator->errors()->add('gateways', __(':gateways cannot take payments in :currency.', [
+                        'gateways' => implode(', ', array_map(fn (string $key): string => $gateways->label($key), $unsupported)),
+                        'currency' => $this->input('currency'),
+                    ]));
+                }
+            },
         ];
     }
 

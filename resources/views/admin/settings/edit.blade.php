@@ -39,66 +39,19 @@
     @endif
 
     @if ($paymentGateways !== [])
-        <div class="grid gap-4 md:grid-cols-2" data-payment-gateways>
-            @foreach ($paymentGateways as $key => $gateway)
-                <x-ui.card data-gateway="{{ $key }}">
-                    <div class="flex items-center justify-between gap-3">
-                        <p class="font-semibold text-fg">{{ $gateway['label'] }}</p>
-                        @switch($gateway['status'])
-                            @case('sandbox')<x-ui.badge tone="info">{{ __('Sandbox · test mode') }}</x-ui.badge>@break
-                            @case('live_unverified')<x-ui.badge tone="warning">{{ __('Live · not verified') }}</x-ui.badge>@break
-                            @case('incomplete')<x-ui.badge tone="warning">{{ __('Incomplete') }}</x-ui.badge>@break
-                            @default<x-ui.badge>{{ __('Requires credentials') }}</x-ui.badge>
-                        @endswitch
-                    </div>
-                    <p class="mt-3 text-xs text-fg-tertiary">{{ __('Webhook endpoint (add it in the gateway dashboard):') }}</p>
-                    <code class="mt-1 block break-all rounded bg-subtle px-2 py-1 font-mono text-xs text-fg" dir="ltr">{{ $gateway['webhook_url'] }}</code>
-                    <p class="mt-2 text-xs text-fg-tertiary">{{ __('Payments are confirmed with the gateway API before they count. A live connection is never claimed until a verified payment arrives.') }}</p>
-                </x-ui.card>
-            @endforeach
-        </div>
+        @include('admin.settings._payment-gateways')
+    @else
+        <form method="POST" action="{{ route('admin.settings.update', $group) }}" class="flex max-w-3xl flex-col gap-6">
+            @csrf
+            @method('PUT')
+
+            <x-ui.card>
+                <div class="flex flex-col gap-5">
+                    @include('admin.settings._fields', ['fields' => $fields])
+                </div>
+            </x-ui.card>
+
+            <div><x-ui.button>{{ __('Save changes') }}</x-ui.button></div>
+        </form>
     @endif
-
-    <form method="POST" action="{{ route('admin.settings.update', $group) }}" class="flex max-w-3xl flex-col gap-6">
-        @csrf
-        @method('PUT')
-
-        <x-ui.card>
-            <div class="flex flex-col gap-5">
-                @foreach ($fields as $key => $field)
-                    @if ($field['type'] === 'translatable')
-                        <fieldset class="flex flex-col gap-3">
-                            <legend class="mb-1 text-sm font-semibold text-fg">{{ __($field['label']) }}</legend>
-                            <div class="grid gap-3 sm:grid-cols-2">
-                                @foreach ($languages as $code => $language)
-                                    <div lang="{{ $code }}" dir="{{ $language['direction'] }}">
-                                        <x-ui.input :name="'settings['.$key.']['.$code.']'" :id="$key.'-'.$code" :label="$language['native_name']" :value="$values[$key][$code] ?? null" />
-                                    </div>
-                                @endforeach
-                            </div>
-                        </fieldset>
-                    @elseif ($field['type'] === 'secret')
-                        <div class="flex flex-col gap-2">
-                            <x-ui.input :name="'settings['.$key.']'" :id="$key" type="password" :label="__($field['label'])" autocomplete="new-password" dir="ltr"
-                                        :helper="$masked[$key] ? __('Saved as :value. Leave blank to keep it.', ['value' => $masked[$key]]) : __('Encrypted at rest and never shown again after saving.')" />
-                            @if ($masked[$key])
-                                <label class="flex items-center gap-2 text-sm text-fg-secondary">
-                                    <input type="checkbox" name="clear[]" value="{{ $key }}" class="size-4 accent-brand">
-                                    {{ __('Remove the saved value') }}
-                                </label>
-                            @endif
-                        </div>
-                    @elseif ($field['type'] === 'select')
-                        <x-ui.select :name="'settings['.$key.']'" :id="$key" :label="__($field['label'])" :options="array_map(fn ($option) => __($option), $field['options'])" :value="$values[$key] ?? null" :placeholder="__('Default')" />
-                    @elseif ($field['type'] === 'number')
-                        <x-ui.input :name="'settings['.$key.']'" :id="$key" type="number" step="0.01" min="0" :label="__($field['label'])" :value="$values[$key] ?? null" dir="ltr" />
-                    @else
-                        <x-ui.input :name="'settings['.$key.']'" :id="$key" :type="$field['type'] === 'email' ? 'email' : 'text'" :label="__($field['label'])" :value="$values[$key] ?? null" dir="ltr" />
-                    @endif
-                @endforeach
-            </div>
-        </x-ui.card>
-
-        <div><x-ui.button>{{ __('Save changes') }}</x-ui.button></div>
-    </form>
 </x-layouts.admin>

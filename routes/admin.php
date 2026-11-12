@@ -36,6 +36,7 @@ use App\Http\Controllers\Admin\ProjectConversationController;
 use App\Http\Controllers\Admin\ProjectDocumentController;
 use App\Http\Controllers\Admin\ProjectMilestoneController;
 use App\Http\Controllers\Admin\ProjectNoteController;
+use App\Http\Controllers\Admin\RefundController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SecurityController;
 use App\Http\Controllers\Admin\ServiceController;
@@ -46,6 +47,7 @@ use App\Http\Controllers\Admin\TechnologyCategoryController;
 use App\Http\Controllers\Admin\TechnologyController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Middleware\ConfirmPasswordForSensitiveSettings;
 use Illuminate\Support\Facades\Route;
 
 Route::get('security', SecurityController::class)->middleware('password.confirm')->name('security');
@@ -134,6 +136,13 @@ Route::middleware('two-factor')->group(function (): void {
         Route::post('invoices/{invoice}/issue', [InvoiceController::class, 'issue'])->name('invoices.issue');
         Route::post('invoices/{invoice}/void', [InvoiceController::class, 'void'])->name('invoices.void');
         Route::get('invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
+        Route::get('payments-export', [PaymentController::class, 'export'])->middleware('throttle:10,1')->name('payments.export');
+        Route::post('payments/{payment}/refunds', [RefundController::class, 'store'])->middleware('throttle:20,1')->name('payments.refunds.store');
+        Route::get('refunds', [RefundController::class, 'index'])->name('refunds.index');
+        Route::post('refunds/{refund}/approve', [RefundController::class, 'approve'])->middleware('throttle:20,1')->name('refunds.approve');
+        Route::post('refunds/{refund}/reject', [RefundController::class, 'reject'])->name('refunds.reject');
+        Route::post('refunds/{refund}/complete', [RefundController::class, 'complete'])->name('refunds.complete');
+        Route::get('credit-notes/{creditNote}/print', [RefundController::class, 'creditNote'])->name('credit-notes.print');
     });
 
     Route::middleware('can:viewAny,App\Models\SupportTicket')->group(function (): void {
@@ -202,8 +211,10 @@ Route::middleware('two-factor')->group(function (): void {
 
     Route::middleware('can:settings.manage')->group(function (): void {
         Route::redirect('settings', 'settings/general')->name('settings.index');
-        Route::get('settings/{group}', [SettingController::class, 'edit'])->whereIn('group', array_keys(config('codefanz.settings')))->name('settings.edit');
-        Route::put('settings/{group}', [SettingController::class, 'update'])->whereIn('group', array_keys(config('codefanz.settings')))->name('settings.update');
+        // Payment credentials need a recently confirmed password (ConfirmPasswordForSensitiveSettings).
+        Route::get('settings/{group}', [SettingController::class, 'edit'])->whereIn('group', array_keys(config('codefanz.settings')))->middleware(ConfirmPasswordForSensitiveSettings::class)->name('settings.edit');
+        Route::put('settings/{group}', [SettingController::class, 'update'])->whereIn('group', array_keys(config('codefanz.settings')))->middleware(ConfirmPasswordForSensitiveSettings::class)->name('settings.update');
+        Route::post('settings/payments/gateways/{gateway}/test', [SettingController::class, 'testGateway'])->middleware(['password.confirm', 'throttle:10,1'])->name('settings.payments.test');
     });
 
     Route::get('ai-usage', AiUsageController::class)->middleware('can:settings.manage')->name('ai-usage');

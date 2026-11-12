@@ -26,7 +26,9 @@ Baseline: OWASP ASVS L2 / OWASP Top 10.
 - Outbound HTTP only to configured integration hosts; any user-supplied URL (link checker, existing website) goes through a guard blocking private/loopback/metadata IP ranges and non-http(s) schemes, with redirect re-validation.
 
 ## 6. Webhooks & integrations
-- Signature verification per gateway (Stripe signature, Paymob HMAC, PayTabs signature, Fawry hash); timestamp tolerance; idempotent processing; server-side verification before marking paid.
+- Signature verification per gateway (Stripe `Stripe-Signature` HMAC-SHA256 with timestamp tolerance, Paymob HMAC-SHA512 over the documented transaction fields, PayTabs `signature` HMAC-SHA256 of the raw body with the server key, Fawry notification V2 SHA-256 `messageSignature`); idempotent processing; server-side verification before marking paid.
+- Payment credentials: `settings.manage` plus a recently confirmed password to view or change Settings → Payments; changes audited without secret values and clear the gateway's connection verification.
+- Refunds: four-eyes (requester can never approve), amount capped under a row lock, credit note per refund; CSV exports are permission-checked, audited and formula-injection safe.
 - n8n: HMAC-SHA256 signed payloads both ways with timestamp + nonce.
 - Credentials encrypted at rest (`encrypted` cast, `APP_KEY` rotation procedure documented); never logged, never returned to UI after save (masked), never in Git.
 

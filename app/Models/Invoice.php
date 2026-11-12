@@ -84,6 +84,7 @@ class Invoice extends Model
         return [
             'status' => InvoiceStatus::class,
             'customer_snapshot' => 'array',
+            'seller_snapshot' => 'array',
             'subtotal_minor' => 'integer',
             'tax_rate_bp' => 'integer',
             'tax_minor' => 'integer',

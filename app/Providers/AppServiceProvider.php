@@ -12,6 +12,7 @@ use App\Models\ChatSession;
 use App\Models\ContactMessage;
 use App\Models\Conversation;
 use App\Models\ConversationMessage;
+use App\Models\CreditNote;
 use App\Models\Customer;
 use App\Models\Document;
 use App\Models\Faq;
@@ -39,6 +40,7 @@ use App\Models\ProductVersion;
 use App\Models\Project;
 use App\Models\ProjectNote;
 use App\Models\Receipt;
+use App\Models\Refund;
 use App\Models\Service;
 use App\Models\ServiceTranslation;
 use App\Models\Statistic;
@@ -123,6 +125,8 @@ class AppServiceProvider extends ServiceProvider
             'payment' => Payment::class,
             'invoice' => Invoice::class,
             'receipt' => Receipt::class,
+            'refund' => Refund::class,
+            'credit_note' => CreditNote::class,
         ]);
 
         // Payment gateway webhooks: generous per gateway and IP; bad signatures are rejected before any work.

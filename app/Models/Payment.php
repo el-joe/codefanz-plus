@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\PaymentEventSource;
 use App\Enums\PaymentStatus;
+use App\Enums\RefundStatus;
 use App\Models\Concerns\BelongsToCustomer;
 use App\Services\Money;
 use Database\Factories\PaymentFactory;
@@ -152,6 +153,29 @@ class Payment extends Model
     public function events(): HasMany
     {
         return $this->hasMany(PaymentEvent::class)->orderBy('id');
+    }
+
+    /**
+     * @return HasMany<Refund, $this>
+     */
+    public function refunds(): HasMany
+    {
+        return $this->hasMany(Refund::class)->latest('id');
+    }
+
+    /**
+     * Amount that can still be requested for refund: collected, minus refunded, minus open refund requests.
+     * Requires the payment row to be locked when used to accept a new request.
+     */
+    public function refundableMinor(): int
+    {
+        if (! $this->status?->isCollected()) {
+            return 0;
+        }
+
+        $reserved = (int) Refund::query()->where('payment_id', $this->getKey())->whereIn('status', RefundStatus::open())->sum('amount_minor');
+
+        return max(0, $this->amount_minor - $this->refunded_minor - $reserved);
     }
 
     /**

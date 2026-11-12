@@ -1,5 +1,8 @@
 <?php
 
+use App\Services\Payments\FawryGateway;
+use App\Services\Payments\PaymobGateway;
+use App\Services\Payments\PayTabsGateway;
 use App\Services\Payments\StripeGateway;
 
 return [
@@ -71,9 +74,24 @@ return [
         ],
         // Payment gateway credentials (M6.2). Each gateway in codefanz.payments.gateways lists its own keys.
         'payments' => [
-            'stripe_mode' => ['type' => 'select', 'label' => 'Stripe mode', 'options' => ['test' => 'Test (sandbox)', 'live' => 'Live'], 'rules' => ['nullable', 'string', 'in:test,live']],
-            'stripe_secret_key' => ['type' => 'secret', 'label' => 'Stripe secret key (sk_test_… / sk_live_…)', 'rules' => ['nullable', 'string', 'max:255', 'regex:/^(sk|rk)_(test|live)_[A-Za-z0-9]+$/']],
-            'stripe_webhook_secret' => ['type' => 'secret', 'label' => 'Stripe webhook signing secret (whsec_…)', 'rules' => ['nullable', 'string', 'max:255', 'regex:/^whsec_[A-Za-z0-9]+$/']],
+            // `section` groups the fields under their gateway's card; changing them needs a confirmed password.
+            'stripe_mode' => ['type' => 'select', 'section' => 'stripe', 'label' => 'Stripe mode', 'options' => ['test' => 'Test (sandbox)', 'live' => 'Live'], 'rules' => ['nullable', 'string', 'in:test,live']],
+            'stripe_secret_key' => ['type' => 'secret', 'section' => 'stripe', 'label' => 'Stripe secret key (sk_test_… / sk_live_…)', 'rules' => ['nullable', 'string', 'max:255', 'regex:/^(sk|rk)_(test|live)_[A-Za-z0-9]+$/']],
+            'stripe_webhook_secret' => ['type' => 'secret', 'section' => 'stripe', 'label' => 'Stripe webhook signing secret (whsec_…)', 'rules' => ['nullable', 'string', 'max:255', 'regex:/^whsec_[A-Za-z0-9]+$/']],
+            'paymob_mode' => ['type' => 'select', 'section' => 'paymob', 'label' => 'Paymob mode', 'options' => ['test' => 'Test (sandbox)', 'live' => 'Live'], 'rules' => ['nullable', 'string', 'in:test,live']],
+            'paymob_secret_key' => ['type' => 'secret', 'section' => 'paymob', 'label' => 'Paymob secret key (egy_sk_…)', 'rules' => ['nullable', 'string', 'max:255', 'regex:/^[A-Za-z0-9_\\-]+$/']],
+            'paymob_public_key' => ['type' => 'text', 'section' => 'paymob', 'label' => 'Paymob public key (egy_pk_…)', 'rules' => ['nullable', 'string', 'max:255', 'regex:/^[A-Za-z0-9_\\-]+$/']],
+            'paymob_api_key' => ['type' => 'secret', 'section' => 'paymob', 'label' => 'Paymob API key', 'rules' => ['nullable', 'string', 'max:2000', 'regex:/^[A-Za-z0-9+\\/=_.\\-]+$/']],
+            'paymob_hmac_secret' => ['type' => 'secret', 'section' => 'paymob', 'label' => 'Paymob HMAC secret', 'rules' => ['nullable', 'string', 'max:255', 'regex:/^[A-Za-z0-9]+$/']],
+            'paymob_integration_ids' => ['type' => 'text', 'section' => 'paymob', 'label' => 'Paymob integration IDs (comma separated)', 'rules' => ['nullable', 'string', 'max:255', 'regex:/^\\d+(\\s*,\\s*\\d+)*$/']],
+            'paytabs_mode' => ['type' => 'select', 'section' => 'paytabs', 'label' => 'PayTabs mode', 'options' => ['test' => 'Test (sandbox)', 'live' => 'Live'], 'rules' => ['nullable', 'string', 'in:test,live']],
+            'paytabs_region' => ['type' => 'select', 'section' => 'paytabs', 'label' => 'PayTabs region', 'options' => ['EGY' => 'Egypt', 'SAU' => 'Saudi Arabia', 'ARE' => 'United Arab Emirates', 'GLOBAL' => 'Global'], 'rules' => ['nullable', 'string', 'in:EGY,SAU,ARE,GLOBAL']],
+            'paytabs_profile_id' => ['type' => 'text', 'section' => 'paytabs', 'label' => 'PayTabs profile ID', 'rules' => ['nullable', 'string', 'max:20', 'regex:/^\\d+$/']],
+            'paytabs_server_key' => ['type' => 'secret', 'section' => 'paytabs', 'label' => 'PayTabs server key', 'rules' => ['nullable', 'string', 'max:255', 'regex:/^[A-Za-z0-9\\-]+$/']],
+            'fawry_mode' => ['type' => 'select', 'section' => 'fawry', 'label' => 'Fawry mode', 'options' => ['test' => 'Test (staging)', 'live' => 'Live'], 'rules' => ['nullable', 'string', 'in:test,live']],
+            'fawry_payment_method' => ['type' => 'select', 'section' => 'fawry', 'label' => 'Fawry payment method', 'options' => ['PAYATFAWRY' => 'Reference number (pay at a Fawry outlet)', 'CARD' => 'Card on the FawryPay page'], 'rules' => ['nullable', 'string', 'in:PAYATFAWRY,CARD']],
+            'fawry_merchant_code' => ['type' => 'text', 'section' => 'fawry', 'label' => 'Fawry merchant code', 'rules' => ['nullable', 'string', 'max:100', 'regex:/^[A-Za-z0-9+\\/=_\\-]+$/']],
+            'fawry_secure_key' => ['type' => 'secret', 'section' => 'fawry', 'label' => 'Fawry secure key', 'rules' => ['nullable', 'string', 'max:255', 'regex:/^[A-Za-z0-9\\-]+$/']],
         ],
     ],
 
@@ -233,6 +251,45 @@ return [
                 // Pinned so response shapes do not change with the account's default API version.
                 'api_version' => env('STRIPE_API_VERSION', '2024-06-20'),
                 'currencies' => ['USD', 'EUR', 'GBP', 'EGP', 'SAR', 'AED'],
+            ],
+            'paymob' => [
+                'driver' => PaymobGateway::class,
+                'label' => 'Paymob',
+                'method' => 'Card or mobile wallet',
+                'description' => 'Visa, Mastercard, Meeza, wallets · processed by Paymob',
+                'credentials' => ['paymob_secret_key', 'paymob_public_key', 'paymob_api_key', 'paymob_hmac_secret', 'paymob_integration_ids'],
+                'mode_key' => 'paymob_mode',
+                'base_url' => env('PAYMOB_BASE_URL', 'https://accept.paymob.com'),
+                // Amounts in piasters; the Egypt account settles EGP only.
+                'currencies' => ['EGP'],
+            ],
+            'paytabs' => [
+                'driver' => PayTabsGateway::class,
+                'label' => 'PayTabs',
+                'method' => 'Credit or debit card',
+                'description' => 'Visa, Mastercard, mada, Meeza · processed by PayTabs',
+                'credentials' => ['paytabs_profile_id', 'paytabs_server_key'],
+                'mode_key' => 'paytabs_mode',
+                'default_region' => 'EGY',
+                // Each region has its own API host; a profile settles only its region's currencies.
+                'regions' => [
+                    'EGY' => ['base_url' => env('PAYTABS_EGY_URL', 'https://secure-egypt.paytabs.com'), 'currencies' => ['EGP', 'USD']],
+                    'SAU' => ['base_url' => env('PAYTABS_SAU_URL', 'https://secure.paytabs.sa'), 'currencies' => ['SAR', 'USD']],
+                    'ARE' => ['base_url' => env('PAYTABS_ARE_URL', 'https://secure.paytabs.com'), 'currencies' => ['AED', 'USD']],
+                    'GLOBAL' => ['base_url' => env('PAYTABS_GLOBAL_URL', 'https://secure-global.paytabs.com'), 'currencies' => ['USD', 'EUR', 'GBP', 'AED', 'SAR', 'EGP']],
+                ],
+            ],
+            'fawry' => [
+                'driver' => FawryGateway::class,
+                'label' => 'Fawry',
+                'method' => 'Fawry reference or card',
+                'description' => 'Pay at any Fawry outlet or by card · processed by FawryPay',
+                'credentials' => ['fawry_merchant_code', 'fawry_secure_key'],
+                'mode_key' => 'fawry_mode',
+                'test_base_url' => env('FAWRY_TEST_URL', 'https://atfawry.fawrystaging.com'),
+                'live_base_url' => env('FAWRY_LIVE_URL', 'https://www.atfawry.com'),
+                'currencies' => ['EGP'],
+                'reference_expiry_hours' => 48,
             ],
         ],
         'currencies' => ['USD', 'EUR', 'GBP', 'EGP', 'SAR', 'AED'],

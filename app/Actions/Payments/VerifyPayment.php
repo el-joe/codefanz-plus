@@ -21,6 +21,7 @@ use App\Services\DeliveryRecipients;
 use App\Services\DocumentNumbers;
 use App\Services\Payments\GatewayVerification;
 use App\Services\Payments\PaymentGatewayManager;
+use App\Services\SellerDetails;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
@@ -42,6 +43,7 @@ class VerifyPayment
         private DocumentNumbers $numbers,
         private SettleInvoices $settleInvoices,
         private DeliveryRecipients $recipients,
+        private SellerDetails $seller,
     ) {}
 
     /**
@@ -128,6 +130,7 @@ class VerifyPayment
             'number' => $this->numbers->next(DocumentNumbers::RECEIPT),
             'customer_id' => $payment->customer_id,
             'customer_snapshot' => Invoice::snapshotOf($payment->customer),
+            'seller_snapshot' => $this->seller->snapshot(),
             'amount_minor' => $payment->amount_minor,
             'currency' => $payment->currency,
             'issued_at' => now(),

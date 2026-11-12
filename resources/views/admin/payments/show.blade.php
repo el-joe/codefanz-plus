@@ -34,6 +34,7 @@
                 [__('Paid at'), $payment->paid_at?->translatedFormat('j M Y, H:i')],
                 [__('Verified at'), $payment->verified_at?->translatedFormat('j M Y, H:i')],
                 [__('Gateway reference'), $payment->gateway_payment_id],
+                [__('Payment reference number'), $payment->metadata['offline_reference'] ?? null],
             ] as [$label, $value])
                 <div>
                     <dt class="text-fg-tertiary">{{ $label }}</dt>
@@ -48,6 +49,40 @@
             @endif
         </dl>
     </x-ui.card>
+
+    @if ($payment->status->isCollected() || $payment->refunds->isNotEmpty())
+        <x-ui.card :title="__('Refunds')" data-payment-refunds>
+            <dl class="grid gap-4 text-sm sm:grid-cols-3">
+                <div><dt class="text-fg-tertiary">{{ __('Refunded') }}</dt><dd class="mt-0.5 font-semibold text-fg" dir="ltr">{{ \App\Services\Money::plain($payment->refunded_minor, $payment->currency) }}</dd></div>
+                <div><dt class="text-fg-tertiary">{{ __('Still refundable') }}</dt><dd class="mt-0.5 font-semibold text-fg" dir="ltr" data-refundable>{{ \App\Services\Money::plain($refundable, $payment->currency) }}</dd></div>
+            </dl>
+
+            @if ($payment->refunds->isNotEmpty())
+                <div class="mt-5 overflow-x-auto rounded-lg border border-line-subtle">
+                    @include('admin.payments._refunds-table', ['refunds' => $payment->refunds, 'showPayment' => false])
+                </div>
+            @endif
+
+            @if ($refundable > 0)
+                @can('create', [\App\Models\Refund::class, $payment])
+                    @php($refundErrors = $errors->getBag('refund'))
+                    <form method="POST" action="{{ route('admin.payments.refunds.store', $payment) }}" class="mt-5 flex flex-col gap-4 border-t border-line-subtle pt-5" data-refund-request>
+                        @csrf
+                        <p class="text-sm font-semibold text-fg">{{ __('Request a refund') }}</p>
+                        @if ($refundErrors->any())
+                            <x-ui.alert tone="danger">{{ $refundErrors->first() }}</x-ui.alert>
+                        @endif
+                        <div class="grid gap-4 sm:grid-cols-[12rem_1fr]">
+                            <x-ui.input name="amount" id="refund-amount" type="number" step="0.01" min="0.01" :max="\App\Services\Money::toDecimal($refundable)" :label="__('Amount (:currency)', ['currency' => $payment->currency])" :value="old('amount', \App\Services\Money::toDecimal($refundable))" bag="refund" required dir="ltr" />
+                            <x-ui.input name="reason" id="refund-reason" :label="__('Reason')" :value="old('reason')" bag="refund" required maxlength="500" dir="auto" />
+                        </div>
+                        <p class="text-xs text-fg-tertiary">{{ __('A different user with refund approval reviews the request. Nothing reaches the gateway before that.') }}</p>
+                        <div><x-ui.button variant="secondary">{{ __('Request refund') }}</x-ui.button></div>
+                    </form>
+                @endcan
+            @endif
+        </x-ui.card>
+    @endif
 
     <x-ui.card :title="__('History')">
         <ol class="flex flex-col gap-3" data-payment-events>

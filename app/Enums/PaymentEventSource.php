@@ -12,6 +12,7 @@ enum PaymentEventSource: string
     case ReturnUrl = 'return_url';
     case Admin = 'admin';
     case Reconciliation = 'reconciliation';
+    case Refund = 'refund';
 
     public function label(): string
     {
@@ -21,6 +22,7 @@ enum PaymentEventSource: string
             self::ReturnUrl => __('Return + API'),
             self::Admin => __('Staff check + API'),
             self::Reconciliation => __('Reconciliation + API'),
+            self::Refund => __('Approved refund'),
         };
     }
 }

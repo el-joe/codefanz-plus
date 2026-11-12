@@ -27,6 +27,12 @@
     @case('payment.received')
         {{ __('Payment :reference received: :amount', ['reference' => $notification->data['reference'] ?? '', 'amount' => \App\Services\Money::localized((int) ($notification->data['amount_minor'] ?? 0), (string) ($notification->data['currency'] ?? 'USD'))]) }}
         @break
+    @case('refund.requested')
+        {{ __(':name requested refund :reference: :amount', ['name' => $notification->data['name'] ?? '', 'reference' => $notification->data['reference'] ?? '', 'amount' => \App\Services\Money::localized((int) ($notification->data['amount_minor'] ?? 0), (string) ($notification->data['currency'] ?? 'USD'))]) }}
+        @break
+    @case('refund.status')
+        {{ __('Refund :reference is now :status', ['reference' => $notification->data['reference'] ?? '', 'status' => \App\Enums\RefundStatus::tryFrom($notification->data['status'] ?? '')?->label() ?? '']) }}
+        @break
     @default
         {{ __('Notification') }}
 @endswitch

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use LogicException;
 
 /**
- * Gap-free document numbers (INV-2026-00001, RCP-2026-00001). The counter row is locked with SELECT … FOR UPDATE
+ * Gap-free document numbers (INV-2026-00001, RCP-2026-00001, CN-2026-00001). The counter row is locked with SELECT … FOR UPDATE
  * and incremented inside the caller's transaction, so a rolled-back issue never consumes a number and two
  * concurrent issues can never share one.
  */
@@ -17,10 +17,12 @@ class DocumentNumbers
 
     public const RECEIPT = 'receipt';
 
+    public const CREDIT_NOTE = 'credit_note';
+
     /**
      * @var array<string, string>
      */
-    private const PREFIXES = [self::INVOICE => 'INV', self::RECEIPT => 'RCP'];
+    private const PREFIXES = [self::INVOICE => 'INV', self::RECEIPT => 'RCP', self::CREDIT_NOTE => 'CN'];
 
     public function next(string $type, ?int $year = null): string
     {

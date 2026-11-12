@@ -299,6 +299,7 @@ test('milestones with payment links cannot be deleted or change currency', funct
 
 test('payment settings show honest gateway statuses', function () {
     $admin = User::factory()->role(Role::Administrator)->withConfirmedTwoFactor()->create();
+    $this->withSession(['auth.password_confirmed_at' => time()]);
 
     $this->actingAs($admin)->get(route('admin.settings.edit', 'payments'))
         ->assertSuccessful()

@@ -2,6 +2,7 @@
 
 namespace App\Actions\Payments;
 
+use App\Actions\Refunds\SyncGatewayRefund;
 use App\Enums\PaymentEventSource;
 use App\Exceptions\InvalidWebhookSignature;
 use App\Exceptions\PaymentGatewayException;
@@ -16,7 +17,8 @@ use Illuminate\Support\Str;
 /**
  * Receives a gateway webhook: authenticate it, record it once in webhook_events (UNIQUE gateway + event id makes
  * duplicates no-ops), then hand the payment to VerifyPayment, which re-checks the status with the gateway API.
- * The webhook body itself is never trusted to mark anything paid.
+ * The webhook body itself is never trusted to mark anything paid. Refund events go to SyncGatewayRefund, which
+ * likewise re-checks the refund with the gateway API.
  *
  * Outcomes: processed, duplicate, ignored (not about a known payment), invalid (bad signature), retry (the
  * gateway API could not be reached; the delivery is answered with 503 so the gateway sends it again).
@@ -33,7 +35,7 @@ class HandleGatewayWebhook
 
     public const RETRY = 'retry';
 
-    public function __construct(private PaymentGatewayManager $gateways, private VerifyPayment $verifyPayment) {}
+    public function __construct(private PaymentGatewayManager $gateways, private VerifyPayment $verifyPayment, private SyncGatewayRefund $syncRefund) {}
 
     public function handle(string $gatewayKey, Request $request): string
     {
@@ -74,6 +76,10 @@ class HandleGatewayWebhook
             $event->forceFill(['attempts' => $event->attempts + 1])->save();
         }
 
+        if ($parsed->gatewayRefundId !== null) {
+            return $this->handleRefund($gatewayKey, $parsed->gatewayRefundId, $event);
+        }
+
         if (! $parsed->concernsPayment) {
             $event->forceFill(['processed_at' => now()])->save();
 
@@ -99,6 +105,24 @@ class HandleGatewayWebhook
         $event->forceFill(['processed_at' => now(), 'error' => null])->save();
 
         return self::PROCESSED;
+    }
+
+    /**
+     * Refund events are confirmed through the gateway API by SyncGatewayRefund; settled refunds make them no-ops.
+     */
+    private function handleRefund(string $gatewayKey, string $gatewayRefundId, WebhookEvent $event): string
+    {
+        try {
+            $outcome = $this->syncRefund->handle($gatewayKey, $gatewayRefundId, $event);
+        } catch (PaymentGatewayException $exception) {
+            $event->forceFill(['error' => Str::limit($exception->getMessage(), 250)])->save();
+
+            return self::RETRY;
+        }
+
+        $event->forceFill(['processed_at' => now(), 'error' => $outcome === SyncGatewayRefund::UNKNOWN ? 'No matching refund' : null])->save();
+
+        return $outcome === SyncGatewayRefund::UNKNOWN ? self::IGNORED : self::PROCESSED;
     }
 
     private function findPayment(string $gatewayKey, ?string $gatewayPaymentId, ?string $paymentUlid): ?Payment
