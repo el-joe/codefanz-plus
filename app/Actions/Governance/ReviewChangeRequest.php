@@ -6,6 +6,7 @@ use App\Enums\ChangeRequestStatus;
 use App\Exceptions\GovernanceException;
 use App\Models\ChangeRequest;
 use App\Models\User;
+use App\Notifications\ChangeRequestDecided;
 use App\Services\AuditLogger;
 
 class ReviewChangeRequest
@@ -56,6 +57,19 @@ class ReviewChangeRequest
             changeRequestId: $changeRequest->id,
         );
 
+        $this->notifyRequester($changeRequest, $reviewer);
+
         return $changeRequest;
+    }
+
+    private function notifyRequester(ChangeRequest $changeRequest, User $reviewer): void
+    {
+        $requester = $changeRequest->requested_by !== null
+            ? User::query()->whereKey($changeRequest->requested_by)->where('is_active', true)->first()
+            : null;
+
+        if ($requester !== null && ! $requester->is($reviewer)) {
+            $requester->notify(new ChangeRequestDecided($changeRequest, $reviewer->name));
+        }
     }
 }

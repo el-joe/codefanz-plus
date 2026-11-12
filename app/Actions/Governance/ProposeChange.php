@@ -9,10 +9,12 @@ use App\Enums\ChangeRequestStatus;
 use App\Exceptions\GovernanceException;
 use App\Models\ChangeRequest;
 use App\Models\User;
+use App\Notifications\ChangeRequestProposed;
 use App\Services\AuditLogger;
 use App\Services\KillSwitches;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 /**
  * Creates a pending change request. AI, MCP and automation must use this instead of writing public content.
@@ -23,6 +25,7 @@ class ProposeChange
 
     /**
      * @param  array<string, mixed>  $proposed
+     * @param  list<array{type: string, locale?: string|null, field?: string|null, excerpt?: string|null}>|null  $guardrailFlags  post-generation checks shown to reviewers
      */
     public function handle(
         Model&Approvable $target,
@@ -33,6 +36,8 @@ class ProposeChange
         ?string $actorLabel = null,
         ?string $locale = null,
         ChangeAction $action = ChangeAction::Update,
+        ?array $guardrailFlags = null,
+        ?int $aiGenerationId = null,
     ): ChangeRequest {
         $killSwitch = $origin->killSwitch();
 
@@ -46,12 +51,13 @@ class ProposeChange
             throw GovernanceException::disallowedAttributes(array_values($disallowed));
         }
 
-        return DB::transaction(function () use ($target, $proposed, $origin, $summary, $requestedBy, $actorLabel, $locale, $action): ChangeRequest {
+        $changeRequest = DB::transaction(function () use ($target, $proposed, $origin, $summary, $requestedBy, $actorLabel, $locale, $action, $guardrailFlags, $aiGenerationId): ChangeRequest {
             $changeRequest = ChangeRequest::create([
                 'reference' => 'CR-PENDING',
                 'origin' => $origin,
                 'actor_label' => $actorLabel ?? $requestedBy?->name,
                 'requested_by' => $requestedBy?->getKey(),
+                'ai_generation_id' => $aiGenerationId,
                 'action' => $action,
                 'target_type' => $target->getMorphClass(),
                 'target_id' => $target->getKey(),
@@ -59,6 +65,7 @@ class ProposeChange
                 'locale' => $locale,
                 'before' => $target->approvableSnapshot($locale),
                 'proposed' => $proposed,
+                'guardrail_flags' => $guardrailFlags === [] ? null : $guardrailFlags,
                 'summary' => $summary,
                 'required_permission' => $target->approvalPermission($proposed),
                 'status' => ChangeRequestStatus::Pending,
@@ -82,5 +89,23 @@ class ProposeChange
 
             return $changeRequest;
         });
+
+        if ($origin !== ChangeOrigin::Human) {
+            $this->notifyReviewers($changeRequest, $requestedBy);
+        }
+
+        return $changeRequest;
+    }
+
+    /**
+     * Everyone who can decide (holds the required permission), except the person who asked for the proposal.
+     */
+    private function notifyReviewers(ChangeRequest $changeRequest, ?User $requestedBy): void
+    {
+        $reviewers = User::query()->holdingPermission($changeRequest->required_permission)->get()
+            ->reject(fn (User $reviewer): bool => $requestedBy !== null && $reviewer->is($requestedBy))
+            ->values();
+
+        Notification::send($reviewers, new ChangeRequestProposed($changeRequest));
     }
 }

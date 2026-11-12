@@ -1,12 +1,16 @@
 <?php
 
+use App\Http\Controllers\Admin\AiGenerationController;
+use App\Http\Controllers\Admin\AiGovernanceController;
 use App\Http\Controllers\Admin\AiUsageController;
 use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\AuthorProfileController;
+use App\Http\Controllers\Admin\BrandProfileController;
 use App\Http\Controllers\Admin\CareerController;
 use App\Http\Controllers\Admin\ChangeRequestController;
 use App\Http\Controllers\Admin\ContactMessageController;
+use App\Http\Controllers\Admin\ContentStudioController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\CustomerPortalUserController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -42,6 +46,7 @@ use App\Http\Controllers\Admin\ProjectConversationController;
 use App\Http\Controllers\Admin\ProjectDocumentController;
 use App\Http\Controllers\Admin\ProjectMilestoneController;
 use App\Http\Controllers\Admin\ProjectNoteController;
+use App\Http\Controllers\Admin\PromptTemplateController;
 use App\Http\Controllers\Admin\RedirectController;
 use App\Http\Controllers\Admin\RefundController;
 use App\Http\Controllers\Admin\RoleController;
@@ -67,12 +72,34 @@ Route::middleware('two-factor')->group(function (): void {
     Route::get('/', DashboardController::class)->name('dashboard');
 
     Route::get('approvals', [ChangeRequestController::class, 'index'])->name('approvals.index');
+    Route::post('approvals/bulk', [ChangeRequestController::class, 'bulk'])->middleware('throttle:20,1')->name('approvals.bulk');
     Route::get('approvals/{changeRequest}', [ChangeRequestController::class, 'show'])->name('approvals.show');
     Route::post('approvals/{changeRequest}/decision', [ChangeRequestController::class, 'decide'])->name('approvals.decide');
     Route::post('approvals/{changeRequest}/apply', [ChangeRequestController::class, 'apply'])->name('approvals.apply');
 
     Route::get('emergency', [KillSwitchController::class, 'index'])->middleware('can:automation.manage')->name('emergency.index');
     Route::put('emergency/{key}', [KillSwitchController::class, 'update'])->middleware('can:automation.manage')->name('emergency.update');
+
+    Route::get('ai-governance', AiGovernanceController::class)->middleware('can:automation.manage')->name('ai-governance');
+
+    Route::middleware('can:ai.use')->prefix('ai-studio')->name('ai-studio.')->group(function (): void {
+        Route::get('/', [ContentStudioController::class, 'index'])->name('index');
+        Route::get('create', [ContentStudioController::class, 'create'])->name('create');
+        Route::post('generations', [ContentStudioController::class, 'store'])->middleware('throttle:20,1')->name('generations.store');
+        Route::get('generations', [AiGenerationController::class, 'index'])->name('generations.index');
+        Route::get('generations/{generation}', [AiGenerationController::class, 'show'])->withoutMiddleware('can:ai.use')->name('generations.show');
+        Route::post('generations/{generation}/draft', [AiGenerationController::class, 'draft'])->name('generations.draft');
+        Route::post('generations/{generation}/propose', [AiGenerationController::class, 'propose'])->name('generations.propose');
+        Route::post('generations/{generation}/save', [AiGenerationController::class, 'save'])->name('generations.save');
+        Route::post('generations/{generation}/discard', [AiGenerationController::class, 'discard'])->name('generations.discard');
+    });
+
+    Route::middleware('can:ai.manage')->group(function (): void {
+        Route::resource('prompts', PromptTemplateController::class)->parameters(['prompts' => 'template'])->except(['show', 'destroy']);
+        Route::post('prompts/{template}/test', [PromptTemplateController::class, 'test'])->middleware('throttle:10,1')->name('prompts.test');
+        Route::get('brand-voice', [BrandProfileController::class, 'edit'])->name('brand-voice.edit');
+        Route::put('brand-voice', [BrandProfileController::class, 'update'])->name('brand-voice.update');
+    });
 
     Route::middleware('can:media.manage')->group(function (): void {
         Route::get('media', [MediaController::class, 'index'])->name('media.index');

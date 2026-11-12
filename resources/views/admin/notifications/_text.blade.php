@@ -42,6 +42,12 @@
     @case('post.changes_requested')
         {{ __(':name requested changes to “:title”', ['name' => $notification->data['name'] ?? '', 'title' => $notification->data['title'] ?? '']) }}
         @break
+    @case('change_request.proposed')
+        {{ __('Approval needed: :reference — :summary', ['reference' => $notification->data['reference'] ?? '', 'summary' => $notification->data['summary'] ?? '']) }}
+        @break
+    @case('change_request.decided')
+        {{ __(':name decided on :reference: :status', ['name' => $notification->data['name'] ?? '', 'reference' => $notification->data['reference'] ?? '', 'status' => \App\Enums\ChangeRequestStatus::tryFrom($notification->data['status'] ?? '')?->label() ?? '']) }}
+        @break
     @default
         {{ __('Notification') }}
 @endswitch

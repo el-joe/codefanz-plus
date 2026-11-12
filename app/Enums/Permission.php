@@ -21,6 +21,7 @@ enum Permission: string
     case SocialApprove = 'social.approve';
     case MediaManage = 'media.manage';
     case AiUse = 'ai.use';
+    case AiManage = 'ai.manage';
     case McpManage = 'mcp.manage';
     case RadarView = 'radar.view';
     case AutomationManage = 'automation.manage';

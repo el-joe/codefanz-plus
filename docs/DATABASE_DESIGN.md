@@ -126,14 +126,16 @@
 ### 2.10 AI, social & governance
 | Table | Notes |
 |---|---|
-| `ai_prompts` | key, locale, template, version, is_active |
-| `ai_generations` | type, provider, model, prompt_key, input JSON, output, tokens_in/out, cost_minor, user_id/agent, status |
+| `brand_profiles` | name, is_default, tone/audience JSON {locale: text}, do_rules/dont_rules JSON {locale: [rules]}, banned_claims JSON, glossary JSON [{en, ar}], allowed_domains JSON, lock_version, updated_by (M8.1) |
+| `prompt_templates` | key (unique), name, purpose (blog_draft, service_copy, seo_meta, social_post, email, ad_copy, translation), locale (null = any), description, system_template, user_template, variables JSON [{name, label, required, max}], version, is_active, created_by/updated_by, soft deletes |
+| `prompt_template_versions` | prompt_template_id, version, system_template, user_template, variables JSON, created_by — immutable; UNIQUE(template, version) |
+| `ai_generations` | ulid, prompt_template_id, template_version, purpose, mode (write/translate), nullable target morph, locales JSON, inputs JSON, output JSON {locale: {field: text}}, guardrail_flags JSON, provider, model, input/output tokens, estimated_cost_minor, status (generated, failed, draft_created, proposed, saved, discarded), is_dry_run, error, user_id, post_id. Change requests link back through `change_requests.ai_generation_id` |
 | `ai_usage_logs` | one row per provider call: feature, provider, model, input/output tokens, estimated_cost_minor (US cents, 4 decimals, from the `codefanz.ai.prices` table), latency_ms, status, error (short, never prompt text), user/lead/chat_session refs. Monthly sum enforces the budget (hard stop) |
 | `social_accounts` | platform, external_id, name, integration_id, capabilities JSON, status |
 | `social_posts` | campaign_id, status (Draft, PendingReview, Approved, Scheduled, Publishing, Published, Failed, Cancelled, ManualExport), scheduled_at, origin |
 | `social_post_targets` | social_post_id, social_account_id, platform_content, media JSON, status, published_url, platform_response JSON, attempts, last_error |
 | `social_metrics` | target_id, metric, value, captured_at |
-| `change_requests` | uuid, origin (ai/mcp/human), actor_type/id, action (create/update/delete/publish/schedule), target_type, target_id, target_version (lock_version or content hash), before JSON, proposed JSON, diff JSON, status (Pending, UnderReview, Approved, Rejected, ChangesRequested, Applied, Failed), required_permission, reviewed_by, reviewed_at, review_note, applied_at, apply_result JSON, expires_at. Index (status, created_at) |
+| `change_requests` | uuid, origin (ai/mcp/human), actor_type/id, action (create/update/delete/publish/schedule), target_type, target_id, target_version (lock_version or content hash), before JSON, proposed JSON, diff JSON, status (Pending, UnderReview, Approved, Rejected, ChangesRequested, Applied, Failed), required_permission, reviewed_by, reviewed_at, review_note, applied_at, apply_result JSON, expires_at. Index (status, created_at). M8.1 adds `ai_generation_id` (nullable FK) and `guardrail_flags` JSON, plus indexes (origin, status) and target_type for the queue filters |
 | `change_request_comments` | review thread |
 | `audit_logs` | actor_type/id (user, ai_agent, mcp_client, system), operation, auditable morph, before JSON, after JSON, change_request_id, ip, user_agent, created_at — append-only; partition by month when large |
 | `mcp_clients` | name, token_id (Sanctum), scopes, last_used_at, revoked_at |

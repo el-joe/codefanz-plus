@@ -11,6 +11,8 @@ enum AiUnavailableReason: string
     case Disabled = 'disabled';
     case BudgetExceeded = 'budget_exceeded';
     case Failed = 'failed';
+    case UserLimitReached = 'user_limit';
+    case FeatureLimitReached = 'feature_limit';
 
     public function label(): string
     {
@@ -19,6 +21,8 @@ enum AiUnavailableReason: string
             self::Disabled => __('Paused by an emergency control'),
             self::BudgetExceeded => __('Monthly budget reached'),
             self::Failed => __('Provider error'),
+            self::UserLimitReached => __('You have reached your personal AI usage limit. It resets automatically; an administrator can raise it in Settings → AI limits.'),
+            self::FeatureLimitReached => __('This feature has reached its monthly AI usage limit. An administrator can raise it in Settings → AI limits.'),
         };
     }
 }

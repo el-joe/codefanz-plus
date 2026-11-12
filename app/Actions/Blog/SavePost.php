@@ -26,7 +26,7 @@ class SavePost
     ) {}
 
     /**
-     * @param  array{post_category_id?: int|null, tag_ids?: list<int>|null, is_featured?: bool, is_single_language?: bool, cover_media_id?: int|null, lock_version?: int|null, translations: array<string, array<string, string|null>>, checklist?: array<string, bool>|null}  $data
+     * @param  array{origin?: PostOrigin, post_category_id?: int|null, tag_ids?: list<int>|null, is_featured?: bool, is_single_language?: bool, cover_media_id?: int|null, lock_version?: int|null, translations: array<string, array<string, string|null>>, checklist?: array<string, bool>|null}  $data
      * @return array{post: Post, approval_withdrawn: bool}
      */
     public function handle(?Post $post, array $data, User $editor, string $reason = 'saved', ?int $restoredFromId = null): array
@@ -44,7 +44,7 @@ class SavePost
                     ...$attributes,
                     'author_id' => $editor->getKey(),
                     'status' => PostStatus::Draft,
-                    'origin' => PostOrigin::Human,
+                    'origin' => $data['origin'] ?? PostOrigin::Human,
                     'created_by' => $editor->getKey(),
                 ]);
                 $before = null;

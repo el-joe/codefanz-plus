@@ -75,6 +75,17 @@ return [
             'google_service_account_json' => ['type' => 'secret', 'label' => 'Google service account key (JSON) for GA4 Data API and Search Console', 'rules' => ['nullable', 'string', 'max:10000', 'json']],
             'ai_monthly_budget' => ['type' => 'number', 'label' => 'AI monthly budget (USD, 0 stops all AI calls)', 'rules' => ['nullable', 'numeric', 'min:0', 'max:1000000']],
         ],
+        // AI usage caps (M8.1), enforced by AiGateway before every call. Blank = no cap, 0 = blocked. The monthly
+        // budget in Integrations stays the hard stop for everything.
+        'ai' => [
+            'user_daily_requests' => ['type' => 'number', 'label' => 'AI requests per staff member per day', 'rules' => ['nullable', 'integer', 'min:0', 'max:100000']],
+            'user_monthly_tokens' => ['type' => 'number', 'label' => 'AI tokens per staff member per month', 'rules' => ['nullable', 'integer', 'min:0', 'max:1000000000']],
+            'content_studio_monthly_tokens' => ['type' => 'number', 'label' => 'AI Content Studio tokens per month', 'rules' => ['nullable', 'integer', 'min:0', 'max:1000000000']],
+            'seo_assistant_monthly_tokens' => ['type' => 'number', 'label' => 'AI SEO suggestions tokens per month', 'rules' => ['nullable', 'integer', 'min:0', 'max:1000000000']],
+            'social_monthly_tokens' => ['type' => 'number', 'label' => 'AI social copy tokens per month', 'rules' => ['nullable', 'integer', 'min:0', 'max:1000000000']],
+            'project_assistant_monthly_tokens' => ['type' => 'number', 'label' => 'AI Project Assistant tokens per month', 'rules' => ['nullable', 'integer', 'min:0', 'max:1000000000']],
+            'radar_monthly_tokens' => ['type' => 'number', 'label' => 'Freelance Radar tokens per month', 'rules' => ['nullable', 'integer', 'min:0', 'max:1000000000']],
+        ],
         // SEO (M7.2). Unset = block search engines everywhere except production.
         'seo' => [
             'block_indexing' => ['type' => 'select', 'label' => 'Search engine indexing', 'options' => ['block' => 'Block (robots.txt Disallow + noindex header)', 'allow' => 'Allow indexing'], 'rules' => ['nullable', 'string', 'in:block,allow']],

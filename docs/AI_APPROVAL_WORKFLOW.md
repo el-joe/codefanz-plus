@@ -46,6 +46,32 @@ Pending ──► UnderReview ──► Approved ──► Applied
    6. relevant kill switch is off.
 7. Result recorded (`Applied` / `Failed` + error), `audit_logs` row written, cache invalidated.
 
+## 4a. AI Content Studio (M8.1)
+
+- Staff with `ai.use` generate from versioned prompt templates (`prompt_templates` + `prompt_template_versions`,
+  managed under `ai.manage` together with the brand voice in `brand_profiles`). Every call goes through
+  `AiGateway`, which checks the feature's kill switches (`ai_content_studio` / `ai_seo` / `ai_social` / `ai_radar`
+  plus the `ai_automation` master; the public assistant only `ai_assistant`), the monthly budget (hard stop) and the
+  per-user / per-feature caps in Settings → AI limits **before** calling the provider.
+- The system prompt contains only admin-configured text (template, brand voice, glossary) and fixed safety rules.
+  Staff input and existing content go into the user message inside `<user_input>` / `<current_content>` tags with
+  `<` and `>` escaped, so they are data, never instructions.
+- Each result is a private `ai_generations` row (template version, inputs, output, tokens, cost, author, target).
+  Post-generation guardrails flag banned claims, numbers not found in the inputs, prices and links to unknown
+  domains; flags are shown to the author and stored on the change request.
+- What a generation can become: a new blog post (`origin = ai`, status Draft, editorial workflow; the author can
+  never approve it) or, for an existing page/service/product/portfolio item/post, one pending change request per
+  language with `origin = ai` and `ai_generation_id` — never a direct write. Social, email and ad copy stay private.
+- Reviewers holding the required permission are notified (database + mail) when an AI/MCP proposal is created;
+  the requester is notified of every decision.
+
+## 4b. Approval queue UI (B04)
+
+Filters (status tab, origin, content type, required permission), per-field before/after with a line diff, guardrail
+flags, the checks re-verified at apply time (version, permission, not own proposal, kill switch, expiry), review note,
+Reject / Request changes / Approve / Approve & apply, and a link to the generation record. Bulk approval skips
+AI-origin requests with guardrail flags, the reviewer's own proposals and requests needing another permission.
+
 ## 5. Audit record (every operation)
 
 actor identity (user / AI agent / MCP client) · operation · target resource · before state · proposed state ·

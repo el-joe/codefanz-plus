@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-#[Fillable(['reference', 'origin', 'actor_label', 'requested_by', 'action', 'target_type', 'target_id', 'target_version', 'locale', 'before', 'proposed', 'summary', 'required_permission', 'status', 'reviewed_by', 'reviewed_at', 'review_note', 'applied_at', 'apply_result', 'expires_at'])]
+#[Fillable(['reference', 'origin', 'actor_label', 'requested_by', 'ai_generation_id', 'action', 'target_type', 'target_id', 'target_version', 'locale', 'before', 'proposed', 'guardrail_flags', 'summary', 'required_permission', 'status', 'reviewed_by', 'reviewed_at', 'review_note', 'applied_at', 'apply_result', 'expires_at'])]
 class ChangeRequest extends Model
 {
     /** @use HasFactory<ChangeRequestFactory> */
@@ -31,6 +31,7 @@ class ChangeRequest extends Model
             'required_permission' => Permission::class,
             'before' => 'array',
             'proposed' => 'array',
+            'guardrail_flags' => 'array',
             'apply_result' => 'array',
             'reviewed_at' => 'datetime',
             'applied_at' => 'datetime',
@@ -60,6 +61,19 @@ class ChangeRequest extends Model
     public function reviewer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
+    /**
+     * @return BelongsTo<AiGeneration, $this>
+     */
+    public function generation(): BelongsTo
+    {
+        return $this->belongsTo(AiGeneration::class, 'ai_generation_id');
+    }
+
+    public function hasGuardrailFlags(): bool
+    {
+        return ! empty($this->guardrail_flags);
     }
 
     public function isExpired(): bool

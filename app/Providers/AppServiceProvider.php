@@ -7,6 +7,8 @@ use App\Contracts\AiProvider;
 use App\Enums\MenuLocation;
 use App\Enums\Role;
 use App\Events\LeadCreated;
+use App\Models\AiGeneration;
+use App\Models\BrandProfile;
 use App\Models\Career;
 use App\Models\CareerTranslation;
 use App\Models\ChangeRequest;
@@ -44,6 +46,7 @@ use App\Models\ProductTranslation;
 use App\Models\ProductVersion;
 use App\Models\Project;
 use App\Models\ProjectNote;
+use App\Models\PromptTemplate;
 use App\Models\Receipt;
 use App\Models\Redirect;
 use App\Models\Refund;
@@ -142,6 +145,9 @@ class AppServiceProvider extends ServiceProvider
             'refund' => Refund::class,
             'credit_note' => CreditNote::class,
             'post' => Post::class,
+            'brand_profile' => BrandProfile::class,
+            'prompt_template' => PromptTemplate::class,
+            'ai_generation' => AiGeneration::class,
             'post_category' => PostCategory::class,
             'tag' => Tag::class,
             'seo_meta' => SeoMeta::class,

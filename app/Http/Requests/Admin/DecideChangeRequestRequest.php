@@ -19,7 +19,7 @@ class DecideChangeRequestRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'decision' => ['required', Rule::in(['approve', 'reject', 'request_changes'])],
+            'decision' => ['required', Rule::in(['approve', 'approve_apply', 'reject', 'request_changes'])],
             'note' => ['nullable', 'string', 'max:1000', 'required_if:decision,request_changes'],
         ];
     }

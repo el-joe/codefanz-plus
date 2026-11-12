@@ -15,9 +15,10 @@ use App\Services\Settings;
 use Illuminate\Support\Facades\Log;
 
 /**
- * The single entry point for AI calls (assistant now, Content Studio and Radar later). It picks the provider
- * from Settings, enforces the feature's kill switch and the monthly budget (hard stop), and writes one
- * ai_usage_logs row per provider call. Prompts and responses are never logged.
+ * The single entry point for AI calls (assistant, Content Studio, SEO suggestions, Radar). It picks the provider
+ * from Settings, enforces the feature's kill switches, the monthly budget (hard stop) and the per-user / per-feature
+ * usage caps before calling, and writes one ai_usage_logs row per provider call. Prompts and responses are never
+ * logged here (the Content Studio keeps its own generation history).
  */
 class AiGateway
 {
@@ -25,6 +26,7 @@ class AiGateway
         private Settings $settings,
         private KillSwitches $killSwitches,
         private AiBudget $budget,
+        private AiUsageLimits $limits,
     ) {}
 
     public function providerName(): AiProviderName
@@ -55,15 +57,18 @@ class AiGateway
     }
 
     /**
-     * Why the feature cannot call AI right now, or null when it can.
+     * Why the feature cannot call AI right now, or null when it can. Pass the staff member to include their
+     * personal caps; the global budget stays the hard stop for everyone.
      */
-    public function unavailableReason(AiFeature $feature): ?AiUnavailableReason
+    public function unavailableReason(AiFeature $feature, ?int $userId = null): ?AiUnavailableReason
     {
+        $paused = collect($feature->killSwitches())->contains(fn ($key): bool => $this->killSwitches->isActive($key));
+
         return match (true) {
-            $this->killSwitches->isActive($feature->killSwitch()) => AiUnavailableReason::Disabled,
+            $paused => AiUnavailableReason::Disabled,
             ! $this->provider()->isConfigured() => AiUnavailableReason::NotConfigured,
             $this->budget->isExceeded() => AiUnavailableReason::BudgetExceeded,
-            default => null,
+            default => $this->limits->exceededReason($feature, $userId),
         };
     }
 
@@ -74,7 +79,7 @@ class AiGateway
      */
     public function complete(AiFeature $feature, AiRequest $request, array $refs = []): AiResponse
     {
-        $reason = $this->unavailableReason($feature);
+        $reason = $this->unavailableReason($feature, isset($refs['user_id']) ? (int) $refs['user_id'] : null);
 
         if ($reason !== null) {
             throw new AiUnavailable($reason);
