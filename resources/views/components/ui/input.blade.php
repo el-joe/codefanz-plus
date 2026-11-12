@@ -1,9 +1,10 @@
-@props(['name', 'label', 'type' => 'text', 'value' => null, 'helper' => null, 'dir' => null])
+@props(['name', 'label', 'type' => 'text', 'value' => null, 'helper' => null, 'dir' => null, 'bag' => 'default'])
 
 @php
     $key = trim(str_replace(['[', ']'], ['.', ''], $name), '.');
     $id = $attributes->get('id', $key);
-    $hasError = $errors->has($key);
+    $bagErrors = $errors->getBag($bag);
+    $hasError = $bagErrors->has($key);
 @endphp
 
 <div class="flex flex-col gap-1.5">
@@ -16,10 +17,10 @@
         @if ($dir) dir="{{ $dir }}" @endif
         @if ($hasError || $helper) aria-describedby="{{ $id }}-help" @endif
         @if ($hasError) aria-invalid="true" @endif
-        {{ $attributes->except('id')->merge(['class' => 'w-full rounded-md border bg-surface px-3 py-2.5 text-base text-fg placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 '.($hasError ? 'border-line-danger' : 'border-line')]) }}
+        {{ $attributes->except(['id', 'bag'])->merge(['class' => 'w-full rounded-md border bg-surface px-3 py-2.5 text-base text-fg placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 '.($hasError ? 'border-line-danger' : 'border-line')]) }}
     >
     @if ($hasError)
-        <p id="{{ $id }}-help" class="text-sm text-fg-danger">{{ $errors->first($key) }}</p>
+        <p id="{{ $id }}-help" class="text-sm text-fg-danger">{{ $bagErrors->first($key) }}</p>
     @elseif ($helper)
         <p id="{{ $id }}-help" class="text-sm text-fg-secondary">{{ $helper }}</p>
     @endif

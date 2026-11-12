@@ -46,6 +46,20 @@ class Settings
         Cache::forget("settings.{$group}.{$key}");
     }
 
+    public function forget(string $group, string $key): void
+    {
+        Setting::query()->where('group', $group)->where('key', $key)->delete();
+
+        Cache::forget("settings.{$group}.{$key}");
+    }
+
+    public function has(string $group, string $key): bool
+    {
+        $value = $this->get($group, $key);
+
+        return $value !== null && $value !== '' && $value !== [];
+    }
+
     /**
      * Masked representation of a secret for display, e.g. "••••4f2a".
      */

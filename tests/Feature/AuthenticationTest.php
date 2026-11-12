@@ -35,7 +35,8 @@ test('privileged staff must confirm two-factor authentication before using the a
     $admin = User::factory()->role(Role::Administrator)->create();
 
     $this->actingAs($admin)->get(route('admin.dashboard'))->assertRedirect(route('admin.security'));
-    $this->actingAs($admin)->get(route('admin.security'))->assertSuccessful();
+    $this->actingAs($admin)->get(route('admin.security'))->assertRedirect(route('password.confirm'));
+    $this->actingAs($admin)->withSession(['auth.password_confirmed_at' => time()])->get(route('admin.security'))->assertSuccessful();
 });
 
 test('privileged staff with confirmed two-factor authentication reach the admin dashboard', function () {

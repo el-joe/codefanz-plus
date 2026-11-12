@@ -8,8 +8,9 @@
         ['label' => __('Pages'), 'route' => 'admin.pages.index', 'can' => 'viewAny', 'model' => \App\Models\Page::class],
         ['label' => __('Media'), 'route' => 'admin.media.index', 'can' => 'media.manage'],
         ['label' => __('Emergency controls'), 'route' => 'admin.emergency.index', 'can' => 'automation.manage'],
+        ['label' => __('Users & roles'), 'route' => 'admin.users.index', 'can' => 'viewAny', 'model' => \App\Models\User::class, 'also' => 'admin.roles.*'],
+        ['label' => __('Settings'), 'route' => 'admin.settings.index', 'can' => 'settings.manage', 'also' => 'admin.settings.*'],
         ['label' => __('Audit logs'), 'route' => 'admin.audit-logs.index', 'can' => 'audit.view'],
-        ['label' => __('Security'), 'route' => 'admin.security', 'can' => 'admin.access'],
     ];
 @endphp
 
@@ -20,7 +21,7 @@
             <nav class="flex flex-1 flex-col gap-0.5 px-3" aria-label="{{ __('Admin navigation') }}">
                 @foreach ($nav as $item)
                     @continue(isset($item['model']) ? ! $user->can($item['can'], $item['model']) : ! $user->can($item['can']))
-                    @php($active = request()->routeIs($item['route'].'*') || request()->routeIs(str_replace('.index', '.*', $item['route'])))
+                    @php($active = request()->routeIs($item['route'].'*') || request()->routeIs(str_replace('.index', '.*', $item['route'])) || (isset($item['also']) && request()->routeIs($item['also'])))
                     <a href="{{ route($item['route']) }}" @if ($active) aria-current="page" @endif
                        class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-semibold {{ $active ? 'bg-brand-subtle text-fg-brand' : 'text-fg-secondary hover:bg-subtle' }}">
                         {{ $item['label'] }}
@@ -47,6 +48,7 @@
                 <div data-dropdown class="relative">
                     <button type="button" data-dropdown-trigger class="flex size-10 items-center justify-center rounded-full bg-brand-subtle text-sm font-semibold text-fg-brand" aria-label="{{ __('Account menu') }}">{{ $user->initials() }}</button>
                     <div data-dropdown-menu hidden class="absolute end-0 z-40 mt-2 w-56 rounded-lg border border-line bg-surface-raised p-1.5 shadow-lg">
+                        <a href="{{ route('admin.profile') }}" class="block rounded-md px-3 py-2 text-sm text-fg hover:bg-subtle">{{ __('Profile') }}</a>
                         <a href="{{ route('admin.security') }}" class="block rounded-md px-3 py-2 text-sm text-fg hover:bg-subtle">{{ __('Security') }}</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

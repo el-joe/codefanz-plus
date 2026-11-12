@@ -2,6 +2,8 @@
 
 namespace App\Enums;
 
+use Illuminate\Support\Str;
+
 enum Role: string
 {
     case SuperAdmin = 'super-admin';
@@ -27,6 +29,21 @@ enum Role: string
     public function isStaff(): bool
     {
         return $this !== self::Client;
+    }
+
+    public function label(): string
+    {
+        return __(Str::headline($this->value));
+    }
+
+    /**
+     * Roles that can be assigned from the staff admin. Client accounts are invited from the portal.
+     *
+     * @return list<self>
+     */
+    public static function staff(): array
+    {
+        return array_values(array_filter(self::cases(), fn (self $role): bool => $role->isStaff()));
     }
 
     /**

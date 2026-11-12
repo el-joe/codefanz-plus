@@ -2,8 +2,10 @@
 
 namespace App\Actions\Fortify;
 
+use App\Models\Language;
 use App\Models\User;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Services\AuditLogger;
+use DateTimeZone;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -11,6 +13,8 @@ use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 
 class UpdateUserProfileInformation implements UpdatesUserProfileInformation
 {
+    public function __construct(private AuditLogger $audit) {}
+
     /**
      * Validate and update the given user's profile information.
      *
@@ -20,42 +24,26 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      */
     public function update(User $user, array $input): void
     {
-        Validator::make($input, [
-            'name' => ['required', 'string', 'max:255'],
+        $input['email'] = mb_strtolower(trim((string) ($input['email'] ?? '')));
 
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique('users')->ignore($user->id),
-            ],
+        Validator::make($input, [
+            'name' => ['required', 'string', 'max:120'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'locale' => ['required', Rule::in(Language::active()->keys()->all())],
+            'timezone' => ['required', Rule::in(DateTimeZone::listIdentifiers())],
         ])->validateWithBag('updateProfileInformation');
 
-        if ($input['email'] !== $user->email &&
-            $user instanceof MustVerifyEmail) {
-            $this->updateVerifiedUser($user, $input);
-        } else {
-            $user->forceFill([
-                'name' => $input['name'],
-                'email' => $input['email'],
-            ])->save();
-        }
-    }
+        $before = $user->only(['name', 'email', 'locale', 'timezone']);
 
-    /**
-     * Update the given verified user's profile information.
-     *
-     * @param  array<string, string>  $input
-     */
-    protected function updateVerifiedUser(User $user, array $input): void
-    {
         $user->forceFill([
             'name' => $input['name'],
             'email' => $input['email'],
-            'email_verified_at' => null,
+            'locale' => $input['locale'],
+            'timezone' => $input['timezone'],
         ])->save();
 
-        $user->sendEmailVerificationNotification();
+        if ($user->wasChanged()) {
+            $this->audit->record(operation: 'profile.updated', auditable: $user, user: $user, before: $before, after: $user->only(['name', 'email', 'locale', 'timezone']));
+        }
     }
 }

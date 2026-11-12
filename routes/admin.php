@@ -6,10 +6,15 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KillSwitchController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SecurityController;
+use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('security', SecurityController::class)->name('security');
+Route::get('security', SecurityController::class)->middleware('password.confirm')->name('security');
+Route::get('profile', ProfileController::class)->name('profile');
 
 Route::middleware('two-factor')->group(function (): void {
     Route::get('/', DashboardController::class)->name('dashboard');
@@ -32,6 +37,17 @@ Route::middleware('two-factor')->group(function (): void {
 
     Route::resource('pages', PageController::class)->except(['show']);
     Route::post('pages/{page}/publish', [PageController::class, 'publish'])->name('pages.publish');
+
+    Route::resource('users', UserController::class)->except(['show', 'destroy']);
+    Route::post('users/{user}/invitation', [UserController::class, 'resendInvitation'])->middleware('throttle:6,1')->name('users.invitation');
+    Route::delete('users/{user}/two-factor', [UserController::class, 'resetTwoFactor'])->middleware('password.confirm')->name('users.two-factor.destroy');
+    Route::get('roles', RoleController::class)->name('roles.index');
+
+    Route::middleware('can:settings.manage')->group(function (): void {
+        Route::redirect('settings', 'settings/general')->name('settings.index');
+        Route::get('settings/{group}', [SettingController::class, 'edit'])->whereIn('group', array_keys(config('codefanz.settings')))->name('settings.edit');
+        Route::put('settings/{group}', [SettingController::class, 'update'])->whereIn('group', array_keys(config('codefanz.settings')))->name('settings.update');
+    });
 
     Route::get('audit-logs', AuditLogController::class)->middleware('can:audit.view')->name('audit-logs.index');
 });
