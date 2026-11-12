@@ -7,6 +7,7 @@ use App\Models\PortfolioCategory;
 use App\Models\PortfolioProject;
 use App\Models\PortfolioProjectTranslation;
 use App\Models\Technology;
+use App\Models\Testimonial;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -125,6 +126,14 @@ class PortfolioController extends Controller
             'solution' => $markdown($translation->solution),
             'results' => $markdown($translation->results),
             'related' => $related,
+            'testimonials' => Testimonial::query()
+                ->publiclyVisible()
+                ->where('portfolio_project_id', $project->getKey())
+                ->translatedIn($locale)
+                ->with(['translations', 'avatar.variants'])
+                ->ordered()
+                ->limit(3)
+                ->get(),
         ]);
     }
 }

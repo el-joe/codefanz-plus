@@ -39,8 +39,8 @@
 | Table | Notes |
 |---|---|
 | `pages` + `page_translations` | template, status, published_at, lock_version |
-| `page_sections` + `page_section_translations` | page_id, type (hero, services, stats…), sort, is_visible, settings JSON — powers manageable homepage |
-| `menus`, `menu_items` (+translations) | location, parent_id, url/route/linkable morph, sort |
+| `page_sections` + `page_section_translations` | `page` key (only `home` today), type (`App\Enums\PageSectionType`, UNIQUE per page), sort_order, is_visible, settings JSON (`limit`, `cta_url`); translations: eyebrow, heading, subheading, cta_label, `points` JSON list, `items` JSON list aligned across locales. A language without a row uses the built-in default wording. Rows are structural (`PageSectionSeeder`) |
+| `menus`, `menu_items` (+translations) | `menus.location` UNIQUE (`App\Enums\MenuLocation`); items: parent_id (two levels, header only), link_type `route` (whitelisted public route + `route_params` query JSON) / `linkable` morph (page, service, product, portfolio_project, career → translated slug per locale) / `url` (https only), is_visible, open_in_new_tab, sort_order; translations: label. Resolved per locale by `App\Services\MenuResolver` into cached plain arrays (versioned key bumped on menu or linked-content writes) |
 | `redirects` | from_path UNIQUE, to_path, status_code, hits, is_active |
 | `services` + `service_translations` | parent_id (one level of sub-services), tier (`core`/`specialist`), icon (curated key, `App\Enums\ContentIcon`), status, is_featured, sort_order, lock_version; cover via `mediables` collection `cover` (no cover_media_id column) |
 | `service_features` (+translations), `service_faqs` (+translations) | |
@@ -51,8 +51,10 @@
 | `products` + translations | icon, `pricing_models` JSON list of `App\Enums\PricingModel` (subscription / one_time_license / custom_quote; first is highlighted; no prices stored), availability (available/beta/coming_soon), demo_enabled, docs_url, status, sort_order, lock_version (Approvable), soft deletes; cover + `screenshots` via `mediables`. Translations: name, slug, tagline, description (Markdown), `features` JSON list (index-aligned), licensing_notes, SEO fields |
 | `product_versions` (+`product_version_translations`) | product_id, version UNIQUE per product, released_at; translatable Markdown changelog |
 | Pivots | `service_technology`, `portfolio_project_technology`, `portfolio_project_service`, `product_technology` |
-| `testimonials` (+translations), `faqs` (+translations), `statistics` (+translations) | status, sort, is_featured |
-| `careers` (+translations), `job_applications` | |
+| `testimonials` (+translations) | author_name, company, rating 1–5 (nullable), portfolio_project_id (nullable), `consent_confirmed` (+ at/by) required to publish, status, is_featured, sort_order, soft deletes; avatar via `mediables` collection `avatar`. Translations: quote, author_role |
+| `faq_categories` (+translations: name), `faqs` (+translations: question, answer Markdown) | faq_category_id (nullable), status, is_featured (homepage first), sort_order, soft deletes |
+| `statistics` (+translations: label, suffix) | value DECIMAL(12,2), status, sort_order |
+| `careers` (+translations), `job_applications` | careers: employment_type (`App\Enums\EmploymentType`), is_remote, status, closes_at (inclusive; open = published and not past), sort_order, soft deletes. Translations: title, slug, department, location (translated for visitors), summary, `responsibilities`/`requirements` JSON lists, body Markdown, SEO fields. `job_applications` arrives with the M5 forms |
 
 ### 2.4 Media
 | Table | Notes |

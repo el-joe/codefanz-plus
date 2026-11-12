@@ -3,18 +3,30 @@
 namespace Database\Seeders;
 
 use App\Enums\ContentStatus;
+use App\Enums\EmploymentType;
+use App\Enums\MenuLinkType;
+use App\Enums\MenuLocation;
+use App\Enums\PageSectionType;
 use App\Enums\PricingModel;
 use App\Enums\ProductAvailability;
 use App\Enums\ProjectType;
 use App\Enums\ServiceTier;
 use App\Enums\TechnologyProficiency;
+use App\Models\Career;
+use App\Models\Faq;
+use App\Models\FaqCategory;
 use App\Models\Industry;
+use App\Models\Menu;
+use App\Models\MenuItem;
+use App\Models\PageSection;
 use App\Models\PortfolioCategory;
 use App\Models\PortfolioProject;
 use App\Models\Product;
 use App\Models\Service;
+use App\Models\Statistic;
 use App\Models\Technology;
 use App\Models\TechnologyCategory;
+use App\Models\Testimonial;
 use Illuminate\Database\Seeder;
 
 /**
@@ -32,6 +44,12 @@ class DemoContentSeeder extends Seeder
         $this->industries();
         $this->portfolio($technologies);
         $this->products($technologies);
+        $this->testimonials();
+        $this->faqs();
+        $this->statistics();
+        $this->careers();
+        $this->menus();
+        $this->homeSections();
     }
 
     /**
@@ -253,6 +271,225 @@ class DemoContentSeeder extends Seeder
             }
 
             $product->technologies()->sync(array_values(array_intersect_key($technologies, array_flip(['laravel', 'php']))));
+        }
+    }
+
+    /**
+     * Clearly-sample quotes. Consent is flagged so they render in demos; never reuse them as real testimonials.
+     */
+    private function testimonials(): void
+    {
+        if (Testimonial::query()->where('author_name', 'like', 'Sample client%')->exists()) {
+            return;
+        }
+
+        $project = PortfolioProject::query()->whereHas('translations', fn ($query) => $query->where('slug', 'sample-clinic-booking-platform'))->value('id');
+
+        $quotes = [
+            ['Sample client A', 'Operations Director', 'Sample: the new platform replaced our spreadsheets.', 'تجريبي: المنصة الجديدة استبدلت جداول البيانات لدينا.', 'مدير العمليات', $project],
+            ['Sample client B', 'Founder', 'Sample: weekly demos kept everyone aligned.', 'تجريبي: العروض الأسبوعية أبقت الجميع على اطلاع.', 'المؤسس', null],
+            ['Sample client C', 'Product Manager', 'Sample: the Arabic experience feels native.', 'تجريبي: التجربة العربية تبدو أصلية.', 'مدير المنتج', null],
+        ];
+
+        foreach ($quotes as $position => [$name, $role, $en, $ar, $arRole, $projectId]) {
+            Testimonial::create([
+                'portfolio_project_id' => $projectId,
+                'author_name' => $name,
+                'company' => 'Sample company (not real)',
+                'consent_confirmed' => true,
+                'consent_confirmed_at' => now(),
+                'status' => ContentStatus::Published,
+                'published_at' => now(),
+                'is_featured' => true,
+                'sort_order' => $position,
+            ])->syncTranslations([
+                'en' => ['quote' => $en, 'author_role' => $role],
+                'ar' => ['quote' => $ar, 'author_role' => $arRole],
+            ], Testimonial::TRANSLATED_FIELDS, 'quote');
+        }
+    }
+
+    private function faqs(): void
+    {
+        if (FaqCategory::query()->exists()) {
+            return;
+        }
+
+        $groups = [
+            [['Projects & pricing', 'المشاريع والأسعار'], [
+                ['Sample: how much does a project cost?', 'It depends on scope. This is sample text — replace it in Admin → FAQ.', 'تجريبي: كم تكلفة المشروع؟', 'يعتمد ذلك على النطاق. هذا نص تجريبي.'],
+                ['Sample: how long does an MVP take?', 'Sample answer for design review.', 'تجريبي: كم يستغرق بناء النسخة الأولى؟', 'إجابة تجريبية للمراجعة.'],
+            ]],
+            [['Support', 'الدعم'], [
+                ['Sample: what happens after launch?', 'Sample answer for design review.', 'تجريبي: ماذا يحدث بعد الإطلاق؟', 'إجابة تجريبية للمراجعة.'],
+            ]],
+        ];
+
+        foreach ($groups as $position => [$names, $questions]) {
+            $category = FaqCategory::create(['sort_order' => $position]);
+            $category->syncTranslations(['en' => ['name' => $names[0]], 'ar' => ['name' => $names[1]]], FaqCategory::TRANSLATED_FIELDS, 'name');
+
+            foreach ($questions as $order => [$question, $answer, $arQuestion, $arAnswer]) {
+                Faq::create(['faq_category_id' => $category->id, 'status' => ContentStatus::Published, 'published_at' => now(), 'is_featured' => true, 'sort_order' => $order])
+                    ->syncTranslations([
+                        'en' => ['question' => $question, 'answer' => $answer],
+                        'ar' => ['question' => $arQuestion, 'answer' => $arAnswer],
+                    ], Faq::TRANSLATED_FIELDS, 'question');
+            }
+        }
+    }
+
+    /**
+     * Placeholder figures for layout review only — replace with real, verifiable numbers before launch.
+     */
+    private function statistics(): void
+    {
+        if (Statistic::query()->exists()) {
+            return;
+        }
+
+        foreach ([[12, '+', 'Sample: projects delivered', 'تجريبي: مشاريع منجزة'], [3, null, 'Sample: countries served', 'تجريبي: دول نخدمها'], [95, '%', 'Sample: milestones on time', 'تجريبي: مراحل في موعدها']] as $position => [$value, $suffix, $en, $ar]) {
+            Statistic::create(['value' => $value, 'status' => ContentStatus::Published, 'sort_order' => $position])
+                ->syncTranslations(['en' => ['label' => $en, 'suffix' => $suffix], 'ar' => ['label' => $ar, 'suffix' => $suffix]], Statistic::TRANSLATED_FIELDS, 'label');
+        }
+    }
+
+    private function careers(): void
+    {
+        $positions = [
+            ['sample-laravel-developer', 'مطور-laravel-تجريبي', ['Sample Laravel Developer', 'مطور Laravel (تجريبي)'], ['Engineering', 'الهندسة'], EmploymentType::FullTime, false],
+            ['sample-flutter-developer', 'مطور-flutter-تجريبي', ['Sample Flutter Developer', 'مطور Flutter (تجريبي)'], ['Mobile', 'تطبيقات الجوال'], EmploymentType::Contract, true],
+        ];
+
+        foreach ($positions as $position => [$slug, $arSlug, $titles, $departments, $type, $remote]) {
+            if (Career::query()->whereHas('translations', fn ($query) => $query->where('locale', 'en')->where('slug', $slug))->exists()) {
+                continue;
+            }
+
+            Career::create([
+                'employment_type' => $type,
+                'is_remote' => $remote,
+                'status' => ContentStatus::Published,
+                'published_at' => now(),
+                'closes_at' => now()->addMonths(2)->toDateString(),
+                'sort_order' => $position,
+            ])->syncTranslations([
+                'en' => [
+                    'title' => $titles[0], 'slug' => $slug, 'department' => $departments[0], 'location' => 'Sample city',
+                    'summary' => 'Sample position — replace in Admin → Careers.',
+                    'responsibilities' => ['Sample responsibility one', 'Sample responsibility two'],
+                    'requirements' => ['Sample requirement one', 'Sample requirement two'],
+                    'body' => 'This is demo text for design review.',
+                ],
+                'ar' => [
+                    'title' => $titles[1], 'slug' => $arSlug, 'department' => $departments[1], 'location' => 'مدينة تجريبية',
+                    'summary' => 'وظيفة تجريبية — استبدلها من لوحة التحكم.',
+                    'responsibilities' => ['مسؤولية تجريبية أولى', 'مسؤولية تجريبية ثانية'],
+                    'requirements' => ['متطلب تجريبي أول', 'متطلب تجريبي ثانٍ'],
+                    'body' => 'هذا نص تجريبي للمراجعة.',
+                ],
+            ], Career::TRANSLATED_FIELDS, 'title');
+        }
+    }
+
+    private function menus(): void
+    {
+        $route = fn (string $name, array $labels): array => ['link_type' => MenuLinkType::Route, 'route_name' => $name, 'labels' => $labels];
+        $services = Service::query()->published()->whereNull('parent_id')->where('tier', ServiceTier::Core)->ordered()->get();
+        $serviceLinks = $services->map(fn (Service $service): array => [
+            'link_type' => MenuLinkType::Linkable, 'linkable_type' => 'service', 'linkable_id' => $service->id, 'labels' => $service->translations()->pluck('title', 'locale')->all(),
+        ])->all();
+
+        $menus = [
+            MenuLocation::Header->value => [
+                [...$route('services.index', ['en' => 'Services', 'ar' => 'الخدمات']), 'children' => $serviceLinks],
+                $route('portfolio.index', ['en' => 'Portfolio', 'ar' => 'أعمالنا']),
+                $route('products.index', ['en' => 'Products', 'ar' => 'المنتجات']),
+                $route('technologies.index', ['en' => 'Technologies', 'ar' => 'التقنيات']),
+                $route('careers.index', ['en' => 'Careers', 'ar' => 'الوظائف']),
+            ],
+            MenuLocation::FooterServices->value => $serviceLinks,
+            MenuLocation::FooterCompany->value => [
+                $route('portfolio.index', ['en' => 'Portfolio', 'ar' => 'أعمالنا']),
+                $route('careers.index', ['en' => 'Careers', 'ar' => 'الوظائف']),
+                $route('testimonials.index', ['en' => 'Testimonials', 'ar' => 'آراء العملاء']),
+            ],
+            MenuLocation::FooterResources->value => [
+                $route('products.index', ['en' => 'Products', 'ar' => 'المنتجات']),
+                $route('technologies.index', ['en' => 'Technologies', 'ar' => 'التقنيات']),
+                $route('industries.index', ['en' => 'Industries', 'ar' => 'القطاعات']),
+                $route('faq.index', ['en' => 'FAQ', 'ar' => 'الأسئلة الشائعة']),
+            ],
+        ];
+
+        foreach ($menus as $location => $items) {
+            $menu = Menu::for(MenuLocation::from($location));
+
+            if ($menu->items()->exists()) {
+                continue;
+            }
+
+            foreach ($items as $position => $item) {
+                $parent = $this->menuItem($menu, $item, $position, null);
+
+                foreach ($item['children'] ?? [] as $order => $child) {
+                    $this->menuItem($menu, $child, $order, $parent->id);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $item
+     */
+    private function menuItem(Menu $menu, array $item, int $position, ?int $parentId): MenuItem
+    {
+        $menuItem = MenuItem::create([
+            'menu_id' => $menu->id,
+            'parent_id' => $parentId,
+            'link_type' => $item['link_type'],
+            'route_name' => $item['route_name'] ?? null,
+            'linkable_type' => $item['linkable_type'] ?? null,
+            'linkable_id' => $item['linkable_id'] ?? null,
+            'sort_order' => $position,
+        ]);
+        $menuItem->syncTranslations(collect($item['labels'])->map(fn (string $label): array => ['label' => $label])->all(), MenuItem::TRANSLATED_FIELDS, 'label');
+
+        return $menuItem;
+    }
+
+    /**
+     * Sample copy for sections that have no catalog source (process steps, reasons, highlights).
+     */
+    private function homeSections(): void
+    {
+        PageSection::ensureHomeSections();
+
+        $copy = [
+            PageSectionType::Hero->value => [
+                'en' => ['points' => ['Sample: free preliminary estimate', 'Sample: Arabic & English teams']],
+                'ar' => ['points' => ['تجريبي: تقدير مبدئي مجاني', 'تجريبي: فرق عربية وإنجليزية']],
+            ],
+            PageSectionType::Process->value => [
+                'en' => ['items' => [['title' => 'Discover', 'text' => 'Sample step description.'], ['title' => 'Design', 'text' => 'Sample step description.'], ['title' => 'Build', 'text' => 'Sample step description.'], ['title' => 'Launch', 'text' => 'Sample step description.']]],
+                'ar' => ['items' => [['title' => 'الاستكشاف', 'text' => 'وصف تجريبي.'], ['title' => 'التصميم', 'text' => 'وصف تجريبي.'], ['title' => 'التطوير', 'text' => 'وصف تجريبي.'], ['title' => 'الإطلاق', 'text' => 'وصف تجريبي.']]],
+            ],
+            PageSectionType::WhyUs->value => [
+                'en' => ['items' => [['title' => 'Security by default', 'text' => 'Sample reason text.'], ['title' => 'You own the code', 'text' => 'Sample reason text.']], 'points' => ['Sample promise one', 'Sample promise two']],
+                'ar' => ['items' => [['title' => 'الأمان أولاً', 'text' => 'نص تجريبي.'], ['title' => 'الكود ملكك', 'text' => 'نص تجريبي.']], 'points' => ['وعد تجريبي أول', 'وعد تجريبي ثانٍ']],
+            ],
+        ];
+
+        foreach ($copy as $type => $locales) {
+            $section = PageSection::query()->home()->where('type', $type)->first();
+
+            if ($section === null || $section->translations()->exists()) {
+                continue;
+            }
+
+            foreach ($locales as $locale => $values) {
+                $section->translations()->create(['locale' => $locale, ...$values]);
+            }
         }
     }
 }

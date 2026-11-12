@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
             LanguageSeeder::class,
             RolesAndPermissionsSeeder::class,
             KillSwitchSeeder::class,
+            PageSectionSeeder::class,
+            MenuSeeder::class,
         ]);
     }
 }

@@ -133,6 +133,17 @@
         </aside>
     </div>
 
+    @if ($testimonials->isNotEmpty())
+        <section class="mx-auto flex max-w-7xl flex-col gap-6 px-5 pb-14 lg:px-20 lg:pb-20" aria-labelledby="client-feedback">
+            <h2 id="client-feedback" class="text-2xl font-bold text-fg">{{ __('What the client says') }}</h2>
+            <ul class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                @foreach ($testimonials as $testimonial)
+                    <x-site.testimonial-card :testimonial="$testimonial" />
+                @endforeach
+            </ul>
+        </section>
+    @endif
+
     @if ($related->isNotEmpty())
         <div class="bg-subtle">
             <div class="mx-auto max-w-7xl px-5 py-14 lg:px-20 lg:py-20">

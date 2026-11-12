@@ -1,17 +1,20 @@
+{{-- Homepage built from the managed sections (Admin → Homepage). Each block: section, copy (translated or default) and data. --}}
+@php
+    $contactHref = 'mailto:'.(app(\App\Services\Settings::class)->get('contact', 'email') ?: 'hello@codefanz.com');
+    $hero = $blocks->first(fn ($block) => $block['section']->type === \App\Enums\PageSectionType::Hero);
+@endphp
+
 <x-layouts.public
-    :title="__('Turning Ideas Into Powerful Digital Products')"
-    :description="__('CodeFanz designs, builds and scales web platforms, mobile apps, SaaS products and AI-powered automation.')"
+    :title="$hero['copy']['heading'] ?? __('Turning Ideas Into Powerful Digital Products')"
+    :description="$hero['copy']['subheading'] ?? __('CodeFanz designs, builds and scales web platforms, mobile apps, SaaS products and AI-powered automation.')"
     :alternates="\App\Models\Language::active()->keys()->mapWithKeys(fn ($code) => [$code => route('home', ['locale' => $code])])->all()">
-    <section class="bg-[radial-gradient(ellipse_at_top_right,rgb(110_86_255/0.18),transparent_60%)]">
-        <div class="mx-auto flex max-w-7xl flex-col gap-7 px-5 py-20 lg:px-20 lg:py-28">
-            <x-ui.badge tone="accent" class="w-fit">{{ __('Software development & digital solutions') }}</x-ui.badge>
-            <h1 class="max-w-4xl text-4xl font-extrabold leading-tight tracking-tight text-fg lg:text-7xl">
-                {{ __('Turning Ideas Into') }} <span class="text-fg-brand">{{ __('Powerful Digital Products') }}</span>
-            </h1>
-            <p class="max-w-2xl text-lg text-fg-secondary">{{ __('We design, build and scale web platforms, mobile apps, SaaS products and AI-powered automation — engineered for reliability and growth.') }}</p>
-            <div class="flex flex-wrap gap-3">
-                <x-ui.button href="mailto:hello@codefanz.com" size="lg">{{ __('Start Your Project') }}</x-ui.button>
-            </div>
-        </div>
-    </section>
+    @foreach ($blocks as $block)
+        @include('home.sections.'.$block['section']->type->value, [
+            'section' => $block['section'],
+            'copy' => $block['copy'],
+            'data' => $block['data'],
+            'contactHref' => $contactHref,
+            'headingId' => 'section-'.$block['section']->type->value,
+        ])
+    @endforeach
 </x-layouts.public>

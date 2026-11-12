@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\CareerController;
 use App\Http\Controllers\DashboardRedirectController;
+use App\Http\Controllers\FaqController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IndustryController;
 use App\Http\Controllers\LocaleController;
@@ -9,6 +11,7 @@ use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TechnologyController;
+use App\Http\Controllers\TestimonialController;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -42,6 +45,10 @@ Route::prefix('{locale}')
         Route::get('/portfolio/{slug}', [PortfolioController::class, 'show'])->where('slug', '[^/]+')->name('portfolio.show');
         Route::get('/products', [ProductController::class, 'index'])->name('products.index');
         Route::get('/products/{slug}', [ProductController::class, 'show'])->where('slug', '[^/]+')->name('products.show');
+        Route::get('/careers', [CareerController::class, 'index'])->name('careers.index');
+        Route::get('/careers/{slug}', [CareerController::class, 'show'])->where('slug', '[^/]+')->name('careers.show');
+        Route::get('/faq', FaqController::class)->name('faq.index');
+        Route::get('/testimonials', TestimonialController::class)->name('testimonials.index');
 
         // Catch-all CMS pages: keep last so the specific routes above win.
         Route::get('/{slug}', PageController::class)->where('slug', '[^/]+')->name('pages.show');

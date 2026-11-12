@@ -3,6 +3,8 @@ import { init as initDropdowns } from './modules/dropdown';
 import { init as initToasts } from './modules/toast';
 import { init as initConfirm } from './modules/confirm';
 import { init as initAutoSubmit } from './modules/auto-submit';
+import { init as initNav } from './modules/nav';
+import { init as initFaqSearch } from './modules/faq-search';
 
 applyStoredTheme();
 
@@ -12,4 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initToasts();
     initConfirm();
     initAutoSubmit();
+    initNav();
+    initFaqSearch();
 });

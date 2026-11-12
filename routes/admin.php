@@ -1,11 +1,17 @@
 <?php
 
 use App\Http\Controllers\Admin\AuditLogController;
+use App\Http\Controllers\Admin\CareerController;
 use App\Http\Controllers\Admin\ChangeRequestController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\FaqCategoryController;
+use App\Http\Controllers\Admin\FaqController;
+use App\Http\Controllers\Admin\HomeSectionController;
 use App\Http\Controllers\Admin\IndustryController;
 use App\Http\Controllers\Admin\KillSwitchController;
 use App\Http\Controllers\Admin\MediaController;
+use App\Http\Controllers\Admin\MenuController;
+use App\Http\Controllers\Admin\MenuItemController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PortfolioCategoryController;
 use App\Http\Controllers\Admin\PortfolioProjectController;
@@ -16,8 +22,10 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SecurityController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\StatisticController;
 use App\Http\Controllers\Admin\TechnologyCategoryController;
 use App\Http\Controllers\Admin\TechnologyController;
+use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -63,6 +71,31 @@ Route::middleware('two-factor')->group(function (): void {
         Route::get('products/{product}/versions/{version}/edit', [ProductVersionController::class, 'edit'])->name('products.versions.edit');
         Route::put('products/{product}/versions/{version}', [ProductVersionController::class, 'update'])->name('products.versions.update');
         Route::delete('products/{product}/versions/{version}', [ProductVersionController::class, 'destroy'])->name('products.versions.destroy');
+    });
+
+    Route::get('home-sections', [HomeSectionController::class, 'index'])->name('home-sections.index');
+    Route::get('home-sections/{section}/edit', [HomeSectionController::class, 'edit'])->name('home-sections.edit');
+    Route::put('home-sections/{section}', [HomeSectionController::class, 'update'])->name('home-sections.update');
+    Route::post('home-sections/{section}/visibility', [HomeSectionController::class, 'visibility'])->name('home-sections.visibility');
+    Route::post('home-sections/{section}/move', [HomeSectionController::class, 'move'])->name('home-sections.move');
+    Route::resource('testimonials', TestimonialController::class)->except(['show']);
+    Route::post('testimonials/{testimonial}/publish', [TestimonialController::class, 'publish'])->name('testimonials.publish');
+    Route::resource('faqs', FaqController::class)->except(['show']);
+    Route::post('faqs/{faq}/publish', [FaqController::class, 'publish'])->name('faqs.publish');
+    Route::resource('faq-categories', FaqCategoryController::class)->except(['index', 'show']);
+    Route::resource('statistics', StatisticController::class)->except(['show']);
+    Route::post('statistics/{statistic}/publish', [StatisticController::class, 'publish'])->name('statistics.publish');
+    Route::resource('careers', CareerController::class)->except(['show']);
+    Route::post('careers/{career}/publish', [CareerController::class, 'publish'])->name('careers.publish');
+    Route::get('menus', [MenuController::class, 'index'])->name('menus.index');
+    Route::get('menus/{menu}', [MenuController::class, 'show'])->name('menus.show');
+    Route::scopeBindings()->group(function (): void {
+        Route::get('menus/{menu}/items/create', [MenuItemController::class, 'create'])->name('menus.items.create');
+        Route::post('menus/{menu}/items', [MenuItemController::class, 'store'])->name('menus.items.store');
+        Route::get('menus/{menu}/items/{item}/edit', [MenuItemController::class, 'edit'])->name('menus.items.edit');
+        Route::put('menus/{menu}/items/{item}', [MenuItemController::class, 'update'])->name('menus.items.update');
+        Route::post('menus/{menu}/items/{item}/move', [MenuItemController::class, 'move'])->name('menus.items.move');
+        Route::delete('menus/{menu}/items/{item}', [MenuItemController::class, 'destroy'])->name('menus.items.destroy');
     });
 
     Route::resource('users', UserController::class)->except(['show', 'destroy']);
