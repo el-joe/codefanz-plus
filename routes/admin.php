@@ -3,13 +3,17 @@
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\ChangeRequestController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\IndustryController;
 use App\Http\Controllers\Admin\KillSwitchController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SecurityController;
+use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\TechnologyCategoryController;
+use App\Http\Controllers\Admin\TechnologyController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -37,6 +41,13 @@ Route::middleware('two-factor')->group(function (): void {
 
     Route::resource('pages', PageController::class)->except(['show']);
     Route::post('pages/{page}/publish', [PageController::class, 'publish'])->name('pages.publish');
+
+    Route::resource('services', ServiceController::class)->except(['show']);
+    Route::post('services/{service}/publish', [ServiceController::class, 'publish'])->name('services.publish');
+    Route::resource('technologies', TechnologyController::class)->except(['show']);
+    Route::resource('technology-categories', TechnologyCategoryController::class)->except(['index', 'show']);
+    Route::resource('industries', IndustryController::class)->except(['show']);
+    Route::post('industries/{industry}/publish', [IndustryController::class, 'publish'])->name('industries.publish');
 
     Route::resource('users', UserController::class)->except(['show', 'destroy']);
     Route::post('users/{user}/invitation', [UserController::class, 'resendInvitation'])->middleware('throttle:6,1')->name('users.invitation');

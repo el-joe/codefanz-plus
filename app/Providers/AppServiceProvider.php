@@ -4,9 +4,13 @@ namespace App\Providers;
 
 use App\Enums\Role;
 use App\Models\ChangeRequest;
+use App\Models\Industry;
 use App\Models\KillSwitch;
 use App\Models\Media;
 use App\Models\Page;
+use App\Models\Service;
+use App\Models\Technology;
+use App\Models\TechnologyCategory;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -36,6 +40,10 @@ class AppServiceProvider extends ServiceProvider
             'change_request' => ChangeRequest::class,
             'kill_switch' => KillSwitch::class,
             'media' => Media::class,
+            'service' => Service::class,
+            'technology' => Technology::class,
+            'technology_category' => TechnologyCategory::class,
+            'industry' => Industry::class,
         ]);
 
         Gate::before(fn (User $user): ?bool => $user->hasRole(Role::SuperAdmin->value) && $user->is_active ? true : null);

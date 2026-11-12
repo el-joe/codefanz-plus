@@ -42,10 +42,10 @@
 | `page_sections` + `page_section_translations` | page_id, type (hero, services, stats…), sort, is_visible, settings JSON — powers manageable homepage |
 | `menus`, `menu_items` (+translations) | location, parent_id, url/route/linkable morph, sort |
 | `redirects` | from_path UNIQUE, to_path, status_code, hits, is_active |
-| `services` + `service_translations` | parent_id (sub-services), icon, cover_media_id, status, sort, lock_version |
+| `services` + `service_translations` | parent_id (one level of sub-services), tier (`core`/`specialist`), icon (curated key, `App\Enums\ContentIcon`), status, is_featured, sort_order, lock_version; cover via `mediables` collection `cover` (no cover_media_id column) |
 | `service_features` (+translations), `service_faqs` (+translations) | |
-| `technology_categories`, `technologies` (+translations) | proficiency enum: `Supported`, `Expertise`, `VerifiedInProjects` (computed from project links) |
-| `industries` (+translations) | |
+| `technology_categories`, `technologies` (+translations) | key UNIQUE, icon, website_url, is_visible, sort_order; `proficiency` stores only `supported`/`expertise` (admin-set). `VerifiedInProjects` is never stored: `Technology::proficiency()` computes it from relations registered with `Technology::verifiedThrough()` (portfolio registers its published-projects relation); load with `withProficiency()` |
+| `industries` (+translations) | icon, status, sort_order; translations carry name, slug, summary, `typical_solutions` JSON list, SEO fields |
 | `portfolio_projects` + translations | category_id, industry_id, type, client_name, is_client_public, project_date, live_url, android_url, ios_url, github_url, video_url, is_featured, visibility, lock_version |
 | `portfolio_categories` (+translations) | |
 | `products` + translations | pricing_model, availability, licensing, demo_enabled |

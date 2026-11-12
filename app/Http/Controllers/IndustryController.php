@@ -1,0 +1,16 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Industry;
+use Illuminate\View\View;
+
+class IndustryController extends Controller
+{
+    public function __invoke(): View
+    {
+        return view('industries.index', [
+            'industries' => Industry::query()->published()->translatedIn()->with('translations')->ordered()->get(),
+        ]);
+    }
+}
