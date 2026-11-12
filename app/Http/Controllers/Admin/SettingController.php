@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateSettingsRequest;
 use App\Services\Ai\AiGateway;
 use App\Services\AuditLogger;
+use App\Services\Payments\PaymentGatewayManager;
 use App\Services\Settings;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -39,6 +40,7 @@ class SettingController extends Controller
             'values' => $values,
             'masked' => $masked,
             'integrations' => $group === 'integrations' ? $this->integrationStatuses() : [],
+            'paymentGateways' => $group === 'payments' ? app(PaymentGatewayManager::class)->statuses() : [],
         ]);
     }
 

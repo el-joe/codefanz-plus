@@ -7,6 +7,7 @@ use App\Actions\Projects\SaveMilestone;
 use App\Enums\MilestoneStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SaveMilestoneRequest;
+use App\Models\Invoice;
 use App\Models\Milestone;
 use App\Models\Project;
 use App\Services\AuditLogger;
@@ -100,8 +101,8 @@ class ProjectMilestoneController extends Controller
     {
         Gate::authorize('update', $project);
 
-        if ($milestone->paid_minor > 0) {
-            return back()->with('toast', __('Milestones with payments cannot be deleted.'));
+        if ($milestone->paid_minor > 0 || $milestone->paymentLinks()->exists() || Invoice::query()->where('milestone_id', $milestone->getKey())->exists()) {
+            return back()->with('toast', __('Milestones with payments, payment links or invoices cannot be deleted.'));
         }
 
         $milestone->delete();

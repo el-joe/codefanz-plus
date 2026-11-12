@@ -1,9 +1,13 @@
 <?php
 
+use App\Services\Settings;
 use Database\Seeders\KillSwitchSeeder;
 use Database\Seeders\LanguageSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 /*
@@ -53,4 +57,104 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+/*
+| Payments (M6.2): Stripe test credentials in Settings, a faked Stripe API and signed webhook deliveries.
+*/
+
+function configureStripe(string $mode = 'test'): void
+{
+    $settings = app(Settings::class);
+    $settings->set('payments', 'stripe_secret_key', 'sk_test_codefanz123', encrypted: true);
+    $settings->set('payments', 'stripe_webhook_secret', 'whsec_codefanzsecret', encrypted: true);
+    $settings->set('payments', 'stripe_mode', $mode);
+}
+
+/**
+ * A Checkout Session as Stripe returns it (expanded to the balance transaction), paid by default.
+ *
+ * @param  array<string, mixed>  $overrides
+ * @return array<string, mixed>
+ */
+function stripeSession(array $overrides = []): array
+{
+    return array_replace_recursive([
+        'id' => 'cs_test_1',
+        'object' => 'checkout.session',
+        'status' => 'complete',
+        'payment_status' => 'paid',
+        'amount_total' => 150000,
+        'currency' => 'usd',
+        'livemode' => false,
+        'customer_details' => ['email' => 'payer@example.test', 'name' => 'Payer'],
+        'payment_intent' => [
+            'id' => 'pi_test_1',
+            'status' => 'succeeded',
+            'latest_charge' => [
+                'id' => 'ch_test_1',
+                'created' => now()->getTimestamp(),
+                'payment_method_details' => ['type' => 'card', 'card' => ['brand' => 'visa', 'last4' => '4242']],
+                'balance_transaction' => ['fee' => 4380, 'currency' => 'usd', 'net' => 145620],
+            ],
+        ],
+    ], $overrides);
+}
+
+/**
+ * Fake the Stripe API: creating a session answers cs_test_1; retrieving one answers $session (or a status code).
+ *
+ * @param  array<string, mixed>|int  $session
+ */
+function fakeStripe(array|int $session = []): void
+{
+    Http::fake(function (Request $request) use ($session) {
+        $path = (string) parse_url($request->url(), PHP_URL_PATH);
+
+        if ($request->method() === 'POST' && $path === '/v1/checkout/sessions') {
+            return Http::response(['id' => 'cs_test_1', 'url' => 'https://checkout.stripe.com/c/pay/cs_test_1', 'livemode' => false]);
+        }
+
+        if ($request->method() === 'GET' && str_starts_with($path, '/v1/checkout/sessions/')) {
+            return is_int($session)
+                ? Http::response(['error' => ['code' => 'api_error']], $session)
+                : Http::response(stripeSession($session));
+        }
+
+        return Http::response(['error' => ['code' => 'unexpected']], 404);
+    });
+}
+
+/**
+ * POST a Stripe-signed webhook delivery.
+ *
+ * @param  array<string, mixed>  $event
+ */
+function postStripeWebhook(TestCase $test, array $event, ?int $timestamp = null, string $secret = 'whsec_codefanzsecret', ?string $signature = null): TestResponse
+{
+    $body = json_encode($event, JSON_THROW_ON_ERROR);
+    $timestamp ??= now()->getTimestamp();
+    $signature ??= hash_hmac('sha256', $timestamp.'.'.$body, $secret);
+
+    return $test->call('POST', route('webhooks.payments', 'stripe'), server: [
+        'HTTP_STRIPE_SIGNATURE' => "t={$timestamp},v1={$signature}",
+        'CONTENT_TYPE' => 'application/json',
+        'HTTP_ACCEPT' => 'application/json',
+    ], content: $body);
+}
+
+/**
+ * @param  array<string, mixed>  $object
+ * @return array<string, mixed>
+ */
+function stripeEvent(string $type, string $sessionId = 'cs_test_1', string $eventId = 'evt_test_1', array $object = []): array
+{
+    return [
+        'id' => $eventId,
+        'object' => 'event',
+        'type' => $type,
+        'created' => now()->getTimestamp(),
+        'livemode' => false,
+        'data' => ['object' => ['id' => $sessionId, 'object' => 'checkout.session', 'status' => 'complete', 'payment_status' => 'paid', ...$object]],
+    ];
 }

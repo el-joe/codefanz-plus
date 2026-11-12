@@ -3,6 +3,7 @@
     $tabs = [
         'overview' => __('Overview'),
         'milestones' => __('Milestones (:count)', ['count' => $project->milestones->count()]),
+        'payments' => __('Payments'),
         'documents' => __('Documents'),
         'conversation' => __('Conversation'),
         'tickets' => __('Tickets'),
@@ -28,6 +29,9 @@
             @if ($canManage)
                 <x-ui.button variant="secondary" size="sm" :href="route('admin.projects.edit', $project)">{{ __('Edit') }}</x-ui.button>
             @endif
+            @isset($linkDialog)
+                <x-ui.button size="sm" type="button" data-dialog-open="payment-link-dialog">{{ __('Create payment link') }}</x-ui.button>
+            @endisset
         </div>
 
         <nav class="mt-5 flex flex-wrap gap-1 border-b border-line" aria-label="{{ __('Project sections') }}">
@@ -38,5 +42,19 @@
         </nav>
     </x-ui.card>
 
+    @if (session('createdPaymentLink'))
+        <x-ui.alert tone="success" :title="__('Payment link ready')" data-created-link>
+            <div class="mt-1 flex flex-wrap items-center gap-3">
+                <code class="break-all rounded bg-surface px-2 py-1 font-mono text-xs text-fg" dir="ltr">{{ session('createdPaymentLink') }}</code>
+                <x-ui.button size="sm" variant="secondary" type="button" data-copy="{{ session('createdPaymentLink') }}" data-copied-label="{{ __('Copied') }}">{{ __('Copy link') }}</x-ui.button>
+            </div>
+            <p class="mt-2">{{ __('Send it to the client. They cannot change the amount.') }}</p>
+        </x-ui.alert>
+    @endif
+
     @include('admin.projects._tab-'.$tab)
+
+    @isset($linkDialog)
+        @include('admin.projects._payment-link-dialog')
+    @endisset
 </x-layouts.admin>

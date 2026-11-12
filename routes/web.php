@@ -10,6 +10,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IndustryController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PayController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\QuoteController;
@@ -36,6 +37,14 @@ Route::post('/locale/{code}', LocaleController::class)
 Route::get('/dashboard', DashboardRedirectController::class)
     ->middleware(['auth', 'active'])
     ->name('dashboard');
+
+// Public checkout for payment links (P03). The ulid is the unguessable capability; no sign-in needed.
+Route::middleware(['locale.preference', 'throttle:pay'])->prefix('pay/{paymentLink}')->name('pay.')->group(function (): void {
+    Route::get('/', [PayController::class, 'show'])->name('show');
+    Route::post('checkout', [PayController::class, 'checkout'])->name('checkout');
+    Route::get('return/{payment}', [PayController::class, 'return'])->scopeBindings()->name('return');
+    Route::get('receipt/{payment}', [PayController::class, 'receipt'])->scopeBindings()->middleware('signed')->name('receipt');
+});
 
 Route::prefix('{locale}')
     ->where(['locale' => '[a-z]{2}'])

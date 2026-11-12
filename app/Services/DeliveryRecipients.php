@@ -64,6 +64,16 @@ class DeliveryRecipients
     }
 
     /**
+     * Finance staff (payments.refund-approve) who hear about collected payments.
+     *
+     * @return Collection<int, User>
+     */
+    public function financeTeam(): Collection
+    {
+        return $this->holding(Permission::PaymentsRefundApprove);
+    }
+
+    /**
      * @return Collection<int, User>
      */
     private function holding(Permission $permission): Collection

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Portal;
 use App\Enums\MilestoneStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Conversation;
+use App\Models\Invoice;
 use App\Models\Milestone;
 use App\Models\Project;
 use App\Models\SupportTicket;
@@ -14,7 +15,7 @@ use Illuminate\View\View;
 
 /**
  * Portal home (P04): real counts for the current customer (active projects, open tickets, unread messages),
- * the most recent active project, upcoming milestones and the latest conversations. Invoices arrive in M6.2.
+ * the most recent active project, upcoming milestones, recent invoices (with Pay now) and the latest conversations.
  */
 class DashboardController extends Controller
 {
@@ -35,6 +36,9 @@ class DashboardController extends Controller
 
         return view('portal.dashboard', [
             'customer' => $currentCustomer->get(),
+            'recentInvoices' => Invoice::query()->forCurrentCustomer()->visibleToClient()
+                ->with('paymentLink:id,ulid,status,expires_at')
+                ->latest('issued_at')->latest('id')->limit(3)->get(),
             'unreadNotificationCount' => $user->unreadNotifications()->count(),
             'activeProjectCount' => $activeProjectIds->count(),
             'openTicketCount' => SupportTicket::query()->forCurrentCustomer()->open()->count(),

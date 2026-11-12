@@ -20,6 +20,7 @@
                     <th scope="col" class="px-4 py-3 text-end font-semibold">{{ __('Amount') }}</th>
                     <th scope="col" class="px-4 py-3 text-end font-semibold">{{ __('Paid') }}</th>
                     <th scope="col" class="px-4 py-3 text-start font-semibold">{{ __('Status') }}</th>
+                    <th scope="col" class="px-4 py-3 text-start font-semibold">{{ __('Payment') }}</th>
                     <th scope="col" class="px-4 py-3 text-end font-semibold"><span class="sr-only">{{ __('Actions') }}</span></th>
                 </tr>
             </thead>
@@ -40,9 +41,29 @@
                         <td class="px-4 py-3 text-end text-fg" dir="ltr">{{ $milestone->formattedAmount() }}</td>
                         <td class="px-4 py-3 text-end text-fg-secondary" dir="ltr">{{ \App\Services\Money::format($milestone->paid_minor, $milestone->currency) }}</td>
                         <td class="px-4 py-3"><x-ui.badge :tone="$milestone->status->tone()">{{ $milestone->status->label() }}</x-ui.badge></td>
+                        <td class="px-4 py-3" data-payment-state="{{ $milestone->paymentState() }}">
+                            @switch($milestone->paymentState())
+                                @case('paid')<x-ui.badge tone="success">{{ __('Paid') }}</x-ui.badge>@break
+                                @case('partial')<x-ui.badge tone="warning">{{ __('Partial') }}</x-ui.badge>@break
+                                @default<x-ui.badge>{{ __('Not billed') }}</x-ui.badge>
+                            @endswitch
+                        </td>
                         <td class="px-4 py-3">
+                            <div class="flex flex-wrap justify-end gap-1.5">
+                                @if (isset($linkDialog) && ($linkDialog['remaining'][$milestone->ulid] ?? 0) > 0)
+                                    <x-ui.button size="sm" variant="secondary" type="button" data-dialog-open="payment-link-dialog" data-milestone="{{ $milestone->ulid }}">{{ __('Payment link') }}</x-ui.button>
+                                @endif
+                                @can('create', \App\Models\Invoice::class)
+                                    @if ($milestone->amount_minor > 0)
+                                        <form method="POST" action="{{ route('admin.projects.milestones.invoice', [$project, $milestone]) }}">
+                                            @csrf
+                                            <x-ui.button size="sm" variant="ghost">{{ __('Invoice') }}</x-ui.button>
+                                        </form>
+                                    @endif
+                                @endcan
+                            </div>
                             @if ($canManage)
-                                <div class="flex flex-wrap justify-end gap-1.5">
+                                <div class="mt-1.5 flex flex-wrap justify-end gap-1.5">
                                     @foreach ($milestone->status->staffTransitions() as $next)
                                         @php($disabled = $next === \App\Enums\MilestoneStatus::InProgress && $milestone->status === \App\Enums\MilestoneStatus::Pending && $blocking->isNotEmpty())
                                         <form method="POST" action="{{ route('admin.projects.milestones.status', [$project, $milestone]) }}">
@@ -75,7 +96,8 @@
                 <tr>
                     <td class="px-4 py-3 font-semibold text-fg" colspan="2">{{ __('Total') }}</td>
                     <td class="px-4 py-3 text-end font-semibold text-fg" dir="ltr">{{ $milestonesTotal }}</td>
-                    <td class="px-4 py-3 text-end text-fg-secondary" colspan="3">{{ __('Payment links and collected amounts arrive with the payments module.') }}</td>
+                    <td class="px-4 py-3 text-end font-semibold text-fg-success" dir="ltr">{{ \App\Services\Money::format((int) $project->milestones->sum('paid_minor'), $project->currency) }}</td>
+                    <td class="px-4 py-3 text-fg-secondary" colspan="3">{{ __('Collected amounts come from verified payments only.') }}</td>
                 </tr>
             </tfoot>
         </table>

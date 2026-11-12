@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\Payments\CreatePaymentLink;
 use App\Actions\Projects\SaveProject;
 use App\Enums\ClientVisibility;
 use App\Enums\LeadStatus;
@@ -10,11 +11,15 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SaveProjectRequest;
 use App\Models\Customer;
 use App\Models\Lead;
+use App\Models\Milestone;
+use App\Models\Payment;
+use App\Models\PaymentLink;
 use App\Models\Project;
 use App\Models\SupportTicket;
 use App\Models\User;
 use App\Services\AuditLogger;
 use App\Services\Money;
+use App\Services\Payments\PaymentGatewayManager;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
@@ -25,14 +30,15 @@ use Illuminate\View\View;
 
 /**
  * Delivery projects (A04): list, create from a customer or a won lead's customer, detail with tabs
- * (overview, milestones, documents, conversation, tickets), edit and soft delete.
+ * (overview, milestones, payments, documents, conversation, tickets), edit and soft delete. Staff who may create
+ * payment links get the Create payment link dialog (A04) with each milestone's remaining balance.
  */
 class ProjectController extends Controller
 {
     /**
      * @var list<string>
      */
-    public const TABS = ['overview', 'milestones', 'documents', 'conversation', 'tickets'];
+    public const TABS = ['overview', 'milestones', 'payments', 'documents', 'conversation', 'tickets'];
 
     public function index(Request $request): View
     {
@@ -109,7 +115,7 @@ class ProjectController extends Controller
         return redirect()->route('admin.projects.show', $project)->with('toast', __('Project :reference created.', ['reference' => $project->reference]));
     }
 
-    public function show(Request $request, Project $project): View
+    public function show(Request $request, Project $project, PaymentGatewayManager $gateways): View
     {
         Gate::authorize('view', $project);
 
@@ -150,6 +156,20 @@ class ProjectController extends Controller
             $data['tickets'] = $request->user()->can('viewAny', SupportTicket::class)
                 ? $project->tickets()->with('assignee:id,name')->latest('last_activity_at')->get()
                 : new Collection;
+        }
+
+        if ($tab === 'payments') {
+            $canSeePayments = $request->user()->can('viewAny', Payment::class);
+            $data['paymentLinks'] = $canSeePayments ? $project->paymentLinks()->with(['milestone:id,title', 'creator:id,name'])->latest()->latest('id')->get() : new Collection;
+            $data['payments'] = $canSeePayments ? $project->payments()->with(['milestone:id,title'])->whereNotNull('gateway_payment_id')->latest()->latest('id')->get() : new Collection;
+            $data['invoices'] = $canSeePayments ? $project->invoices()->with('milestone:id,title')->latest()->latest('id')->get() : new Collection;
+        }
+
+        if ($request->user()->can('create', PaymentLink::class)) {
+            $data['linkDialog'] = [
+                'remaining' => $project->milestones->mapWithKeys(fn (Milestone $milestone): array => [$milestone->ulid => CreatePaymentLink::remainingBalance($milestone)])->all(),
+                'gateways' => $gateways->statuses(),
+            ];
         }
 
         $data['clientUpdatesCount'] = $project->notes()->where('visibility', ClientVisibility::Client)->count();

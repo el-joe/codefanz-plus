@@ -24,6 +24,9 @@
     @case('ticket.status')
         {{ __('Ticket :reference was updated by :name', ['reference' => $notification->data['reference'] ?? '', 'name' => $notification->data['name'] ?? '']) }}
         @break
+    @case('payment.received')
+        {{ __('Payment :reference received: :amount', ['reference' => $notification->data['reference'] ?? '', 'amount' => \App\Services\Money::localized((int) ($notification->data['amount_minor'] ?? 0), (string) ($notification->data['currency'] ?? 'USD'))]) }}
+        @break
     @default
         {{ __('Notification') }}
 @endswitch

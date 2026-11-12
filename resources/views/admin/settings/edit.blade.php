@@ -1,5 +1,5 @@
 @php
-    $groupLabels = ['general' => __('General'), 'contact' => __('Contact'), 'integrations' => __('Integrations')];
+    $groupLabels = ['general' => __('General'), 'contact' => __('Contact'), 'integrations' => __('Integrations'), 'payments' => __('Payments')];
     $languages = \App\Models\Language::active();
 @endphp
 
@@ -38,6 +38,27 @@
         </div>
     @endif
 
+    @if ($paymentGateways !== [])
+        <div class="grid gap-4 md:grid-cols-2" data-payment-gateways>
+            @foreach ($paymentGateways as $key => $gateway)
+                <x-ui.card data-gateway="{{ $key }}">
+                    <div class="flex items-center justify-between gap-3">
+                        <p class="font-semibold text-fg">{{ $gateway['label'] }}</p>
+                        @switch($gateway['status'])
+                            @case('sandbox')<x-ui.badge tone="info">{{ __('Sandbox · test mode') }}</x-ui.badge>@break
+                            @case('live_unverified')<x-ui.badge tone="warning">{{ __('Live · not verified') }}</x-ui.badge>@break
+                            @case('incomplete')<x-ui.badge tone="warning">{{ __('Incomplete') }}</x-ui.badge>@break
+                            @default<x-ui.badge>{{ __('Requires credentials') }}</x-ui.badge>
+                        @endswitch
+                    </div>
+                    <p class="mt-3 text-xs text-fg-tertiary">{{ __('Webhook endpoint (add it in the gateway dashboard):') }}</p>
+                    <code class="mt-1 block break-all rounded bg-subtle px-2 py-1 font-mono text-xs text-fg" dir="ltr">{{ $gateway['webhook_url'] }}</code>
+                    <p class="mt-2 text-xs text-fg-tertiary">{{ __('Payments are confirmed with the gateway API before they count. A live connection is never claimed until a verified payment arrives.') }}</p>
+                </x-ui.card>
+            @endforeach
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('admin.settings.update', $group) }}" class="flex max-w-3xl flex-col gap-6">
         @csrf
         @method('PUT')
@@ -68,7 +89,7 @@
                             @endif
                         </div>
                     @elseif ($field['type'] === 'select')
-                        <x-ui.select :name="'settings['.$key.']'" :id="$key" :label="__($field['label'])" :options="$field['options']" :value="$values[$key] ?? null" :placeholder="__('Default')" />
+                        <x-ui.select :name="'settings['.$key.']'" :id="$key" :label="__($field['label'])" :options="array_map(fn ($option) => __($option), $field['options'])" :value="$values[$key] ?? null" :placeholder="__('Default')" />
                     @elseif ($field['type'] === 'number')
                         <x-ui.input :name="'settings['.$key.']'" :id="$key" type="number" step="0.01" min="0" :label="__($field['label'])" :value="$values[$key] ?? null" dir="ltr" />
                     @else

@@ -4,9 +4,10 @@ use App\Http\Controllers\Portal\AccountSwitchController;
 use App\Http\Controllers\Portal\ConversationController;
 use App\Http\Controllers\Portal\DashboardController;
 use App\Http\Controllers\Portal\DocumentController;
+use App\Http\Controllers\Portal\InvoiceController;
 use App\Http\Controllers\Portal\MilestoneReviewController;
-use App\Http\Controllers\Portal\ModuleController;
 use App\Http\Controllers\Portal\NotificationController;
+use App\Http\Controllers\Portal\PaymentController;
 use App\Http\Controllers\Portal\ProfileController;
 use App\Http\Controllers\Portal\ProjectController;
 use App\Http\Controllers\Portal\SecurityController;
@@ -16,15 +17,16 @@ use Illuminate\Support\Facades\Route;
 /*
 | Client portal. Every route runs behind `portal` (EnsurePortalAccess), which resolves App\Services\CurrentCustomer.
 | Record parameters are plain ulids/uuids resolved by the controllers through forCurrentCustomer(), so another
-| customer's record is always a 404. Invoices and payments (Milestone 6 slice 2) still show an honest empty state.
+| customer's record is always a 404.
 */
 
 Route::get('/', DashboardController::class)->name('dashboard');
 Route::post('account', AccountSwitchController::class)->middleware('throttle:30,1')->name('account.switch');
 
-foreach (ModuleController::MODULES as $module) {
-    Route::get($module, ModuleController::class)->defaults('module', $module)->name($module.'.index');
-}
+Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+Route::get('invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
+Route::get('payments', [PaymentController::class, 'index'])->name('payments.index');
+Route::get('payments/{payment}/receipt', [PaymentController::class, 'receipt'])->name('payments.receipt');
 
 Route::get('projects', [ProjectController::class, 'index'])->name('projects.index');
 Route::get('projects/{project}', [ProjectController::class, 'show'])->name('projects.show');

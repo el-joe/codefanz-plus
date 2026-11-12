@@ -11,10 +11,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 
 /**
- * A project milestone. `paid_minor` is a cache derived from the payments ledger (M6.2) and is never filled from forms.
+ * A project milestone. `paid_minor` is a cache derived from the payments ledger by
+ * App\Actions\Payments\RecomputeMilestonePaid and is never filled from forms.
  */
 #[Fillable(['project_id', 'sort_order', 'title', 'description', 'due_date', 'status', 'amount_minor', 'currency'])]
 class Milestone extends Model
@@ -108,6 +110,26 @@ class Milestone extends Model
     public function blockingDependencies(): Collection
     {
         return $this->dependencies->reject(fn (Milestone $dependency): bool => $dependency->status === MilestoneStatus::Completed)->values();
+    }
+
+    /**
+     * @return HasMany<PaymentLink, $this>
+     */
+    public function paymentLinks(): HasMany
+    {
+        return $this->hasMany(PaymentLink::class);
+    }
+
+    /**
+     * Billing state for the milestone table: paid, partially paid or not billed yet.
+     */
+    public function paymentState(): string
+    {
+        return match (true) {
+            $this->amount_minor > 0 && $this->paid_minor >= $this->amount_minor => 'paid',
+            $this->paid_minor > 0 => 'partial',
+            default => 'unbilled',
+        };
     }
 
     public function formattedAmount(): string

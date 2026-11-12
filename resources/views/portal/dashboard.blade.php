@@ -94,11 +94,29 @@
         <aside class="flex flex-col gap-6">
             <x-ui.card :title="__('Recent invoices')">
                 <x-slot:action><a href="{{ route('portal.invoices.index') }}" class="text-sm font-semibold text-fg-brand hover:underline">{{ __('View all') }}</a></x-slot:action>
-                @include('portal._empty-module', [
-                    'title' => __('No invoices yet'),
-                    'description' => __('Invoices and payment requests from CodeFanz will be listed here.'),
-                    'icon' => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>',
-                ])
+                @if ($recentInvoices->isEmpty())
+                    @include('portal._empty-module', [
+                        'title' => __('No invoices yet'),
+                        'description' => __('Invoices and payment requests from CodeFanz will be listed here.'),
+                        'icon' => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>',
+                    ])
+                @else
+                    <ul class="flex flex-col divide-y divide-line-subtle" data-recent-invoices>
+                        @foreach ($recentInvoices as $invoice)
+                            <li class="flex items-center gap-3 py-2.5">
+                                <a href="{{ route('portal.invoices.print', $invoice) }}" class="min-w-0 flex-1">
+                                    <span class="block font-mono text-xs font-semibold text-fg" dir="ltr">{{ $invoice->number }}</span>
+                                    <span class="block text-sm font-semibold text-fg" dir="ltr">{{ \App\Services\Money::plain($invoice->total_minor, $invoice->currency) }}</span>
+                                </a>
+                                @if ($invoice->status === \App\Enums\InvoiceStatus::Issued && $invoice->paymentLink?->isPayable())
+                                    <x-ui.button size="sm" :href="route('pay.show', $invoice->paymentLink)">{{ __('Pay') }}</x-ui.button>
+                                @else
+                                    <x-ui.badge :tone="$invoice->isOverdue() ? 'danger' : $invoice->status->tone()">{{ $invoice->isOverdue() ? __('Overdue') : $invoice->status->label() }}</x-ui.badge>
+                                @endif
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
             </x-ui.card>
 
             <x-ui.card :title="__('Messages')">

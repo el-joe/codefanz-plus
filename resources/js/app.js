@@ -8,6 +8,9 @@ import { init as initFaqSearch } from './modules/faq-search';
 import { init as initStepper } from './modules/stepper';
 import { init as initAssistant } from './modules/assistant';
 import { init as initConversations } from './modules/conversation';
+import { init as initDialogs } from './modules/dialog';
+import { init as initCopy } from './modules/copy';
+import { init as initPrint } from './modules/print';
 
 applyStoredTheme();
 
@@ -22,4 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initStepper();
     initAssistant();
     initConversations();
+    initDialogs();
+    initCopy();
+    initPrint();
 });

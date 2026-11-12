@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PaymentWebhookController;
 use App\Http\Middleware\AssignRequestId;
 use App\Http\Middleware\EnsurePortalAccess;
 use App\Http\Middleware\EnsureUserIsActive;
@@ -18,6 +19,12 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function (): void {
+            // Gateway webhooks: no session or CSRF; the driver verifies the gateway's signature.
+            Route::post('webhooks/payments/{gateway}', PaymentWebhookController::class)
+                ->where('gateway', '[a-z0-9_-]+')
+                ->middleware('throttle:webhooks')
+                ->name('webhooks.payments');
+
             Route::middleware(['web', 'auth', 'active', 'locale.preference', 'can:admin.access'])
                 ->prefix('admin')
                 ->name('admin.')

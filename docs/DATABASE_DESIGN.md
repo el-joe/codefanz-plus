@@ -95,15 +95,15 @@
 ### 2.7 Billing (immutable ledger)
 | Table | Notes |
 |---|---|
-| `payment_links` | reference UNIQUE, token_hash UNIQUE (raw token shown once), project_id, milestone_id NULL, customer_id, amount_minor, currency, description, is_reusable, max_uses, uses, expires_at, status, created_by |
-| `payments` | reference UNIQUE, payment_link_id, project_id, milestone_id, customer_id, gateway, gateway_payment_id UNIQUE(gateway, gateway_payment_id), amount_minor, currency, fee_minor, net_minor, status, paid_at, verified_at. No soft deletes |
-| `payment_events` | append-only status transitions (payment_id, from, to, source: webhook/verify/admin, payload JSON) |
-| `refunds` | payment_id, amount_minor, status, reason, requested_by, approved_by (separate finance approval) |
-| `webhook_events` | gateway, event_id, signature_valid, payload, processed_at, attempts; UNIQUE(gateway, event_id) → duplicate protection |
-| `idempotency_keys` | key UNIQUE, scope, response hash, expires_at |
-| `invoices`, `invoice_items` | number UNIQUE (sequential per year, gapless via locked counter), customer, project, totals, tax, status, issued_at, pdf media |
-| `receipts` | payment_id UNIQUE, number UNIQUE, pdf path |
-| `document_sequences` | type+year UNIQUE, next_value — `SELECT … FOR UPDATE` for gapless numbering |
+| `payment_links` | ulid UNIQUE (the unguessable public token in `/pay/{ulid}`), reference UNIQUE (PL-YYYY-NNNNN), customer_id, project_id, milestone_id NULL, amount_minor, currency, description, expires_at, single_use, gateways JSON (allowed keys), status (active/used/expired/cancelled), uses, created_by, cancelled_at/by. Milestone links are single use and capped at amount − paid − open links (checked under a milestone row lock). Never deleted |
+| `payments` | ulid, reference UNIQUE (PAY-YYYY-NNNNN), payment_link_id, customer_id, project_id, milestone_id, gateway, gateway_payment_id UNIQUE(gateway, gateway_payment_id), amount_minor, fee_minor, net_minor, refunded_minor, currency, status (pending/paid/failed/cancelled/refunded/partially_refunded), verified_via, failure_reason, paid_at, verified_at, metadata JSON (gateway ids/statuses only, never card data). No soft deletes; status not mass assignable, changed only through `Payment::transitionTo()` inside payment actions |
+| `payment_events` | append-only status transitions (payment_id, from_status, to_status, source: checkout/webhook/return_url/admin/reconciliation, webhook_event_id, user_id, payload JSON); model blocks update/delete |
+| `refunds` | (slice 3) payment_id, amount_minor, status, reason, requested_by, approved_by (separate finance approval) |
+| `webhook_events` | gateway, event_id, event_type, signature_valid, payload (sanitized), attempts, processed_at, error; UNIQUE(gateway, event_id) → duplicate protection. Received data immutable; only attempts/processed_at/error change. Rejected signatures are stored under a random `unverified-…` id so they cannot reserve a real event id |
+| `idempotency_keys` | (later) key UNIQUE, scope, response hash, expires_at. Gateway calls send idempotency keys per payment |
+| `invoices`, `invoice_items` | ulid, number UNIQUE NULL (INV-YYYY-NNNNN, assigned on issue), customer, project, milestone, payment_link, customer_snapshot JSON (name/contact/email/address/country/tax id frozen at issue), subtotal/tax_rate_bp/tax/total minor, currency, status (draft/issued/paid/void), issued_at, due_at, paid_at, voided_at + reason. Issued invoices are immutable except status columns; printable bilingual HTML (no PDF library) |
+| `receipts` | ulid, payment_id UNIQUE, number UNIQUE (RCP-YYYY-NNNNN), customer_id, customer_snapshot, amount_minor, currency, issued_at; immutable |
+| `document_sequences` | type+year UNIQUE, next_value — `SELECT … FOR UPDATE` inside the issuing transaction for gapless numbering (`App\Services\DocumentNumbers`) |
 
 ### 2.8 Blog
 | Table | Notes |
@@ -163,7 +163,7 @@
 2. `milestones.paid_minor` and project summaries are derived from `payments` with status `Paid`/`PartiallyRefunded` minus refunds; a recompute action exists for reconciliation.
 3. `webhook_events` UNIQUE(gateway, event_id) + `payments` UNIQUE(gateway, gateway_payment_id) make duplicates no-ops.
 4. Change requests store `target_version`; apply fails if the target `lock_version` changed.
-5. `audit_logs`, `payment_events`, `webhook_events` have no update/delete paths in application code.
+5. `audit_logs`, `payment_events`, `webhook_events` have no update/delete paths in application code (models throw; webhook events only record processing attempts).
 
 ## 4. Indexing & performance plan
 

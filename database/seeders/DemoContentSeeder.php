@@ -9,6 +9,7 @@ use App\Enums\CustomerStatus;
 use App\Enums\CustomerType;
 use App\Enums\CustomerUserRole;
 use App\Enums\EmploymentType;
+use App\Enums\InvoiceStatus;
 use App\Enums\LeadActivityType;
 use App\Enums\LeadPriority;
 use App\Enums\LeadSource;
@@ -33,6 +34,7 @@ use App\Models\Customer;
 use App\Models\Faq;
 use App\Models\FaqCategory;
 use App\Models\Industry;
+use App\Models\Invoice;
 use App\Models\Lead;
 use App\Models\Menu;
 use App\Models\MenuItem;
@@ -40,6 +42,7 @@ use App\Models\Milestone;
 use App\Models\Page;
 use App\Models\PageSection;
 use App\Models\PageTranslation;
+use App\Models\PaymentLink;
 use App\Models\PortfolioCategory;
 use App\Models\PortfolioProject;
 use App\Models\Product;
@@ -51,7 +54,9 @@ use App\Models\Technology;
 use App\Models\TechnologyCategory;
 use App\Models\Testimonial;
 use App\Models\User;
+use App\Services\DocumentNumbers;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
@@ -80,6 +85,7 @@ class DemoContentSeeder extends Seeder
         $this->leads();
         $this->customers();
         $this->delivery();
+        $this->billing();
     }
 
     /**
@@ -748,5 +754,55 @@ class DemoContentSeeder extends Seeder
             'last_activity_at' => now(),
         ]);
         $ticket->replies()->create(['user_id' => $ticket->opened_by, 'from_client' => true, 'body' => 'Sample question for layout review.']);
+    }
+
+    /**
+     * A sample payment link and an issued invoice on the demo project (no payments: those only come from a
+     * verified gateway checkout).
+     */
+    private function billing(): void
+    {
+        $project = Project::query()->whereHas('customer', fn ($query) => $query->where('email', 'customer.demo@example.test'))->with('milestones')->first();
+        $staff = User::query()->whereHas('roles', fn ($query) => $query->whereIn('name', [Role::SuperAdmin->value, Role::FinanceManager->value, Role::ProjectManager->value]))->orderBy('id')->first();
+
+        if ($project === null || PaymentLink::query()->where('project_id', $project->getKey())->exists()) {
+            return;
+        }
+
+        $milestone = $project->milestones->firstWhere('title', 'Backend development (sample)') ?? $project->milestones->first();
+
+        DB::transaction(function () use ($project, $milestone, $staff): void {
+            $link = PaymentLink::create([
+                'customer_id' => $project->customer_id,
+                'project_id' => $project->getKey(),
+                'milestone_id' => $milestone?->getKey(),
+                'amount_minor' => 300_000,
+                'currency' => 'USD',
+                'description' => 'Sample installment (demo only)',
+                'expires_at' => now()->addDays(14)->endOfDay(),
+                'single_use' => true,
+                'gateways' => ['stripe'],
+                'created_by' => $staff?->getKey(),
+            ]);
+
+            $invoice = Invoice::create([
+                'customer_id' => $project->customer_id,
+                'project_id' => $project->getKey(),
+                'milestone_id' => $milestone?->getKey(),
+                'payment_link_id' => $link->getKey(),
+                'currency' => 'USD',
+                'due_at' => now()->addDays(14)->toDateString(),
+                'created_by' => $staff?->getKey(),
+            ]);
+            $invoice->items()->create(['description' => 'Sample installment (demo only)', 'quantity' => 1, 'unit_minor' => 300_000, 'total_minor' => 300_000, 'sort_order' => 1]);
+            $invoice->load(['items', 'customer'])->recalculate();
+            $invoice->forceFill([
+                'number' => app(DocumentNumbers::class)->next(DocumentNumbers::INVOICE),
+                'status' => InvoiceStatus::Issued,
+                'customer_snapshot' => Invoice::snapshotOf($invoice->customer),
+                'issued_at' => now(),
+                'issued_by' => $staff?->getKey(),
+            ])->save();
+        });
     }
 }

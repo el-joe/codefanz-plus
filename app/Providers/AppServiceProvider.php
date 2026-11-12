@@ -17,6 +17,7 @@ use App\Models\Document;
 use App\Models\Faq;
 use App\Models\FaqCategory;
 use App\Models\Industry;
+use App\Models\Invoice;
 use App\Models\KillSwitch;
 use App\Models\Lead;
 use App\Models\Media;
@@ -27,6 +28,8 @@ use App\Models\Milestone;
 use App\Models\Page;
 use App\Models\PageSection;
 use App\Models\PageTranslation;
+use App\Models\Payment;
+use App\Models\PaymentLink;
 use App\Models\PortfolioCategory;
 use App\Models\PortfolioProject;
 use App\Models\PortfolioProjectTranslation;
@@ -35,6 +38,7 @@ use App\Models\ProductTranslation;
 use App\Models\ProductVersion;
 use App\Models\Project;
 use App\Models\ProjectNote;
+use App\Models\Receipt;
 use App\Models\Service;
 use App\Models\ServiceTranslation;
 use App\Models\Statistic;
@@ -47,6 +51,7 @@ use App\Models\User;
 use App\Services\Ai\AiGateway;
 use App\Services\CurrentCustomer;
 use App\Services\MenuResolver;
+use App\Services\Payments\PaymentGatewayManager;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -65,6 +70,9 @@ class AppServiceProvider extends ServiceProvider
     {
         // One per request (and per queued job): the customer a portal user is acting for.
         $this->app->scoped(CurrentCustomer::class);
+
+        // Payment gateway drivers by key (config codefanz.payments.gateways), credentials from Settings.
+        $this->app->scoped(PaymentGatewayManager::class);
 
         // The provider selected in Settings → Integrations (a NullAiProvider until credentials are saved).
         // Features should call AiGateway, which adds the kill switch, budget and usage logging.
@@ -111,7 +119,17 @@ class AppServiceProvider extends ServiceProvider
             'conversation_message' => ConversationMessage::class,
             'support_ticket' => SupportTicket::class,
             'ticket_reply' => TicketReply::class,
+            'payment_link' => PaymentLink::class,
+            'payment' => Payment::class,
+            'invoice' => Invoice::class,
+            'receipt' => Receipt::class,
         ]);
+
+        // Payment gateway webhooks: generous per gateway and IP; bad signatures are rejected before any work.
+        RateLimiter::for('webhooks', fn (Request $request): Limit => Limit::perMinute(120)->by('webhooks:'.$request->ip()));
+
+        // Public pay page: opening and starting checkouts per visitor IP.
+        RateLimiter::for('pay', fn (Request $request): Limit => Limit::perMinute(30)->by('pay:'.$request->ip()));
 
         // Public contact form: a few messages a minute and a daily cap per visitor IP.
         RateLimiter::for('contact', fn (Request $request): array => [

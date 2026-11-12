@@ -1,5 +1,7 @@
 <?php
 
+use App\Services\Payments\StripeGateway;
+
 return [
 
     /*
@@ -66,6 +68,12 @@ return [
             'anthropic_api_key' => ['type' => 'secret', 'label' => 'Anthropic API key', 'rules' => ['nullable', 'string', 'max:255']],
             'anthropic_model' => ['type' => 'text', 'label' => 'Anthropic model', 'rules' => ['nullable', 'string', 'max:100', 'regex:/^[A-Za-z0-9._:-]+$/']],
             'ai_monthly_budget' => ['type' => 'number', 'label' => 'AI monthly budget (USD, 0 stops all AI calls)', 'rules' => ['nullable', 'numeric', 'min:0', 'max:1000000']],
+        ],
+        // Payment gateway credentials (M6.2). Each gateway in codefanz.payments.gateways lists its own keys.
+        'payments' => [
+            'stripe_mode' => ['type' => 'select', 'label' => 'Stripe mode', 'options' => ['test' => 'Test (sandbox)', 'live' => 'Live'], 'rules' => ['nullable', 'string', 'in:test,live']],
+            'stripe_secret_key' => ['type' => 'secret', 'label' => 'Stripe secret key (sk_test_… / sk_live_…)', 'rules' => ['nullable', 'string', 'max:255', 'regex:/^(sk|rk)_(test|live)_[A-Za-z0-9]+$/']],
+            'stripe_webhook_secret' => ['type' => 'secret', 'label' => 'Stripe webhook signing secret (whsec_…)', 'rules' => ['nullable', 'string', 'max:255', 'regex:/^whsec_[A-Za-z0-9]+$/']],
         ],
     ],
 
@@ -200,6 +208,40 @@ return [
         'message_max_length' => 5000,
         'poll_seconds' => 20,
         'default_currency' => 'USD',
+    ],
+
+    /*
+    | Payments (M6.2). Gateways are resolved by key through
+    | App\Services\Payments\PaymentGatewayManager: adding a provider means a new
+    | driver class implementing App\Contracts\PaymentGateway plus an entry
+    | here (and its credential fields in settings.payments). Credentials live
+    | in Settings (encrypted); a gateway is offered on the pay page only when
+    | its credentials are saved. Amounts are minor units, so only currencies
+    | with two decimals are accepted for payment links.
+    */
+
+    'payments' => [
+        'gateways' => [
+            'stripe' => [
+                'driver' => StripeGateway::class,
+                'label' => 'Stripe',
+                'method' => 'Credit or debit card',
+                'description' => 'Visa, Mastercard · processed by Stripe',
+                'credentials' => ['stripe_secret_key', 'stripe_webhook_secret'],
+                'mode_key' => 'stripe_mode',
+                'base_url' => env('STRIPE_BASE_URL', 'https://api.stripe.com'),
+                // Pinned so response shapes do not change with the account's default API version.
+                'api_version' => env('STRIPE_API_VERSION', '2024-06-20'),
+                'currencies' => ['USD', 'EUR', 'GBP', 'EGP', 'SAR', 'AED'],
+            ],
+        ],
+        'currencies' => ['USD', 'EUR', 'GBP', 'EGP', 'SAR', 'AED'],
+        'webhook_tolerance_seconds' => 300,
+        'timeout_seconds' => 20,
+        'connect_timeout_seconds' => 5,
+        'link_default_days' => 14,
+        'invoice_due_days' => 14,
+        'receipt_link_hours' => 72,
     ],
 
     'support' => [

@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\FaqCategoryController;
 use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\HomeSectionController;
 use App\Http\Controllers\Admin\IndustryController;
+use App\Http\Controllers\Admin\InvoiceController;
 use App\Http\Controllers\Admin\KillSwitchController;
 use App\Http\Controllers\Admin\LeadActivityController;
 use App\Http\Controllers\Admin\LeadAssignmentController;
@@ -23,6 +24,8 @@ use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\MenuItemController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\PaymentLinkController;
 use App\Http\Controllers\Admin\PortfolioCategoryController;
 use App\Http\Controllers\Admin\PortfolioProjectController;
 use App\Http\Controllers\Admin\ProductController;
@@ -113,6 +116,24 @@ Route::middleware('two-factor')->group(function (): void {
             Route::post('projects/{project}/conversations/{conversation}/messages', [ProjectConversationController::class, 'message'])->middleware('throttle:60,1')->name('projects.conversations.messages.store');
             Route::get('projects/{project}/conversations/{conversation}/messages', [ProjectConversationController::class, 'messages'])->middleware('throttle:120,1')->name('projects.conversations.messages.index');
         });
+    });
+
+    Route::middleware('can:viewAny,App\Models\Payment')->group(function (): void {
+        Route::get('payments', [PaymentController::class, 'index'])->name('payments.index');
+        Route::get('payments/{payment}', [PaymentController::class, 'show'])->name('payments.show');
+        Route::post('payments/{payment}/verify', [PaymentController::class, 'verify'])->middleware('throttle:20,1')->name('payments.verify');
+        Route::get('payments/{payment}/receipt', [PaymentController::class, 'receipt'])->name('payments.receipt');
+        Route::get('payment-links', [PaymentLinkController::class, 'index'])->name('payment-links.index');
+        Route::post('projects/{project}/payment-links', [PaymentLinkController::class, 'store'])->middleware('throttle:30,1')->name('projects.payment-links.store');
+        Route::post('payment-links/{paymentLink}/cancel', [PaymentLinkController::class, 'cancel'])->name('payment-links.cancel');
+        Route::post('payment-links/{paymentLink}/invoice', [InvoiceController::class, 'storeFromLink'])->name('payment-links.invoice');
+        Route::post('projects/{project}/milestones/{milestone}/invoice', [InvoiceController::class, 'storeFromMilestone'])->scopeBindings()->name('projects.milestones.invoice');
+        Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+        Route::get('invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
+        Route::put('invoices/{invoice}', [InvoiceController::class, 'update'])->name('invoices.update');
+        Route::post('invoices/{invoice}/issue', [InvoiceController::class, 'issue'])->name('invoices.issue');
+        Route::post('invoices/{invoice}/void', [InvoiceController::class, 'void'])->name('invoices.void');
+        Route::get('invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
     });
 
     Route::middleware('can:viewAny,App\Models\SupportTicket')->group(function (): void {

@@ -46,6 +46,7 @@ class SaveMilestone
                 }
 
                 $before = $this->snapshot($milestone);
+                $this->guardBilling($milestone, $attributes);
                 $milestone->fill($attributes);
                 $milestone->lock_version++;
                 $milestone->save();
@@ -65,6 +66,24 @@ class SaveMilestone
 
             return $milestone;
         });
+    }
+
+    /**
+     * Once a milestone has payment links its currency is fixed, and its amount cannot drop below what was collected.
+     *
+     * @param  array<string, mixed>  $attributes
+     *
+     * @throws ValidationException
+     */
+    private function guardBilling(Milestone $milestone, array $attributes): void
+    {
+        if (isset($attributes['currency']) && $attributes['currency'] !== $milestone->currency && $milestone->paymentLinks()->exists()) {
+            throw ValidationException::withMessages(['currency' => __('The currency cannot change after payment links were created for this milestone.')]);
+        }
+
+        if (isset($attributes['amount_minor']) && (int) $attributes['amount_minor'] < $milestone->paid_minor) {
+            throw ValidationException::withMessages(['amount' => __('The amount cannot be lower than what was already paid.')]);
+        }
     }
 
     /**
