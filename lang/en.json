@@ -1,0 +1,3 @@
+{
+    ":count change request is waiting for review.|:count change requests are waiting for review.": "{0} No change requests are waiting for review.|{1} :count change request is waiting for review.|[2,*] :count change requests are waiting for review."
+}

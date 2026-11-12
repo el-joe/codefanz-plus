@@ -1,7 +1,7 @@
 <?php
 
-test('the application returns a successful response', function () {
-    $response = $this->get('/');
+test('the application root redirects to the localized home page', function () {
+    $this->get('/')->assertRedirect('/en');
 
-    $response->assertStatus(200);
+    $this->get('/en')->assertSuccessful();
 });

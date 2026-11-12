@@ -2,8 +2,232 @@
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
+@source '../js/**/*.js';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * CodeFanz design tokens — mirrored from the Figma file (docs/DESIGN_SYSTEM.md).
+ * Primitives are exposed as Tailwind colors; semantic tokens are CSS variables that
+ * switch between light and dark, so components never need `dark:` overrides.
+ */
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-arabic: 'Cairo', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+    --color-brand-50: #f0eeff;
+    --color-brand-100: #e2deff;
+    --color-brand-200: #c8c0ff;
+    --color-brand-300: #a89bff;
+    --color-brand-400: #8a77ff;
+    --color-brand-500: #6e56ff;
+    --color-brand-600: #5a3df5;
+    --color-brand-700: #4a2fd6;
+    --color-brand-800: #3b26ab;
+    --color-brand-900: #2e2183;
+    --color-brand-950: #1b1350;
+
+    --color-accent-50: #e8fffc;
+    --color-accent-100: #c6fff7;
+    --color-accent-300: #4cebdd;
+    --color-accent-400: #1ad5c8;
+    --color-accent-500: #08b8ae;
+    --color-accent-700: #087571;
+    --color-accent-900: #0e4d4b;
+
+    --color-ink-0: #ffffff;
+    --color-ink-25: #fbfbfe;
+    --color-ink-50: #f5f6fa;
+    --color-ink-100: #eceef4;
+    --color-ink-200: #dce0ea;
+    --color-ink-300: #c2c8d6;
+    --color-ink-400: #959db1;
+    --color-ink-500: #6a7389;
+    --color-ink-600: #4d556a;
+    --color-ink-700: #363d50;
+    --color-ink-800: #222838;
+    --color-ink-900: #141826;
+    --color-ink-950: #0a0d17;
+
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+    --radius-2xl: 28px;
+
+    --shadow-xs: 0 1px 2px rgb(20 24 38 / 0.06);
+    --shadow-sm: 0 1px 3px rgb(20 24 38 / 0.08), 0 1px 2px -1px rgb(20 24 38 / 0.05);
+    --shadow-md: 0 4px 8px -2px rgb(20 24 38 / 0.08), 0 2px 4px -2px rgb(20 24 38 / 0.04);
+    --shadow-lg: 0 12px 24px -4px rgb(20 24 38 / 0.1), 0 4px 8px -2px rgb(20 24 38 / 0.05);
+    --shadow-xl: 0 24px 48px -12px rgb(20 24 38 / 0.14);
+}
+
+@theme inline {
+    --color-canvas: var(--cf-bg-canvas);
+    --color-surface: var(--cf-bg-surface);
+    --color-surface-raised: var(--cf-bg-surface-raised);
+    --color-subtle: var(--cf-bg-subtle);
+    --color-muted: var(--cf-bg-muted);
+    --color-inverse: var(--cf-bg-inverse);
+    --color-brand: var(--cf-bg-brand);
+    --color-brand-hover: var(--cf-bg-brand-hover);
+    --color-brand-subtle: var(--cf-bg-brand-subtle);
+    --color-accent: var(--cf-bg-accent);
+    --color-accent-subtle: var(--cf-bg-accent-subtle);
+    --color-success-subtle: var(--cf-bg-success-subtle);
+    --color-warning-subtle: var(--cf-bg-warning-subtle);
+    --color-danger: var(--cf-bg-danger);
+    --color-danger-hover: var(--cf-bg-danger-hover);
+    --color-danger-subtle: var(--cf-bg-danger-subtle);
+    --color-info-subtle: var(--cf-bg-info-subtle);
+    --color-disabled: var(--cf-bg-disabled);
+
+    --color-fg: var(--cf-text-primary);
+    --color-fg-secondary: var(--cf-text-secondary);
+    --color-fg-tertiary: var(--cf-text-tertiary);
+    --color-fg-disabled: var(--cf-text-disabled);
+    --color-fg-inverse: var(--cf-text-inverse);
+    --color-fg-on-brand: var(--cf-text-on-brand);
+    --color-fg-brand: var(--cf-text-brand);
+    --color-fg-accent: var(--cf-text-accent);
+    --color-fg-success: var(--cf-text-success);
+    --color-fg-warning: var(--cf-text-warning);
+    --color-fg-danger: var(--cf-text-danger);
+    --color-fg-info: var(--cf-text-info);
+
+    --color-line: var(--cf-border-default);
+    --color-line-strong: var(--cf-border-strong);
+    --color-line-subtle: var(--cf-border-subtle);
+    --color-line-brand: var(--cf-border-brand);
+    --color-line-focus: var(--cf-border-focus);
+    --color-line-danger: var(--cf-border-danger);
+    --color-line-success: var(--cf-border-success);
+    --color-line-warning: var(--cf-border-warning);
+    --color-line-info: var(--cf-border-info);
+}
+
+:root {
+    --cf-bg-canvas: #fbfbfe;
+    --cf-bg-surface: #ffffff;
+    --cf-bg-surface-raised: #ffffff;
+    --cf-bg-subtle: #f5f6fa;
+    --cf-bg-muted: #eceef4;
+    --cf-bg-inverse: #0a0d17;
+    --cf-bg-brand: #5a3df5;
+    --cf-bg-brand-hover: #4a2fd6;
+    --cf-bg-brand-subtle: #f0eeff;
+    --cf-bg-accent: #1ad5c8;
+    --cf-bg-accent-subtle: #e8fffc;
+    --cf-bg-success-subtle: #ecfdf3;
+    --cf-bg-warning-subtle: #fffaeb;
+    --cf-bg-danger: #d92d20;
+    --cf-bg-danger-hover: #b42318;
+    --cf-bg-danger-subtle: #fef3f2;
+    --cf-bg-info-subtle: #eff8ff;
+    --cf-bg-disabled: #eceef4;
+
+    --cf-text-primary: #141826;
+    --cf-text-secondary: #4d556a;
+    --cf-text-tertiary: #6a7389;
+    --cf-text-disabled: #959db1;
+    --cf-text-inverse: #ffffff;
+    --cf-text-on-brand: #ffffff;
+    --cf-text-brand: #4a2fd6;
+    --cf-text-accent: #087571;
+    --cf-text-success: #027a48;
+    --cf-text-warning: #b54708;
+    --cf-text-danger: #b42318;
+    --cf-text-info: #175cd3;
+
+    --cf-border-default: #dce0ea;
+    --cf-border-strong: #c2c8d6;
+    --cf-border-subtle: #eceef4;
+    --cf-border-brand: #6e56ff;
+    --cf-border-focus: #6e56ff;
+    --cf-border-danger: #f04438;
+    --cf-border-success: #12b76a;
+    --cf-border-warning: #f79009;
+    --cf-border-info: #2e90fa;
+
+    color-scheme: light;
+}
+
+.dark {
+    --cf-bg-canvas: #0a0d17;
+    --cf-bg-surface: #141826;
+    --cf-bg-surface-raised: #222838;
+    --cf-bg-subtle: #222838;
+    --cf-bg-muted: #363d50;
+    --cf-bg-inverse: #ffffff;
+    --cf-bg-brand: #6e56ff;
+    --cf-bg-brand-hover: #8a77ff;
+    --cf-bg-brand-subtle: #1b1350;
+    --cf-bg-accent: #1ad5c8;
+    --cf-bg-accent-subtle: #0e4d4b;
+    --cf-bg-success-subtle: #054f31;
+    --cf-bg-warning-subtle: #7a2e0e;
+    --cf-bg-danger: #f04438;
+    --cf-bg-danger-hover: #d92d20;
+    --cf-bg-danger-subtle: #7a271a;
+    --cf-bg-info-subtle: #194185;
+    --cf-bg-disabled: #222838;
+
+    --cf-text-primary: #f5f6fa;
+    --cf-text-secondary: #c2c8d6;
+    --cf-text-tertiary: #959db1;
+    --cf-text-disabled: #4d556a;
+    --cf-text-inverse: #0a0d17;
+    --cf-text-brand: #a89bff;
+    --cf-text-accent: #4cebdd;
+    --cf-text-success: #6ce9a6;
+    --cf-text-warning: #fec84b;
+    --cf-text-danger: #fda29b;
+    --cf-text-info: #84caff;
+
+    --cf-border-default: #363d50;
+    --cf-border-strong: #4d556a;
+    --cf-border-subtle: #222838;
+    --cf-border-brand: #8a77ff;
+    --cf-border-focus: #a89bff;
+    --cf-border-danger: #fda29b;
+    --cf-border-success: #6ce9a6;
+    --cf-border-warning: #fec84b;
+    --cf-border-info: #84caff;
+
+    color-scheme: dark;
+}
+
+@layer base {
+    html {
+        @apply bg-canvas text-fg antialiased;
+    }
+
+    html[dir='rtl'] body {
+        font-family: var(--font-arabic);
+    }
+
+    body {
+        font-family: var(--font-sans);
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--cf-border-focus);
+        outline-offset: 2px;
+    }
+
+    [hidden] {
+        display: none !important;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
 }

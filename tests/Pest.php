@@ -1,5 +1,8 @@
 <?php
 
+use Database\Seeders\KillSwitchSeeder;
+use Database\Seeders\LanguageSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,7 +18,10 @@ use Tests\TestCase;
 */
 
 pest()->extend(TestCase::class)
- // ->use(RefreshDatabase::class)
+    ->use(RefreshDatabase::class)
+    ->beforeEach(function () {
+        $this->seed([LanguageSeeder::class, RolesAndPermissionsSeeder::class, KillSwitchSeeder::class]);
+    })
     ->in('Feature');
 
 /*
