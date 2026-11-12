@@ -5,6 +5,8 @@
     $nav = [
         ['label' => __('Overview'), 'route' => 'admin.dashboard', 'can' => 'admin.access'],
         ['label' => __('Approvals'), 'route' => 'admin.approvals.index', 'can' => 'viewAny', 'model' => \App\Models\ChangeRequest::class, 'count' => $pendingApprovalsCount ?? null],
+        ['label' => __('Pages'), 'route' => 'admin.pages.index', 'can' => 'viewAny', 'model' => \App\Models\Page::class],
+        ['label' => __('Media'), 'route' => 'admin.media.index', 'can' => 'media.manage'],
         ['label' => __('Emergency controls'), 'route' => 'admin.emergency.index', 'can' => 'automation.manage'],
         ['label' => __('Audit logs'), 'route' => 'admin.audit-logs.index', 'can' => 'audit.view'],
         ['label' => __('Security'), 'route' => 'admin.security', 'can' => 'admin.access'],

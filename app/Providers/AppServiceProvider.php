@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Enums\Role;
 use App\Models\ChangeRequest;
 use App\Models\KillSwitch;
+use App\Models\Media;
 use App\Models\Page;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
@@ -34,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
             'page' => Page::class,
             'change_request' => ChangeRequest::class,
             'kill_switch' => KillSwitch::class,
+            'media' => Media::class,
         ]);
 
         Gate::before(fn (User $user): ?bool => $user->hasRole(Role::SuperAdmin->value) && $user->is_active ? true : null);

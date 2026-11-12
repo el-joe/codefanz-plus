@@ -173,5 +173,16 @@ Overview A01 · Pages A08 · Navigation & Menus A08 pattern · Services A09 · T
   - Mobile admin is designed for 3 key screens only; other admin screens use the responsive table → card pattern.
 - **Content:** all names, figures, testimonials, legal copy and statistics are sample content and must be replaced before launch.
 
+## Code implementation (Milestone 3)
+
+Blade components mirroring the Figma library live in `resources/views/components/`:
+
+| Component | Notes |
+|---|---|
+| `x-ui.button`, `x-ui.input`, `x-ui.badge`, `x-ui.alert`, `x-ui.card`, `x-ui.empty-state`, `x-ui.logo` | Semantic tokens only; `x-ui.input` accepts array names (`translations[ar][title]`) and maps errors to dot notation |
+| `x-layouts.base` / `auth` / `admin` / `public` | `public` takes `title`, `description` and `alternates` (locale → URL) for hreflang, canonical and the language switch |
+| `x-language-switch` | Uses `alternates` on localized pages so switching keeps the visitor on the translated page |
+| `x-media.picture` | `<picture>`: AVIF `srcset`, then WebP, `<img>` fallback with width/height, lazy by default (`eager` for hero images), localized alt |
+
 ## Next
-Owner reviews the Figma file and signs off. Then Milestone 3 (core platform build) starts, which needs MySQL access.
+Milestone 3 slice 3: settings UI, users & roles admin, profile and 2FA management.
