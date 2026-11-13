@@ -172,13 +172,14 @@ test('service and industry pages list related public projects', function () {
 
 test('the products index lists published products with availability and demo requests', function () {
     Product::factory()->withTranslation('en', ['name' => 'FanzERP', 'features' => [['title' => 'Multi-branch POS', 'description' => null]]])->create();
+    Product::factory()->withTranslation('en', ['name' => 'QueueBeta'])->create(['availability' => 'beta']);
     Product::factory()->draft()->withTranslation('en', ['name' => 'Draft Product'])->create();
     Product::factory()->withTranslation('ar', ['name' => 'منتج عربي', 'slug' => 'منتج-عربي'])->create();
 
     $this->get('/en/products')
         ->assertSuccessful()
         ->assertSee('FanzERP')
-        ->assertSee('Available')
+        ->assertSeeInOrder(['QueueBeta', 'Beta'])
         ->assertSee('Multi-branch POS')
         ->assertSee('Request a demo')
         ->assertSee(route('contact', ['locale' => 'en', 'topic' => 'demo', 'ref' => 'FanzERP']))

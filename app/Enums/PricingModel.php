@@ -30,6 +30,20 @@ enum PricingModel: string
     }
 
     /**
+     * What each licensing model includes, shown as checklist lines on the product page (never prices).
+     *
+     * @return list<string>
+     */
+    public function highlights(): array
+    {
+        return match ($this) {
+            self::Subscription => [__('Automatic updates'), __('Daily backups'), __('Email & WhatsApp support')],
+            self::OneTimeLicense => [__('Full data control'), __('Annual support plan'), __('Version upgrades')],
+            self::CustomQuote => [__('Dedicated team'), __('Custom integrations'), __('Agreed service levels')],
+        };
+    }
+
+    /**
      * @return array<string, string>
      */
     public static function options(): array

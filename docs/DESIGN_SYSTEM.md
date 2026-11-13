@@ -207,6 +207,11 @@ Blade components mirroring the Figma library live in `resources/views/components
 | Tabs `data-tab-all` | An "All" tab whose panel wraps the others shows every panel (Technologies catalogue underline tabs) |
 | Restyle slice 2 pages | Services, Service Detail (hero actions, What you get, quote card, related work, FAQ), Technologies, Industries, About (story visual with up to two published statistics) |
 | Dark bands | Add the `dark` class to a block (footer, stats, CTA card, delivery promise) so its tokens switch to the dark set |
+| `x-site.screen-mockup` (`tone`, `layout` chart / table, `window` [w, h]) | Figma "mockup" placeholder when a project/product has no media: gradient stage + SVG app window (80% wide, 14% from top; give the stage the window's aspect ratio). In RTL the sidebar moves right while the chart still rises left to right. Used for the featured project, project gallery + thumbs strip, product screens |
+| `pagination.site` view (`->onEachSide(1)->links('pagination.site')`) | Figma Pagination: "Showing x–y of n" + 36px page squares, brand current page, mirrored chevrons, rel=prev/next |
+| Portfolio filter bar | Pill tabs (`bg-muted` track, `shadow-xs` active) + 48px search and native select; `data-auto-submit` submits on change, `<noscript>` Filter button as fallback |
+| `PricingModel::highlights()` | Three checklist lines per licensing model on the product page (no prices; quotes stay preliminary) |
+| Restyle slice 3 pages | Portfolio (featured card 720/558 split, Card/Project grid), Project Detail (hero link buttons with icons, gallery, story + facts sidebar, "What we built" services tiles + testimonial, related), Products (Card/Product grid, Why a product), Product Detail (id row badges, screens, feature cards, licensing plans with "Most chosen", changelog + resource cards, demo card). `x-site.product-card` "Request a demo" opens the contact form with `topic=demo` |
 
 ## Next
 Milestone 4: corporate website (services, portfolio, technologies, contact/lead form).

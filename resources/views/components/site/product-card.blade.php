@@ -1,4 +1,4 @@
-{{-- Figma "Card/Product": brand icon tile, name + tagline, three key features and the demo / learn-more actions. Expects translations loaded. --}}
+{{-- Figma "Card/Product": brand icon tile, name + tagline (availability badge unless generally available), three key features and the demo (contact form, topic=demo) / learn-more actions. Expects translations loaded. --}}
 @props(['product', 'headingTag' => 'h3'])
 
 @php
@@ -33,7 +33,7 @@
     @endif
     <div class="mt-auto flex flex-wrap items-center gap-3">
         @if ($product->demo_enabled)
-            <x-ui.button :href="$url.'#request-demo'">{{ __('Request a demo') }}</x-ui.button>
+            <x-ui.button :href="route('contact', ['topic' => 'demo', 'ref' => $translation->name])">{{ __('Request a demo') }}</x-ui.button>
         @endif
         <x-ui.button :href="$url" variant="ghost" arrow>{{ __('Learn more') }}<span class="sr-only"> — {{ $translation->name }}</span></x-ui.button>
     </div>
