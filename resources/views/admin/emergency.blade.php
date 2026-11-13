@@ -8,4 +8,9 @@
             @include('admin._kill-switch-toggle', ['key' => $switch['key'], 'active' => $switch['active']])
         @endforeach
     </div>
+
+    <x-ui.card :title="__('n8n workflows')">
+        <p class="text-sm text-fg-secondary">{{ __('Enable, disable and inspect each signed n8n workflow (deliveries, retries and failed runs) on its own page.') }}</p>
+        <x-ui.button variant="secondary" size="sm" class="mt-3" :href="route('admin.automation.index')">{{ __('n8n integrations') }}</x-ui.button>
+    </x-ui.card>
 </x-layouts.admin>

@@ -3,6 +3,7 @@
 namespace App\Actions\Support;
 
 use App\Enums\TicketStatus;
+use App\Events\SupportTicketOpened;
 use App\Models\Customer;
 use App\Models\SupportTicket;
 use App\Models\User;
@@ -51,6 +52,7 @@ class OpenSupportTicket
         });
 
         Notification::send($this->recipients->supportTeam(null), new SupportTicketUpdated($ticket, 'opened', $client->name, forClient: false));
+        SupportTicketOpened::dispatch($ticket);
 
         return $ticket;
     }

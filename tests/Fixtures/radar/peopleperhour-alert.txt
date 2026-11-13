@@ -1,0 +1,16 @@
+Hi there,
+
+Here are new jobs matching your alert "Laravel":
+
+Laravel developer to build a SaaS billing module
+https://www.peopleperhour.com/freelance-jobs/technology-programming/software-development/laravel-developer-to-build-a-saas-billing-4213567
+Fixed Price: £600
+We need Stripe subscriptions and invoices added to an existing Laravel 11 app.
+5 proposals
+
+WordPress speed fixes
+https://www.peopleperhour.com/freelance-jobs/technology-programming/website-development/wordpress-speed-fixes-4213999
+Per hour: $25/hr
+Improve Core Web Vitals on a WooCommerce site.
+
+Manage your alerts: https://www.peopleperhour.com/settings/alerts

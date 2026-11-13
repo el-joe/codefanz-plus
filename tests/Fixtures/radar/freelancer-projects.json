@@ -1,0 +1,37 @@
+{
+    "status": "success",
+    "result": {
+        "projects": [
+            {
+                "id": 39001122,
+                "owner_id": 501,
+                "title": "Laravel SaaS dashboard for a clinic chain",
+                "seo_url": "php/laravel-saas-dashboard-clinic-chain",
+                "currency": {"code": "USD", "sign": "$"},
+                "description": "We need a multi-branch booking dashboard built with Laravel and MySQL. Vue front end is a plus.",
+                "type": "fixed",
+                "budget": {"minimum": 3000, "maximum": 5000},
+                "time_submitted": 1794571200,
+                "bid_stats": {"bid_count": 4},
+                "jobs": [{"id": 3, "name": "PHP"}, {"id": 1520, "name": "Laravel"}, {"id": 13, "name": "MySQL"}]
+            },
+            {
+                "id": 39001123,
+                "owner_id": 502,
+                "title": "Logo design for a bakery",
+                "seo_url": "graphic-design/logo-design-bakery",
+                "currency": {"code": "GBP", "sign": "£"},
+                "preview_description": "Simple modern logo for a small bakery.",
+                "type": "hourly",
+                "budget": {"minimum": 10, "maximum": 20},
+                "time_submitted": 1794564000,
+                "bid_stats": {"bid_count": 61},
+                "jobs": [{"id": 20, "name": "Graphic Design"}, {"id": 32, "name": "Logo Design"}]
+            }
+        ],
+        "users": {
+            "501": {"id": 501, "location": {"country": {"code": "ae", "name": "United Arab Emirates"}}, "reputation": {"entire_history": {"overall": 4.9}}, "status": {"payment_verified": true}},
+            "502": {"id": 502, "location": {"country": {"code": "gb"}}, "reputation": {"entire_history": {"overall": 0}}, "status": {"payment_verified": false}}
+        }
+    }
+}

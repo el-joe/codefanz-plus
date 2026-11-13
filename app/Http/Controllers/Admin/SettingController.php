@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\UpdateSettingsRequest;
 use App\Services\Ai\AiGateway;
 use App\Services\AuditLogger;
 use App\Services\Payments\PaymentGatewayManager;
+use App\Services\Radar\RadarPlatforms;
 use App\Services\Settings;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -95,6 +96,10 @@ class SettingController extends Controller
             if ($cleared !== []) {
                 $after['connection_verification_cleared'] = $cleared;
             }
+        }
+
+        if ($group === 'radar' && $after !== []) {
+            app(RadarPlatforms::class)->refreshStatuses();
         }
 
         if ($after !== []) {

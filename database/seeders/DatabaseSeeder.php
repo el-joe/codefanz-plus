@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissionsSeeder::class,
             KillSwitchSeeder::class,
             AiStudioSeeder::class,
+            RadarPlatformSeeder::class,
             PageSectionSeeder::class,
             MenuSeeder::class,
         ]);

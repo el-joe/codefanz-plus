@@ -24,6 +24,7 @@ enum Permission: string
     case AiManage = 'ai.manage';
     case McpManage = 'mcp.manage';
     case RadarView = 'radar.view';
+    case RadarManage = 'radar.manage';
     case AutomationManage = 'automation.manage';
     case SettingsManage = 'settings.manage';
     case UsersManage = 'users.manage';

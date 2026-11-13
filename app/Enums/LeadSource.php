@@ -13,6 +13,7 @@ enum LeadSource: string
     case Manual = 'manual';
     case Mcp = 'mcp';
     case Radar = 'radar';
+    case Automation = 'automation';
 
     public function label(): string
     {
@@ -23,6 +24,7 @@ enum LeadSource: string
             self::Manual => __('Manual'),
             self::Mcp => __('MCP'),
             self::Radar => __('Freelance Radar'),
+            self::Automation => __('n8n automation'),
         };
     }
 

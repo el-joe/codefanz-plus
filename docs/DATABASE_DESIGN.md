@@ -144,18 +144,19 @@
 ### 2.11 Freelance Radar
 | Table | Notes |
 |---|---|
-| `radar_platforms` | key UNIQUE, name, connector, status (Active, Unavailable, NeedsCredentials), rate_limit, last_run_at |
-| `radar_projects` | platform_id, external_id, UNIQUE(platform_id, external_id), title, description, url, budget_min/max_minor, currency, type, skills JSON, posted_at, client_info JSON, proposals_count, collected_at, content_hash, source JSON, status (New, Interested, Applied, Won, Lost, Ignored). FULLTEXT(title, description) |
-| `radar_evaluations` | radar_project_id, score, breakdown JSON (skill, experience, clarity, budget, opportunity, complexity, profitability, competition), explanation, model, content_hash (re-score only if changed) |
-| `radar_filters` | name, rules JSON (include/exclude keywords, skills, budget, platforms, min_score, languages…), is_active |
-| `radar_alerts` | radar_project_id, channel, level, content_hash, sent_at; UNIQUE(radar_project_id, channel, content_hash) → no repeat alerts |
-| `radar_proposals` | AI proposal drafts (never auto-submitted) |
+| `radar_platforms` | key UNIQUE, name, connector (`api`/`email`/`none`), status (`RadarPlatformStatus`: active, needs_credentials, unavailable, error; recomputed from saved credentials, enabled inbound email endpoints and the last run), status_note, is_enabled (per-platform kill switch), fetch_interval_minutes, rate_limit_per_hour, last_run_at, last_success_at, last_error, last_run_count. Seeded by `RadarPlatformSeeder` |
+| `radar_projects` | radar_platform_id, external_id, UNIQUE(radar_platform_id, external_id), url, title, description, budget_min/max_minor + currency, budget_type (fixed/hourly/unknown), skills JSON, client_country, client_rating, client_spent_minor, client_payment_verified, proposals_count, language (en/ar, detected), posted_at, collected_at, content_hash (re-score / re-alert only when it changes), source JSON, status (`RadarProjectStatus`: new, shortlisted, proposal_drafted, applied, won, lost, ignored), score (latest rule score), ai_score, lead_id, soft deletes. Indexes: (status, score), posted_at, created_at, FULLTEXT(title, description) |
+| `radar_evaluations` | radar_project_id, kind (`rules` / `ai`), score, breakdown JSON (rules: per factor score, weight, reason + params; ai: matching skills), explanation, model, content_hash, weights_hash (rules re-scored only when content or weights change), user_id. The AI score never replaces the rule score |
+| `radar_filters` | name, rules JSON (include/exclude keywords, skills, countries, platforms, languages, min_budget USD, min_score, budget_type), is_active (tab), alerts_enabled (Telegram gate), sort_order |
+| `radar_alerts` | radar_project_id, channel, level (immediate/normal/digest), content_hash, score, status (pending/sent/failed/skipped), error, sent_at; UNIQUE(radar_project_id, channel, content_hash) → no repeat alerts |
+| `radar_proposals` | radar_project_id, locale, body, guardrail_flags JSON, ai_generation_id — drafts only, never submitted anywhere |
+| (settings) | group `radar` (API credentials, Telegram bot token encrypted) and group `radar_scoring` (weights, thresholds, keywords, targets, languages, digest size, AI auto-score) |
 
 ### 2.12 Automation & notifications
 | Table | Notes |
 |---|---|
-| `automation_workflows` | key UNIQUE, name, direction (outbound/inbound), url, secret (enc), is_enabled |
-| `automation_runs` | workflow_id, event, payload hash, status, attempts, response, error |
+| `automation_workflows` | key UNIQUE (random suffix, part of the inbound URL), name, direction (outbound/inbound), url (outbound), secret (encrypted, per workflow), events JSON (outbound subscriptions), action (inbound: one whitelisted `AutomationAction`), acts_as_user_id (inbound permissions), include_personal_data, is_enabled, last_run_at, last_status, soft deletes |
+| `automation_runs` | uuid, automation_workflow_id, direction, event, idempotency_key (outbound delivery id / inbound sender delivery id), UNIQUE(workflow, idempotency_key) = inbound replay protection, payload_hash, payload (outbound body, resent unchanged on retries; null for inbound), status (pending/succeeded/failed/rejected), attempts, http_status, response, error, duration_ms, ip_address, completed_at |
 | `notifications` | Laravel default |
 | `notification_preferences` | user_id, event, channels JSON |
 | `consents` | subject (lead/user/visitor), type, version, given_at, ip_hash |

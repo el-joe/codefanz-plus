@@ -30,3 +30,8 @@ Schedule::command('analytics:sync')->dailyAt('06:00')->withoutOverlapping();
 Schedule::command('social:publish-due')->everyMinute()->withoutOverlapping();
 Schedule::command('social:refresh-tokens')->everyFifteenMinutes()->withoutOverlapping();
 Schedule::command('social:fetch-metrics')->everySixHours()->withoutOverlapping();
+
+// Freelance Radar (M10): API platforms are checked every five minutes; each platform's own cadence, hourly request
+// budget and switch decide whether it is actually called. The digest goes out once a day.
+Schedule::command('radar:fetch')->everyFiveMinutes()->withoutOverlapping();
+Schedule::command('radar:digest')->dailyAt((string) config('codefanz.radar.digest_time', '08:00'))->withoutOverlapping();

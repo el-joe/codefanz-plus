@@ -13,6 +13,8 @@ enum KillSwitchKey: string
     case AiSeo = 'ai_seo';
     case AiSocial = 'ai_social';
     case AiRadar = 'ai_radar';
+    case RadarCollection = 'radar_collection';
+    case AutomationWebhooks = 'automation_webhooks';
 
     public function label(): string
     {
@@ -26,6 +28,8 @@ enum KillSwitchKey: string
             self::AiSeo => __('AI SEO suggestions'),
             self::AiSocial => __('AI social copy'),
             self::AiRadar => __('Freelance Radar AI'),
+            self::RadarCollection => __('Freelance Radar collection & alerts'),
+            self::AutomationWebhooks => __('n8n webhooks'),
         };
     }
 
@@ -41,6 +45,8 @@ enum KillSwitchKey: string
             self::AiSeo => __('No AI SEO suggestions or metadata generations.'),
             self::AiSocial => __('No AI-written social captions.'),
             self::AiRadar => __('No AI scoring of freelance projects.'),
+            self::RadarCollection => __('No platform fetches, alert-email imports or Telegram alerts.'),
+            self::AutomationWebhooks => __('Outbound n8n deliveries stay queued as failed and inbound requests are refused.'),
         };
     }
 }

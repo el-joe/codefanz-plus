@@ -8,6 +8,7 @@ use App\Enums\MenuLocation;
 use App\Enums\Role;
 use App\Events\LeadCreated;
 use App\Models\AiGeneration;
+use App\Models\AutomationWorkflow;
 use App\Models\BrandProfile;
 use App\Models\Career;
 use App\Models\CareerTranslation;
@@ -48,6 +49,10 @@ use App\Models\ProductVersion;
 use App\Models\Project;
 use App\Models\ProjectNote;
 use App\Models\PromptTemplate;
+use App\Models\RadarFilter;
+use App\Models\RadarPlatform;
+use App\Models\RadarProject;
+use App\Models\RadarProposal;
 use App\Models\Receipt;
 use App\Models\Redirect;
 use App\Models\Refund;
@@ -161,6 +166,11 @@ class AppServiceProvider extends ServiceProvider
             'social_post' => SocialPost::class,
             'social_post_variant' => SocialPostVariant::class,
             'mcp_client' => McpClient::class,
+            'radar_project' => RadarProject::class,
+            'radar_filter' => RadarFilter::class,
+            'radar_platform' => RadarPlatform::class,
+            'radar_proposal' => RadarProposal::class,
+            'automation_workflow' => AutomationWorkflow::class,
         ]);
 
         // Payment gateway webhooks: generous per gateway and IP; bad signatures are rejected before any work.

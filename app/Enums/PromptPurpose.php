@@ -15,6 +15,7 @@ enum PromptPurpose: string
     case Email = 'email';
     case AdCopy = 'ad_copy';
     case Translation = 'translation';
+    case RadarProposal = 'radar_proposal';
 
     public function label(): string
     {
@@ -26,6 +27,7 @@ enum PromptPurpose: string
             self::Email => __('Email draft'),
             self::AdCopy => __('Ad copy'),
             self::Translation => __('Translation'),
+            self::RadarProposal => __('Freelance proposal'),
         };
     }
 
@@ -39,6 +41,7 @@ enum PromptPurpose: string
             self::Email => __('Campaigns and follow-ups'),
             self::AdCopy => __('Headlines and short ad text'),
             self::Translation => __('English to Arabic, keeping the glossary'),
+            self::RadarProposal => __('Proposal draft for a Freelance Radar project (never submitted)'),
         };
     }
 
@@ -52,6 +55,7 @@ enum PromptPurpose: string
             self::Email => 'users',
             self::AdCopy => 'sparkles',
             self::Translation => 'globe',
+            self::RadarProposal => 'send',
         };
     }
 
@@ -68,7 +72,7 @@ enum PromptPurpose: string
      */
     public function isPrivateOnly(): bool
     {
-        return in_array($this, [self::SocialPost, self::Email, self::AdCopy], true);
+        return in_array($this, [self::SocialPost, self::Email, self::AdCopy, self::RadarProposal], true);
     }
 
     /**
@@ -79,6 +83,7 @@ enum PromptPurpose: string
         return match ($this) {
             self::SeoMeta => AiFeature::SeoAssistant,
             self::SocialPost => AiFeature::Social,
+            self::RadarProposal => AiFeature::Radar,
             default => AiFeature::ContentStudio,
         };
     }
@@ -96,6 +101,7 @@ enum PromptPurpose: string
             self::SocialPost => ['text', 'hashtags', 'call_to_action'],
             self::Email => ['subject', 'preheader', 'body'],
             self::AdCopy => ['headline', 'description', 'call_to_action'],
+            self::RadarProposal => ['body'],
             self::ServiceCopy, self::Translation => ['title', 'summary', 'body'],
         };
     }

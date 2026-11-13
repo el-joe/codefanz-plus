@@ -95,6 +95,17 @@ return [
             'x_client_id' => ['type' => 'text', 'section' => 'x', 'label' => 'X OAuth 2.0 client ID', 'rules' => ['nullable', 'string', 'max:100', 'regex:/^[A-Za-z0-9_-]+$/']],
             'x_client_secret' => ['type' => 'secret', 'section' => 'x', 'label' => 'X OAuth 2.0 client secret', 'rules' => ['nullable', 'string', 'max:255']],
         ],
+        // Freelance Radar (M10): platform API credentials and the Telegram bot. Scoring weights, thresholds and
+        // keywords are edited on Radar → Settings (radar.manage).
+        'radar' => [
+            'freelancer_api_token' => ['type' => 'secret', 'section' => 'freelancer', 'label' => 'Freelancer API OAuth token', 'rules' => ['nullable', 'string', 'max:255', 'regex:/^[A-Za-z0-9._\\-]+$/']],
+            'freelancer_query' => ['type' => 'text', 'section' => 'freelancer', 'label' => 'Freelancer search query (e.g. laravel flutter)', 'rules' => ['nullable', 'string', 'max:200']],
+            'upwork_client_id' => ['type' => 'text', 'section' => 'upwork', 'label' => 'Upwork API client ID (approved key)', 'rules' => ['nullable', 'string', 'max:100', 'regex:/^[A-Za-z0-9_\\-]+$/']],
+            'upwork_client_secret' => ['type' => 'secret', 'section' => 'upwork', 'label' => 'Upwork API client secret', 'rules' => ['nullable', 'string', 'max:255']],
+            'upwork_query' => ['type' => 'text', 'section' => 'upwork', 'label' => 'Upwork search query', 'rules' => ['nullable', 'string', 'max:200']],
+            'telegram_bot_token' => ['type' => 'secret', 'section' => 'telegram', 'label' => 'Telegram bot token (from @BotFather)', 'rules' => ['nullable', 'string', 'max:100', 'regex:/^\\d{5,15}:[A-Za-z0-9_\\-]{30,60}$/']],
+            'telegram_chat_id' => ['type' => 'text', 'section' => 'telegram', 'label' => 'Telegram chat ID (user, group or channel)', 'rules' => ['nullable', 'string', 'max:64', 'regex:/^(-?\\d{1,20}|@[A-Za-z0-9_]{5,32})$/']],
+        ],
         // SEO (M7.2). Unset = block search engines everywhere except production.
         'seo' => [
             'block_indexing' => ['type' => 'select', 'label' => 'Search engine indexing', 'options' => ['block' => 'Block (robots.txt Disallow + noindex header)', 'allow' => 'Allow indexing'], 'rules' => ['nullable', 'string', 'in:block,allow']],
@@ -197,6 +208,44 @@ return [
         'messages_per_ip_per_day' => 300,
         'retention_days' => (int) env('ASSISTANT_RETENTION_DAYS', 30),
         'lead_retention_days' => (int) env('ASSISTANT_LEAD_RETENTION_DAYS', 365),
+    ],
+
+    /*
+    | Freelance Radar (M10). Defaults for the scoring weights and alert
+    | thresholds (editable on Radar → Settings), approximate USD rates used
+    | only to compare budgets in different currencies, and API endpoints.
+    */
+
+    'radar' => [
+        'weights' => ['skills' => 35, 'budget' => 20, 'client' => 15, 'freshness' => 10, 'competition' => 10, 'language' => 10],
+        'thresholds' => ['immediate' => 90, 'normal' => 75, 'digest' => 60],
+        'target_budget_usd' => 1000,
+        'target_hourly_usd' => 25,
+        'languages' => ['en', 'ar'],
+        'digest_size' => 10,
+        'digest_time' => env('RADAR_DIGEST_TIME', '08:00'),
+        'max_projects_per_fetch' => 50,
+        'usd_rates' => ['USD' => 1.0, 'EUR' => 1.08, 'GBP' => 1.27, 'SAR' => 0.27, 'AED' => 0.27, 'EGP' => 0.02, 'KWD' => 3.25, 'QAR' => 0.27, 'INR' => 0.012, 'AUD' => 0.66, 'CAD' => 0.73, 'NZD' => 0.6, 'SGD' => 0.74, 'HKD' => 0.13],
+        'timeout_seconds' => 15,
+        'freelancer' => ['base_url' => env('FREELANCER_API_URL', 'https://www.freelancer.com/api')],
+        'upwork' => [
+            'token_url' => env('UPWORK_TOKEN_URL', 'https://www.upwork.com/api/v3/oauth2/token'),
+            'graphql_url' => env('UPWORK_GRAPHQL_URL', 'https://api.upwork.com/graphql'),
+        ],
+        'telegram' => ['base_url' => env('TELEGRAM_API_URL', 'https://api.telegram.org')],
+    ],
+
+    /*
+    | n8n integration (M10): signed webhooks. Inbound requests older than the
+    | tolerance are refused; outbound deliveries retry with backoff (seconds).
+    */
+
+    'automation' => [
+        'signature_tolerance_seconds' => 300,
+        'timeout_seconds' => 10,
+        'tries' => 5,
+        'backoff' => [60, 300, 900, 3600],
+        'max_body_bytes' => 262144,
     ],
 
     /*

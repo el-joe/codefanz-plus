@@ -150,6 +150,19 @@ TEXT;
                     ['name' => 'offer', 'label' => 'What is promoted', 'required' => true, 'max' => 1000],
                 ],
             ],
+            [
+                'key' => 'radar-proposal', 'name' => 'Freelance proposal', 'purpose' => PromptPurpose::RadarProposal,
+                'description' => 'Proposal draft for a Freelance Radar project (never submitted)',
+                'system_template' => self::SYSTEM,
+                'user_template' => "Draft a proposal for this freelance project. A person will review, edit and send it themselves.\nProject title: {{project_title}}\nProject description: {{project_description}}\nSkills requested: {{skills}}\nFacts about our relevant experience (mention no other projects, clients, portfolio items, years or numbers): {{our_facts}}\nPrice or rate to quote (if this is empty, do not mention any price, rate, budget or currency): {{price}}\nStructure: a short opening that shows we understood the need, our approach in three to five bullet points, one or two clarifying questions, and a short closing. Plain text with simple dash bullets, under 250 words. Never claim we already built the same product unless the facts say so.",
+                'variables' => [
+                    ['name' => 'project_title', 'label' => 'Project title', 'required' => true, 'max' => 255],
+                    ['name' => 'project_description', 'label' => 'Project description', 'required' => true, 'max' => 8000],
+                    ['name' => 'skills', 'label' => 'Skills requested', 'required' => false, 'max' => 500],
+                    ['name' => 'our_facts', 'label' => 'Facts about our experience', 'required' => false, 'max' => 2000],
+                    ['name' => 'price', 'label' => 'Price or rate to quote', 'required' => false, 'max' => 100],
+                ],
+            ],
         ];
     }
 }

@@ -1,0 +1,38 @@
+{
+    "data": {
+        "marketplaceJobPostingsSearch": {
+            "edges": [
+                {
+                    "node": {
+                        "id": "1789000111222",
+                        "ciphertext": "~01abcdef1234567890",
+                        "title": "Flutter app for a delivery startup (Android + iOS)",
+                        "description": "Build a Flutter app with Firebase and Google Maps integration.",
+                        "createdDateTime": "2026-11-13T09:00:00Z",
+                        "totalApplicants": 17,
+                        "skills": [{"name": "flutter", "prettyName": "Flutter"}, {"name": "firebase", "prettyName": "Firebase"}],
+                        "amount": {"rawValue": "4000.0", "currency": "USD"},
+                        "hourlyBudgetMin": null,
+                        "hourlyBudgetMax": null,
+                        "client": {"location": {"country": "SA"}, "totalFeedback": 4.7, "totalSpent": {"rawValue": "25000", "currency": "USD"}, "verificationStatus": "VERIFIED"}
+                    }
+                },
+                {
+                    "node": {
+                        "id": "1789000111333",
+                        "ciphertext": "~01ffff",
+                        "title": "Ongoing Laravel maintenance",
+                        "description": "Hourly Laravel bug fixing.",
+                        "createdDateTime": "2026-11-13T08:00:00Z",
+                        "totalApplicants": 3,
+                        "skills": [{"name": "laravel", "prettyName": "Laravel"}],
+                        "amount": {"rawValue": "0.0", "currency": "USD"},
+                        "hourlyBudgetMin": {"rawValue": "30", "currency": "USD"},
+                        "hourlyBudgetMax": {"rawValue": "45", "currency": "USD"},
+                        "client": {"location": {"country": "US"}, "totalFeedback": null, "totalSpent": null, "verificationStatus": null}
+                    }
+                }
+            ]
+        }
+    }
+}

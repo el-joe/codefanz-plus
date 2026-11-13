@@ -12,6 +12,7 @@ enum GuardrailFlagType: string
     case UnverifiedNumber = 'unverified_number';
     case Price = 'price';
     case UnknownLink = 'unknown_link';
+    case ExperienceClaim = 'experience_claim';
 
     public function label(): string
     {
@@ -20,6 +21,7 @@ enum GuardrailFlagType: string
             self::UnverifiedNumber => __('Number not found in your inputs'),
             self::Price => __('Price or amount'),
             self::UnknownLink => __('Link to an unknown domain'),
+            self::ExperienceClaim => __('Experience or portfolio claim'),
         };
     }
 
@@ -30,6 +32,7 @@ enum GuardrailFlagType: string
             self::UnverifiedNumber => __('Statistics and figures must come from a real source. Verify or remove it.'),
             self::Price => __('Prices are quoted per project. Remove amounts unless they are approved.'),
             self::UnknownLink => __('Only links to this website or approved domains are allowed.'),
+            self::ExperienceClaim => __('Only mention projects, clients and experience listed in your facts.'),
         };
     }
 }

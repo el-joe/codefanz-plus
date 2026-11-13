@@ -27,7 +27,8 @@ class ContentStudioController extends Controller
 {
     public function index(Request $request, AiGateway $gateway, AiBudget $budget, KillSwitches $killSwitches): View
     {
-        $templates = PromptTemplate::query()->active()->orderBy('purpose')->orderBy('name')->get();
+        // Radar proposal templates are used from a radar project page (they need the project), not from the studio.
+        $templates = PromptTemplate::query()->active()->where('purpose', '!=', PromptPurpose::RadarProposal)->orderBy('purpose')->orderBy('name')->get();
 
         return view('admin.ai-studio.index', [
             'templates' => $templates,

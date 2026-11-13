@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InboundAutomationController;
 use App\Http\Controllers\PaymentWebhookController;
 use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\SitemapController;
@@ -38,6 +39,12 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->where('gateway', '[a-z0-9_-]+')
                 ->middleware('throttle:webhooks')
                 ->name('webhooks.payments');
+
+            // n8n inbound endpoints: no session or CSRF; HMAC signature, timestamp and delivery id are checked first.
+            Route::post('webhooks/n8n/{key}', InboundAutomationController::class)
+                ->where('key', '[a-z0-9-]+')
+                ->middleware('throttle:webhooks')
+                ->name('webhooks.n8n');
 
             // Social images fetched by Meta (Facebook / Instagram) while publishing: signed, expiring, no session.
             Route::get('social-media/{media}', SocialMediaController::class)

@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AiUsageController;
 use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\AuthorProfileController;
+use App\Http\Controllers\Admin\AutomationController;
 use App\Http\Controllers\Admin\BrandProfileController;
 use App\Http\Controllers\Admin\CareerController;
 use App\Http\Controllers\Admin\ChangeRequestController;
@@ -48,6 +49,11 @@ use App\Http\Controllers\Admin\ProjectDocumentController;
 use App\Http\Controllers\Admin\ProjectMilestoneController;
 use App\Http\Controllers\Admin\ProjectNoteController;
 use App\Http\Controllers\Admin\PromptTemplateController;
+use App\Http\Controllers\Admin\RadarAnalyticsController;
+use App\Http\Controllers\Admin\RadarController;
+use App\Http\Controllers\Admin\RadarFilterController;
+use App\Http\Controllers\Admin\RadarProposalController;
+use App\Http\Controllers\Admin\RadarSettingsController;
 use App\Http\Controllers\Admin\RedirectController;
 use App\Http\Controllers\Admin\RefundController;
 use App\Http\Controllers\Admin\RoleController;
@@ -98,6 +104,46 @@ Route::middleware('two-factor')->group(function (): void {
         Route::delete('clients/{client}', [McpClientController::class, 'destroy'])->name('clients.destroy');
         Route::post('clients/{client}/token', [McpClientController::class, 'issueToken'])->middleware('throttle:10,1')->name('clients.token.store');
         Route::delete('clients/{client}/token', [McpClientController::class, 'revokeToken'])->name('clients.token.destroy');
+    });
+
+    // Freelance Radar (B09, M10): viewing needs radar.view; every change needs radar.manage.
+    Route::middleware('can:radar.view')->prefix('radar')->name('radar.')->group(function (): void {
+        Route::get('/', [RadarController::class, 'index'])->name('index');
+        Route::get('analytics', RadarAnalyticsController::class)->name('analytics');
+        Route::get('projects/{project}', [RadarController::class, 'show'])->name('projects.show');
+
+        Route::middleware('can:radar.manage')->group(function (): void {
+            Route::post('projects/{project}/status', [RadarController::class, 'status'])->name('projects.status');
+            Route::post('projects/{project}/ai-score', [RadarController::class, 'aiScore'])->middleware('throttle:20,1')->name('projects.ai-score');
+            Route::post('projects/{project}/lead', [RadarController::class, 'convert'])->name('projects.convert');
+            Route::post('projects/{project}/proposals', [RadarProposalController::class, 'store'])->middleware('throttle:20,1')->name('projects.proposals.store');
+            Route::put('projects/{project}/proposals/{proposal}', [RadarProposalController::class, 'update'])->scopeBindings()->name('projects.proposals.update');
+            Route::post('platforms/{platform}/fetch', [RadarController::class, 'fetch'])->middleware('throttle:10,1')->name('platforms.fetch');
+            Route::get('settings', [RadarSettingsController::class, 'edit'])->name('settings');
+            Route::put('settings', [RadarSettingsController::class, 'update'])->name('settings.update');
+            Route::put('platforms/{platform}', [RadarSettingsController::class, 'platform'])->name('platforms.update');
+            Route::post('telegram/test', [RadarSettingsController::class, 'telegramTest'])->middleware('throttle:6,1')->name('telegram.test');
+            Route::post('rescore', [RadarSettingsController::class, 'rescore'])->middleware('throttle:6,1')->name('rescore');
+            Route::get('filters/create', [RadarFilterController::class, 'create'])->name('filters.create');
+            Route::post('filters', [RadarFilterController::class, 'store'])->name('filters.store');
+            Route::get('filters/{filter}/edit', [RadarFilterController::class, 'edit'])->name('filters.edit');
+            Route::put('filters/{filter}', [RadarFilterController::class, 'update'])->name('filters.update');
+            Route::delete('filters/{filter}', [RadarFilterController::class, 'destroy'])->name('filters.destroy');
+        });
+    });
+
+    // n8n integrations (B10, M10): signed outbound workflows, inbound endpoints and the run log.
+    Route::middleware('can:automation.manage')->prefix('automation')->name('automation.')->group(function (): void {
+        Route::get('/', [AutomationController::class, 'index'])->name('index');
+        Route::get('workflows/create', [AutomationController::class, 'create'])->name('create');
+        Route::post('workflows', [AutomationController::class, 'store'])->name('store');
+        Route::get('workflows/{workflow}/edit', [AutomationController::class, 'edit'])->name('edit');
+        Route::put('workflows/{workflow}', [AutomationController::class, 'update'])->name('update');
+        Route::delete('workflows/{workflow}', [AutomationController::class, 'destroy'])->name('destroy');
+        Route::post('workflows/{workflow}/toggle', [AutomationController::class, 'toggle'])->name('toggle');
+        Route::post('workflows/{workflow}/secret', [AutomationController::class, 'rotate'])->middleware('throttle:10,1')->name('rotate');
+        Route::post('workflows/{workflow}/test', [AutomationController::class, 'test'])->middleware('throttle:10,1')->name('test');
+        Route::post('runs/{run}/retry', [AutomationController::class, 'retry'])->middleware('throttle:30,1')->name('runs.retry');
     });
 
     Route::middleware('can:ai.use')->prefix('ai-studio')->name('ai-studio.')->group(function (): void {
