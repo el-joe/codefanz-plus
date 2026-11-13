@@ -1,5 +1,6 @@
 <?php
 
+use App\Services\Operations\SchedulerHeartbeat;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -7,6 +8,9 @@ use Illuminate\Support\Facades\Schedule;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+// Proof that cron runs `schedule:run`: read by /health and app:check-production (M12).
+Schedule::call(fn () => app(SchedulerHeartbeat::class)->beat())->everyMinute()->name('scheduler-heartbeat');
 
 // Assistant conversations (and any other Prunable model) past their retention period.
 Schedule::command('model:prune')->daily();

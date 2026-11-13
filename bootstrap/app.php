@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HealthController;
 use App\Http\Controllers\InboundAutomationController;
 use App\Http\Controllers\PaymentWebhookController;
 use App\Http\Controllers\RobotsController;
@@ -11,6 +12,7 @@ use App\Http\Middleware\AuthorizeMcpCall;
 use App\Http\Middleware\EnsurePortalAccess;
 use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\HandleRedirects;
+use App\Http\Middleware\RedirectTrailingSlash;
 use App\Http\Middleware\RequireTwoFactor;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\SetLocaleFromPreference;
@@ -31,6 +33,9 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function (): void {
+            // Uptime monitors and the deploy script (M12): JSON status, details for allow-listed IPs / token only.
+            Route::get('health', HealthController::class)->name('health');
+
             // Crawler files: no session or cookies. robots.txt replaces the old static file.
             Route::get('robots.txt', RobotsController::class)->name('robots');
             Route::get('sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
@@ -69,7 +74,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(AssignRequestId::class);
         // Managed redirects answer requests that would otherwise 404; staging responses carry X-Robots-Tag.
         // SecurityHeaders: CSP (nonce shared with Vite), HSTS on https, nosniff, frame and referrer policies (M11).
-        $middleware->append([HandleRedirects::class, AddRobotsHeader::class, SecurityHeaders::class]);
+        // RedirectTrailingSlash: `/en/` → 301 `/en`, matching the Apache and Nginx rules (M12); runs after TrustProxies.
+        $middleware->append([RedirectTrailingSlash::class, HandleRedirects::class, AddRobotsHeader::class, SecurityHeaders::class]);
         // The consent cookie (written by the banner script) and GA4's own _ga cookie are read as plain text.
         // Rate limits for Fortify's credential routes that Fortify itself does not throttle (M11).
         $middleware->web(append: [ThrottleSensitiveAuthRoutes::class]);

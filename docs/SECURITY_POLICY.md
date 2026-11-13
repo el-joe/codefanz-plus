@@ -50,7 +50,14 @@ Baseline: OWASP ASVS L2 / OWASP Top 10.
 - Consent records, data export & deletion requests workflow; cookie consent for non-essential analytics.
 
 ## 10. Operations
-- Daily encrypted DB backups + off-site copy; monthly restore test.
+- Nightly encrypted backups (DB dump, private storage, `.env`; AES-256 + PBKDF2 with a root-only key file or GnuPG
+  public key), 7 daily / 4 weekly / 6 monthly, off-site copy, monthly automated restore drill (DEPLOYMENT_GUIDE §8).
+- `/health` never returns hosts, credentials or exception messages; per-check details only for allow-listed IPs or
+  `X-Health-Token` (constant-time compare). `app:check-production` prints setting names, never values.
+- First Super Admin via `php artisan app:create-super-admin`: password from a hidden prompt only (no option/env, so
+  nothing in shell history), breached-password policy applied, 2FA enforced at first sign-in, audited.
+- Nginx adds HSTS, denies dotfiles and everything under `/storage` except media variants, and rate-limits credential
+  endpoints, webhooks and the MCP API ahead of the app's own limits; PHP-FPM disables shell functions.
 - Dependency audit (`composer audit`, `npm audit`) in CI.
 - Vulnerability reports: security@codefanz.com (to be confirmed by owner).
 

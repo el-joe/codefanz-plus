@@ -507,6 +507,37 @@ return [
         // Password reset, password confirmation, password change and 2FA confirmation: per IP and route.
         'auth_attempts_per_minute' => 5,
         'allow_private_outbound' => (bool) env('ALLOW_PRIVATE_OUTBOUND', false),
+        // Reverse proxies / CDN edges whose X-Forwarded-* headers are trusted (comma-separated IPs or CIDRs, or `*`
+        // when the app is reachable only through the proxy). Empty = trust none (direct Nginx → PHP-FPM).
+        'trusted_proxies' => array_values(array_filter(array_map('trim', explode(',', (string) env('TRUSTED_PROXIES', ''))))),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Operations (M12): health endpoint, scheduler heartbeat, production checks
+    |--------------------------------------------------------------------------
+    |
+    | GET /health answers {"status":"ok"|"fail"} (200 / 503) to anyone; the
+    | per-check details are only shown to an allow-listed IP (CIDR allowed) or
+    | a caller sending `X-Health-Token`. Nothing secret is ever included.
+    |
+    */
+
+    'operations' => [
+        'health' => [
+            'token' => env('HEALTH_TOKEN'),
+            'allowed_ips' => array_values(array_filter(array_map('trim', explode(',', (string) env('HEALTH_ALLOWED_IPS', '127.0.0.1,::1'))))),
+            // Oldest waiting job older than this marks the queue unhealthy (workers down or saturated).
+            'max_queue_age_seconds' => (int) env('HEALTH_MAX_QUEUE_AGE', 600),
+            'min_free_disk_mb' => (int) env('HEALTH_MIN_FREE_DISK_MB', 1024),
+        ],
+        // The scheduler writes this cache key every minute; older than max_age = cron is not running.
+        'scheduler_heartbeat' => [
+            'cache_key' => 'operations:scheduler-heartbeat',
+            'max_age_seconds' => 300,
+        ],
+        // Queues the Supervisor workers listen on (deploy/production/supervisor/codefanz-workers.conf).
+        'queues' => ['default', 'media', 'social'],
     ],
 
     // Local-only sign-in accounts for manual QA (Database\Seeders\LocalDevAccountsSeeder, refuses outside APP_ENV=local).

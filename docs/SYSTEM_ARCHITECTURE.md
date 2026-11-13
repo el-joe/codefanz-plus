@@ -143,7 +143,10 @@ options. Credentials live in `integration_credentials` encrypted with Laravel's 
 
 ## 8. Async & scheduling
 
-- Queues (Redis): `default`, `payments` (high priority), `media`, `ai`, `social`, `radar`, `notifications`.
+- Queues (database driver by default, Redis optional — same code): `default` (n8n deliveries, GA4 events, radar
+  scoring/alerts, SEO audit crawl), `media` (`OptimizeImage`), `social` (publish, token refresh, metrics). One Supervisor
+  program per queue (`deploy/production/supervisor/codefanz-workers.conf`). Mail notifications are sent synchronously.
+- Scheduler heartbeat: a closure writes `operations:scheduler-heartbeat` to the cache every minute (M12).
 - Scheduler: publish scheduled posts/articles (only if approved), expire payment links, radar collection,
   daily digest, weekly SEO report, broken-link crawl, token refresh, pruning.
 - Idempotency: `idempotency_keys` + unique constraints on `(gateway, event_id)` webhooks, `(platform, external_id)`
@@ -165,4 +168,6 @@ rate limits, kill switches and the approval engine. Draft/write tools only creat
 ## 11. Observability
 
 Structured logs per channel (`payments`, `webhooks`, `ai`, `mcp`, `radar`), `audit_logs` table for business
-events, `/health` endpoint (DB, Redis, queue lag, disk), failed-job alerts via Telegram/mail.
+events, `/health` endpoint (DB, cache, oldest waiting job per queue, scheduler heartbeat, free disk; details only for
+allow-listed IPs / `X-Health-Token`), `php artisan app:check-production`, daily log files, critical errors to Slack via
+`LOG_STACK=daily,slack` (M12, DEPLOYMENT_GUIDE §9).

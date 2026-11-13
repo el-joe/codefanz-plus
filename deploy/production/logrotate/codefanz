@@ -1,0 +1,35 @@
+# CodeFanz — logrotate. Install as /etc/logrotate.d/codefanz. Rendered by render.sh ({{APP_PATH}}, {{APP_USER}}).
+# The application log uses Laravel's `daily` channel (LOG_STACK=daily, LOG_DAILY_DAYS=14), which rotates and prunes
+# laravel-YYYY-MM-DD.log itself — logrotate must NOT touch those files. Supervisor rotates the worker logs
+# (stdout_logfile_maxbytes / _backups). This file covers Nginx, PHP-FPM and backup logs.
+
+/var/log/nginx/codefanz.*.log {
+    daily
+    rotate 14
+    missingok
+    notifempty
+    compress
+    delaycompress
+    sharedscripts
+    postrotate
+        [ -s /run/nginx.pid ] && kill -USR1 "$(cat /run/nginx.pid)"
+    endscript
+}
+
+/var/log/php8.3-fpm-codefanz.*.log {
+    weekly
+    rotate 8
+    missingok
+    notifempty
+    compress
+    delaycompress
+    copytruncate
+}
+
+/var/log/codefanz-backup.log {
+    monthly
+    rotate 12
+    missingok
+    notifempty
+    compress
+}

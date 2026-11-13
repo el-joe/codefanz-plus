@@ -1,0 +1,17 @@
+# CodeFanz deploy settings, read by deploy.sh. Install as /etc/codefanz/deploy.conf (root:{{APP_USER}} 0640).
+# No secrets here: database, mail and API credentials live in {{APP_PATH}}/shared/.env and Admin → Settings.
+APP_PATH={{APP_PATH}}
+DOMAIN={{DOMAIN}}
+REPO_URL=git@github.com:{{GIT_REPOSITORY}}.git   # read-only deploy key of APP_USER
+PHP_BIN=php
+COMPOSER_BIN=composer
+NPM_BIN=npm
+PHP_FPM_SERVICE=php8.3-fpm
+KEEP_RELEASES=5
+# 1 = also build mcp-server/ (only when the optional codefanz-mcp-http Supervisor program is used)
+MCP_BUILD=0
+# File (root:{{APP_USER}} 0640) holding HEALTH_TOKEN (same value as in .env) so the health check sees details; optional.
+HEALTH_TOKEN_FILE=/etc/codefanz/health-token
+HEALTH_ATTEMPTS=9
+# Pre-migration backup (run through sudo; add a NOPASSWD rule for exactly this path).
+BACKUP_SCRIPT={{APP_PATH}}/current/deploy/production/backup/backup.sh

@@ -1,0 +1,28 @@
+# CodeFanz backup settings. Install as /etc/codefanz/backup.conf (root:root 0600). No passwords in this file.
+APP_PATH={{APP_PATH}}
+DB_NAME={{DB_NAME}}
+# STORAGE_DIR / ENV_FILE default to $APP_PATH/shared/storage and $APP_PATH/shared/.env
+BACKUP_ROOT=/var/backups/codefanz
+
+# [client] user=codefanz_backup / password=... (root 0600). Grants for that MySQL user:
+#   GRANT SELECT, SHOW VIEW, TRIGGER, LOCK TABLES ON `{{DB_NAME}}`.* TO 'codefanz_backup'@'localhost';
+MYSQL_DEFAULTS_FILE=/etc/codefanz/backup.my.cnf
+# Restores and drills create/drop databases; empty = root over the local socket (Ubuntu auth_socket).
+MYSQL_ADMIN_DEFAULTS_FILE=
+
+# Symmetric key (openssl rand -base64 48 > /etc/codefanz/backup.key && chmod 400 /etc/codefanz/backup.key).
+# Keep a copy OFF the server (password manager): without it no backup can be restored.
+BACKUP_KEY_FILE=/etc/codefanz/backup.key
+# Or public-key encryption: import only the PUBLIC key on the server; restores need the private key elsewhere.
+BACKUP_GPG_RECIPIENT=
+
+RETAIN_DAILY=7
+RETAIN_WEEKLY=4
+RETAIN_MONTHLY=6
+RETAIN_ADHOC=5
+INCLUDE_PUBLIC_MEDIA=1
+
+# Off-site copy after each run; $BACKUP_DIR = the new backup, $BACKUP_ROOT = all tiers. Examples:
+#   BACKUP_OFFSITE_CMD='rclone sync "$BACKUP_ROOT" offsite:codefanz-backups --transfers 2'
+#   BACKUP_OFFSITE_CMD='rsync -a --delete "$BACKUP_ROOT"/ backup@{{OFFSITE_HOST}}:/srv/backups/codefanz/'
+BACKUP_OFFSITE_CMD=

@@ -1,0 +1,13 @@
+# CodeFanz — cron. Install as /etc/cron.d/codefanz (root:root 0644; the file must end with a newline).
+# Rendered by deploy/production/render.sh ({{APP_PATH}}, {{APP_USER}}).
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Laravel scheduler: every minute. It also writes the heartbeat read by /health and app:check-production.
+* * * * * {{APP_USER}} cd {{APP_PATH}}/current && php artisan schedule:run >> /dev/null 2>&1
+
+# Nightly encrypted backup (database, private storage, .env) at 02:15 server time, as root (reads the root-only key).
+15 2 * * * root {{APP_PATH}}/current/deploy/production/backup/backup.sh >> /var/log/codefanz-backup.log 2>&1
+
+# Monthly restore drill on the 1st at 04:30: restores the newest backup into a throwaway database and compares rows.
+30 4 1 * * root {{APP_PATH}}/current/deploy/production/backup/restore-drill.sh >> /var/log/codefanz-backup.log 2>&1
