@@ -13,12 +13,15 @@ export function init() {
             return;
         }
 
+        // A [data-tab-all] tab ("All") controls a wrapper around the other panels and shows every one of them.
+        const showsAll = (position) => tabs[position].hasAttribute('data-tab-all');
+
         const select = (index, focus = false) => {
             tabs.forEach((tab, position) => {
                 const active = position === index;
                 tab.setAttribute('aria-selected', active ? 'true' : 'false');
                 tab.tabIndex = active ? 0 : -1;
-                panels[position].hidden = !active;
+                panels[position].hidden = showsAll(position) ? false : !(active || showsAll(index));
             });
 
             if (focus) {
@@ -31,7 +34,9 @@ export function init() {
         tablist.hidden = false;
         panels.forEach((panel) => {
             panel.classList.remove('[&+&]:mt-10', '[&+&]:border-t', '[&+&]:pt-10');
-            panel.querySelector('[data-panel-heading]')?.classList.add('sr-only');
+            if (!tabs.some((tab, position) => showsAll(position))) {
+                panel.querySelector('[data-panel-heading]')?.classList.add('sr-only');
+            }
             panel.tabIndex = 0;
         });
 

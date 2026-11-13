@@ -139,3 +139,25 @@ test('catalog routes win over the cms page catch-all', function () {
     $this->get('/en/technologies')->assertSuccessful();
     $this->get('/en/industries')->assertSuccessful();
 });
+
+test('the technologies page offers an "All" tab once there are several categories', function () {
+    foreach (['Languages', 'Frameworks'] as $name) {
+        $category = TechnologyCategory::factory()->withTranslation('en', ['name' => $name])->create();
+        Technology::factory()->expertise()->withTranslation('en', ['name' => $name.' Tech'])->create(['technology_category_id' => $category->id]);
+    }
+
+    $this->get('/en/technologies')
+        ->assertSuccessful()
+        ->assertSee('data-tab-all', false)
+        ->assertSeeInOrder(['Languages Tech', 'Frameworks Tech']);
+});
+
+test('the arabic service detail renders the quote card in arabic and rtl', function () {
+    Service::factory()->withTranslation('ar', ['title' => 'تطوير المواقع', 'slug' => 'تطوير-المواقع'])->create();
+
+    $this->get('/ar/services/'.rawurlencode('تطوير-المواقع'))
+        ->assertSuccessful()
+        ->assertSee('dir="rtl"', false)
+        ->assertSee('احصل على تقدير مجاني')
+        ->assertSee('تقدير مبدئي مجاني · دون أي دفع');
+});

@@ -1,3 +1,13 @@
+@php
+    // Figma "Chip/Tech" styles per level, shown in the legend with the level name in place of a sample technology.
+    $legendStyles = [
+        'verified_in_projects' => ['chip' => 'border-line-brand', 'dot' => 'bg-accent'],
+        'expertise' => ['chip' => 'border-line', 'dot' => 'bg-brand'],
+        'supported' => ['chip' => 'border-line', 'dot' => 'bg-ink-300'],
+    ];
+    $categoryName = fn ($category): string => $category->translation()?->name ?? $category->key;
+@endphp
+
 <x-layouts.public
     :title="__('Technologies & programming languages')"
     :description="__('We choose technology for your goals — not trends. Here is what we work with, and where we have proven delivery experience.')"
@@ -6,46 +16,51 @@
                       :lead="__('We choose technology for your goals — not trends. Here is what we work with, and where we have proven delivery experience.')"
                       :crumbs="[__('Technologies') => null]" />
 
-    <section class="mx-auto flex max-w-7xl flex-col gap-10 px-5 py-14 lg:px-20 lg:py-20">
-        <div class="flex flex-col gap-3 rounded-xl bg-subtle p-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6" role="note" aria-label="{{ __('Legend') }}">
+    <x-site.section inner="flex flex-col gap-10">
+        <ul class="flex flex-col gap-4 rounded-lg bg-subtle px-5 py-4 lg:flex-row lg:flex-wrap lg:items-center lg:gap-x-6" aria-label="{{ __('Legend') }}">
             @foreach ($levels as $level)
-                @php($dot = ['verified_in_projects' => 'bg-accent', 'expertise' => 'bg-brand', 'supported' => 'bg-fg-tertiary'][$level->value])
-                <p class="flex items-center gap-2 text-sm text-fg-secondary">
-                    <span class="inline-flex items-center gap-2 rounded-full border bg-surface px-3 py-1 text-xs font-semibold text-fg {{ $level === \App\Enums\TechnologyProficiency::VerifiedInProjects ? 'border-line-brand' : 'border-line' }}">
-                        <span class="size-2 rounded-full {{ $dot }}" aria-hidden="true"></span>{{ $level->label() }}
+                <li class="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                    <span class="inline-flex items-center gap-2 rounded-full border bg-surface px-4 py-2 type-label-md text-fg {{ $legendStyles[$level->value]['chip'] }}">
+                        <span class="size-2 rounded-full {{ $legendStyles[$level->value]['dot'] }}" aria-hidden="true"></span>{{ $level->label() }}
                     </span>
-                    {{ $level->description() }}
-                </p>
+                    <span class="type-body-sm text-fg-secondary">{{ $level->description() }}</span>
+                </li>
             @endforeach
-        </div>
+        </ul>
 
         @if ($categories->isEmpty())
             <x-ui.empty-state :title="__('Our technology list is being updated')" />
         @else
-            @if ($categories->count() > 1)
-                <nav aria-label="{{ __('Technology categories') }}" class="-mt-4 overflow-x-auto">
-                    <ul class="flex gap-5 border-b border-line text-sm font-semibold text-fg-secondary">
+            {{-- Underline tabs (vanilla tabs module): "All" shows every category; without JavaScript every group stays visible. --}}
+            <div @if ($categories->count() > 1) data-tabs @endif class="flex flex-col gap-10">
+                @if ($categories->count() > 1)
+                    <div role="tablist" data-tablist hidden aria-label="{{ __('Technology categories') }}" class="flex max-w-full gap-6 self-start overflow-x-auto border-b border-line">
+                        <button type="button" role="tab" data-tab data-tab-all id="tech-tab-all" aria-controls="tech-panel-all" aria-selected="true"
+                                class="-mb-px border-b-2 border-transparent pt-2 pb-3 type-label-md whitespace-nowrap text-fg-secondary hover:text-fg aria-selected:border-line-brand aria-selected:text-fg-brand">{{ __('All') }}</button>
                         @foreach ($categories as $category)
-                            <li><a href="#category-{{ $category->key }}" class="inline-block whitespace-nowrap border-b-2 border-transparent py-2 hover:border-line-brand hover:text-fg-brand">{{ $category->translation()?->name ?? $category->key }}</a></li>
+                            <button type="button" role="tab" data-tab id="tech-tab-{{ $category->key }}" aria-controls="category-{{ $category->key }}" aria-selected="false"
+                                    class="-mb-px border-b-2 border-transparent pt-2 pb-3 type-label-md whitespace-nowrap text-fg-secondary hover:text-fg aria-selected:border-line-brand aria-selected:text-fg-brand">{{ $categoryName($category) }}</button>
                         @endforeach
-                    </ul>
-                </nav>
-            @endif
+                    </div>
+                @endif
 
-            @foreach ($categories as $category)
-                <section id="category-{{ $category->key }}" class="flex scroll-mt-6 flex-col gap-4" aria-labelledby="category-{{ $category->key }}-title">
-                    <h2 id="category-{{ $category->key }}-title" class="text-xl font-bold text-fg">{{ $category->translation()?->name ?? $category->key }}</h2>
-                    <ul class="flex flex-wrap gap-2">
-                        @foreach ($category->technologies as $technology)
-                            <x-site.tech-chip :technology="$technology" />
-                        @endforeach
-                    </ul>
-                </section>
-            @endforeach
+                <div id="tech-panel-all" @if ($categories->count() > 1) role="tabpanel" aria-labelledby="tech-tab-all" @endif class="flex flex-col gap-10 rounded-lg focus-visible:outline-offset-8">
+                    @foreach ($categories as $category)
+                        <section id="category-{{ $category->key }}" @if ($categories->count() > 1) role="tabpanel" @endif class="flex scroll-mt-24 flex-col gap-4" aria-labelledby="category-{{ $category->key }}-title">
+                            <h2 id="category-{{ $category->key }}-title" data-panel-heading class="type-h4 text-fg">{{ $categoryName($category) }}</h2>
+                            <ul class="flex flex-wrap gap-2.5">
+                                @foreach ($category->technologies as $technology)
+                                    <x-site.tech-chip :technology="$technology" />
+                                @endforeach
+                            </ul>
+                        </section>
+                    @endforeach
+                </div>
+            </div>
 
-            <p class="text-xs text-fg-tertiary">{{ __('“Verified” is calculated automatically from published portfolio projects. Brand names belong to their owners.') }}</p>
+            <p class="type-body-xs text-fg-tertiary">{{ __('“Verified” is calculated automatically from published portfolio projects. Brand names belong to their owners.') }}</p>
         @endif
-    </section>
+    </x-site.section>
 
     <x-site.cta-band />
 </x-layouts.public>

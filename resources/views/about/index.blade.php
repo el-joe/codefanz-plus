@@ -10,8 +10,10 @@
             'copy' => $block['copy'],
             'headingId' => 'section-'.$block['section']->type->value,
             'statistics' => $statistics,
+            // Bands alternate surface / canvas by position, like the Figma screen.
+            'tone' => $loop->odd ? 'surface' : 'canvas',
         ])
     @endforeach
 
-    <x-site.cta-band />
+    <x-site.cta-band :tone="$blocks->count() % 2 === 0 ? 'surface' : 'canvas'" />
 </x-layouts.public>

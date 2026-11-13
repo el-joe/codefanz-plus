@@ -201,6 +201,11 @@ Blade components mirroring the Figma library live in `resources/views/components
 | `x-site.page-hero`, `x-site.cta-band` (`tone`; WhatsApp button when configured), `x-site.consent-banner` | Inner-page header, closing CTA card (rendered in `.dark` tokens), cookie banner |
 | `x-site.service-card`, `x-site.product-card`, `x-site.industry-card`, `x-site.testimonial-card`, `x-site.tech-chip`, `x-site.faq-item`, `portfolio/_card`, `blog/_card` | Figma Card/* components; whole-card links via `after:inset-0`; project/article cards without a cover show the designed gradient + `x-site.window-mock` |
 | `x-language-switch globe` | Navbar style: globe + native name (icon-only below `sm`) |
+| `type-h3` | EN/Heading/H3 28/36 (AR 27/40): in-page H2s such as "What you get" on the service detail |
+| `x-site.tile-card` (`icon`, `title`, `text`, `href`) | Figma Card/Industry layout as a compact tile (specialist services, About team disciplines); `x-site.industry-card` wraps it |
+| `x-site.faq-item` `question` + slot | Plain-text answers (service FAQs) besides the FaqTranslation mode |
+| Tabs `data-tab-all` | An "All" tab whose panel wraps the others shows every panel (Technologies catalogue underline tabs) |
+| Restyle slice 2 pages | Services, Service Detail (hero actions, What you get, quote card, related work, FAQ), Technologies, Industries, About (story visual with up to two published statistics) |
 | Dark bands | Add the `dark` class to a block (footer, stats, CTA card, delivery promise) so its tokens switch to the dark set |
 
 ## Next
