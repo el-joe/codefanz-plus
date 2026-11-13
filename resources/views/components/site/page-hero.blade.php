@@ -1,18 +1,18 @@
-{{-- Public page header: breadcrumb, eyebrow, title and lead. $crumbs = [label => url|null] after "Home". --}}
+{{-- Public page header: breadcrumb, eyebrow, title and lead on the canvas band with the brand glow. $crumbs = [label => url|null] after "Home". --}}
 @props(['eyebrow' => null, 'title', 'lead' => null, 'crumbs' => []])
 
-<section class="bg-[radial-gradient(ellipse_at_bottom_left,rgb(110_86_255/0.12),transparent_60%)] bg-subtle">
-    <div class="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-12 lg:px-20 lg:py-16">
+<section class="border-b border-line-subtle bg-canvas bg-[radial-gradient(50rem_17rem_at_5rem_100%,rgb(110_86_255/0.14),transparent)] rtl:bg-[radial-gradient(50rem_17rem_at_calc(100%-5rem)_100%,rgb(110_86_255/0.14),transparent)]">
+    <div class="container-page flex flex-col gap-5 py-12 lg:py-20">
         <nav aria-label="{{ __('Breadcrumb') }}">
-            <ol class="flex flex-wrap items-center gap-2 text-sm text-fg-secondary">
-                <li><a href="{{ route('home') }}" class="hover:text-fg-brand">{{ __('Home') }}</a></li>
+            <ol class="flex flex-wrap items-center gap-2 type-body-sm text-fg-tertiary">
+                <li><a href="{{ route('home') }}" class="rounded-sm hover:text-fg-brand">{{ __('Home') }}</a></li>
                 @foreach ($crumbs as $label => $url)
                     <li class="flex items-center gap-2">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="rtl:-scale-x-100"><path d="m9 6 6 6-6 6"/></svg>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="text-icon-secondary rtl:-scale-x-100"><path d="m9 6 6 6-6 6"/></svg>
                         @if ($url)
-                            <a href="{{ $url }}" class="hover:text-fg-brand">{{ $label }}</a>
+                            <a href="{{ $url }}" class="rounded-sm hover:text-fg-brand">{{ $label }}</a>
                         @else
-                            <span aria-current="page" class="text-fg">{{ $label }}</span>
+                            <span aria-current="page" class="type-label-md text-fg">{{ $label }}</span>
                         @endif
                     </li>
                 @endforeach
@@ -20,11 +20,11 @@
         </nav>
         {{ $before ?? '' }}
         @if ($eyebrow)
-            <p class="text-xs font-bold uppercase tracking-wider text-fg-brand">{{ $eyebrow }}</p>
+            <p class="type-overline text-fg-brand">{{ $eyebrow }}</p>
         @endif
-        <h1 class="max-w-3xl text-4xl font-extrabold leading-tight tracking-tight text-fg lg:text-5xl">{{ $title }}</h1>
+        <h1 class="max-w-4xl type-h1 text-balance text-fg lg:type-display-lg">{{ $title }}</h1>
         @if ($lead)
-            <p class="max-w-2xl text-lg text-fg-secondary">{{ $lead }}</p>
+            <p class="max-w-3xl type-body-lg text-fg-secondary">{{ $lead }}</p>
         @endif
         {{ $slot }}
     </div>

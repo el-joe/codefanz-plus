@@ -1,9 +1,11 @@
-<section class="mx-auto flex max-w-7xl flex-col gap-10 px-5 py-16 lg:px-20 lg:py-24" aria-labelledby="{{ $headingId }}" data-section="latest_articles">
-    <x-site.section-heading :id="$headingId" :eyebrow="$copy['eyebrow']" :heading="$copy['heading']" :subheading="$copy['subheading']" />
-    <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+<x-site.section :tone="$tone" aria-labelledby="{{ $headingId }}" data-section="latest_articles">
+    <div class="flex flex-col items-start gap-5 md:flex-row md:items-end">
+        <x-site.section-heading :id="$headingId" align="start" :eyebrow="$copy['eyebrow']" :heading="$copy['heading']" :subheading="$copy['subheading']" />
+        <x-ui.button :href="route('blog.index')" variant="secondary" class="shrink-0" arrow>{{ $copy['cta_label'] ?: __('Read the blog') }}</x-ui.button>
+    </div>
+    <ul class="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
         @foreach ($data as $post)
             @include('blog._card', ['post' => $post])
         @endforeach
     </ul>
-    <div class="flex justify-center"><a href="{{ route('blog.index') }}" class="text-sm font-semibold text-fg-brand hover:underline">{{ $copy['cta_label'] ?: __('Read the blog') }}</a></div>
-</section>
+</x-site.section>

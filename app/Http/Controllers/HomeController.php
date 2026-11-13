@@ -69,7 +69,7 @@ class HomeController extends Controller
                 ->orderByRaw('tier = ? desc', [ServiceTier::Core->value])
                 ->ordered()->limit($limit)->get(),
             PageSectionType::Technologies => Technology::query()
-                ->where('is_visible', true)->translatedIn()->withProficiency()->with('translations')->ordered()->get()
+                ->where('is_visible', true)->translatedIn()->withProficiency()->with(['translations', 'category.translations'])->ordered()->get()
                 ->reject(fn (Technology $technology): bool => $technology->proficiency() === TechnologyProficiency::Supported)
                 ->sortBy(fn (Technology $technology): int => $technology->proficiency() === TechnologyProficiency::VerifiedInProjects ? 0 : 1)
                 ->take($limit)->values(),

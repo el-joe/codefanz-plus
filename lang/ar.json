@@ -3439,5 +3439,13 @@
     "Telegram chat ID (user, group or channel)": "معرّف محادثة تيليجرام (مستخدم أو مجموعة أو قناة)",
     "Sent": "مُرسل",
     "Sort": "الترتيب",
-    "Enable, disable and inspect each signed n8n workflow (deliveries, retries and failed runs) on its own page.": "فعّل كل سير عمل موقّع في n8n أو عطّله وافحصه (عمليات الإرسال وإعادة المحاولة والتشغيلات الفاشلة) في صفحته الخاصة."
+    "Enable, disable and inspect each signed n8n workflow (deliveries, retries and failed runs) on its own page.": "فعّل كل سير عمل موقّع في n8n أو عطّله وافحصه (عمليات الإرسال وإعادة المحاولة والتشغيلات الفاشلة) في صفحته الخاصة.",
+    "Chat on WhatsApp": "تحدث معنا عبر واتساب",
+    "Great! Which platforms do you need — web, mobile, or both?": "رائع! ما المنصات التي تحتاجها — الويب أم الجوال أم كلاهما؟",
+    "New leads": "عملاء محتملون جدد",
+    "Production expertise": "خبرة في بيئات الإنتاج",
+    "Revenue collected": "الإيرادات المحصّلة",
+    "Used in delivered projects": "مستخدمة في مشاريع مُسلّمة",
+    "Verified gateway payments, net of refunds": "مدفوعات موثقة عبر البوابة بعد خصم المبالغ المستردة",
+    "vs last month": "مقارنة بالشهر الماضي"
 }

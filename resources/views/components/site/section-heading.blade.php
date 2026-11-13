@@ -1,12 +1,12 @@
-{{-- Section header: eyebrow, heading and optional subheading. --}}
-@props(['eyebrow' => null, 'heading', 'subheading' => null, 'id' => null, 'align' => 'center'])
+{{-- Figma "Section Header": overline, H2 and lead. align = center (720px column) | start (fills its row). --}}
+@props(['eyebrow' => null, 'heading', 'subheading' => null, 'id' => null, 'align' => 'center', 'headingTag' => 'h2'])
 
-<div @class(['flex flex-col gap-3', 'items-center text-center' => $align === 'center'])>
+<div {{ $attributes->class(['flex flex-col gap-3', 'mx-auto max-w-[45rem] items-center text-center' => $align === 'center', 'min-w-0 flex-1 items-start text-start' => $align !== 'center']) }}>
     @if ($eyebrow)
-        <p class="text-xs font-bold uppercase tracking-wider text-fg-brand">{{ $eyebrow }}</p>
+        <p class="type-overline text-fg-brand">{{ $eyebrow }}</p>
     @endif
-    <h2 @if ($id) id="{{ $id }}" @endif class="max-w-3xl text-3xl font-bold tracking-tight text-fg lg:text-4xl">{{ $heading }}</h2>
+    <{{ $headingTag }} @if ($id) id="{{ $id }}" @endif class="type-h2 text-fg">{{ $heading }}</{{ $headingTag }}>
     @if ($subheading)
-        <p class="max-w-2xl text-lg text-fg-secondary">{{ $subheading }}</p>
+        <p class="type-body-lg text-fg-secondary">{{ $subheading }}</p>
     @endif
 </div>

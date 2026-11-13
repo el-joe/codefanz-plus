@@ -1,6 +1,7 @@
 /**
  * Mobile navigation disclosure: [data-nav-toggle] (aria-controls → panel id) shows/hides [data-nav-panel].
  * Without JavaScript the toggle stays hidden and the panel is always visible, so every link stays reachable.
+ * Once enhanced the panel gets [data-enhanced] and is styled as a full-height drawer under the sticky header.
  */
 export function init() {
     const toggle = document.querySelector('[data-nav-toggle]');
@@ -21,6 +22,7 @@ export function init() {
     };
 
     toggle.hidden = false;
+    panel.dataset.enhanced = '';
     setOpen(false);
 
     toggle.addEventListener('click', () => setOpen(panel.hidden));

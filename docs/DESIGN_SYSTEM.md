@@ -186,5 +186,22 @@ Blade components mirroring the Figma library live in `resources/views/components
 | `.prose-article` (app.css) | Article body styles shared by the public article and the A11 TipTap editor: H2–H4, lists, quote, `aside[data-callout=info\|tip\|warning]`, LTR code blocks, tables, privacy video embeds |
 | `x-media.picture` | `<picture>`: AVIF `srcset`, then WebP, `<img>` fallback with width/height, lazy by default (`eager` for hero images), localized alt |
 
+### Public website foundation (Figma restyle, slice 1)
+
+| Piece | Notes |
+|---|---|
+| `type-display`, `type-display-lg`, `type-h1`, `type-h2`, `type-h4`, `type-h5`, `type-body-{lg,md,sm,xs}`, `type-label-{lg,md,sm}`, `type-overline` (app.css `@utility`) | Figma EN/* text styles; under `dir="rtl"` each switches to the AR/* metrics (Cairo, taller line height, no tracking). Combine with responsive variants (`type-h1 md:type-display`) |
+| `container-page`, `section-y` | 1440 frame → 1280px content, 80px gutters (20px below `lg`); 96px band padding (56px on mobile) |
+| `illustration-stage` | Inside an `@container`, 1em = 16 design px at 560px wide — scalable HTML/CSS illustrations (hero product visual) |
+| Tokens | `text-icon-{primary,secondary,brand,success}` (light/dark), primitives `warning-500`, `danger-500`, `success-50/600` for illustrative gradients |
+| `x-ui.button` | Figma Button: `size` sm 32 / md 40 / lg 48, variants primary / secondary / ghost / danger, `arrow` appends the RTL-mirrored trailing arrow |
+| `x-ui.arrow`, `x-ui.check-circle`, `x-ui.logo` (`size`, wordmark scales, "fanz" turns accent on dark) | Icon helpers; 1.75 stroke |
+| `x-site.section` (`tone` canvas / surface / subtle / none, `inner` classes) | Page band + container; the homepage alternates canvas / surface by position |
+| `x-site.section-heading` (`align` center / start) | Figma Section Header (overline, H2, lead) |
+| `x-site.page-hero`, `x-site.cta-band` (`tone`; WhatsApp button when configured), `x-site.consent-banner` | Inner-page header, closing CTA card (rendered in `.dark` tokens), cookie banner |
+| `x-site.service-card`, `x-site.product-card`, `x-site.industry-card`, `x-site.testimonial-card`, `x-site.tech-chip`, `x-site.faq-item`, `portfolio/_card`, `blog/_card` | Figma Card/* components; whole-card links via `after:inset-0`; project/article cards without a cover show the designed gradient + `x-site.window-mock` |
+| `x-language-switch globe` | Navbar style: globe + native name (icon-only below `sm`) |
+| Dark bands | Add the `dark` class to a block (footer, stats, CTA card, delivery promise) so its tokens switch to the dark set |
+
 ## Next
 Milestone 4: corporate website (services, portfolio, technologies, contact/lead form).

@@ -12,6 +12,7 @@ import { init as initDialogs } from './modules/dialog';
 import { init as initCopy } from './modules/copy';
 import { init as initPrint } from './modules/print';
 import { init as initConsent } from './modules/consent';
+import { init as initTabs } from './modules/tabs';
 
 applyStoredTheme();
 
@@ -30,4 +31,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initCopy();
     initPrint();
     initConsent();
+    initTabs();
 });
