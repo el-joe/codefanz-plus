@@ -578,7 +578,7 @@ test('staff change a project status and it is audited', function () {
 
 test('radar screens need radar.view and changes need radar.manage', function () {
     $project = RadarProject::factory()->create();
-    $content = User::factory()->role(Role::ContentManager)->create();
+    $content = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 
     $this->actingAs($content)->get(route('admin.radar.index'))->assertForbidden();
     $this->actingAs($content)->get(route('admin.radar.projects.show', $project))->assertForbidden();

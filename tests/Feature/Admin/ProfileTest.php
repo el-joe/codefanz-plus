@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 beforeEach(function () {
-    $this->user = User::factory()->role(Role::ContentManager)->create(['password' => 'Old-password-123']);
+    $this->user = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create(['password' => 'Old-password-123']);
 });
 
 test('the profile page renders', function () {

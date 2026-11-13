@@ -12,7 +12,7 @@ use App\Models\Technology;
 use App\Models\User;
 
 beforeEach(function () {
-    $this->editor = User::factory()->role(Role::ContentManager)->create();
+    $this->editor = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 });
 
 /**
@@ -39,7 +39,7 @@ function productPayload(array $overrides = []): array
 }
 
 test('staff without content permission cannot manage products or versions', function () {
-    $seo = User::factory()->role(Role::SeoSpecialist)->create();
+    $seo = User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create();
     $product = Product::factory()->withTranslation('en')->create();
     $version = ProductVersion::factory()->for($product)->withTranslation('en')->create();
 

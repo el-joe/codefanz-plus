@@ -51,7 +51,7 @@ function deliveryProjectPayload(array $overrides = []): array
 
 test('staff without project permissions get 403', function () {
     $project = Project::factory()->forCustomer($this->customer)->create();
-    $editor = User::factory()->role(Role::ContentManager)->create();
+    $editor = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 
     $this->actingAs($editor)->get(route('admin.projects.index'))->assertForbidden();
     $this->actingAs($editor)->get(route('admin.projects.show', $project))->assertForbidden();
@@ -275,7 +275,7 @@ test('documents upload privately, version by title and download only when author
         ->assertHeader('Content-Type', 'application/octet-stream')
         ->assertDownload('Scope-v2.pdf');
 
-    $this->actingAs(User::factory()->role(Role::ContentManager)->create())->get(route('admin.documents.download', $versions[1]))->assertForbidden();
+    $this->actingAs(User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create())->get(route('admin.documents.download', $versions[1]))->assertForbidden();
 
     // Disallowed types are rejected.
     $this->actingAs($this->manager)->post(route('admin.projects.documents.store', $project), [

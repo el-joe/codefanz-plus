@@ -78,8 +78,8 @@
         {{ $structuredData->script($structuredData->website()) }}
         @if ($gaMeasurementId)
             {{-- GA4 only after the visitor opted in; consent mode defaults to denied, then grants analytics only. --}}
-            <script async src="https://www.googletagmanager.com/gtag/js?id={{ $gaMeasurementId }}"></script>
-            <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied'});gtag('consent','update',{analytics_storage:'granted'});gtag('js',new Date());gtag('config',@json($gaMeasurementId),{anonymize_ip:true});</script>
+            <script async nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}" src="https://www.googletagmanager.com/gtag/js?id={{ $gaMeasurementId }}"></script>
+            <script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied'});gtag('consent','update',{analytics_storage:'granted'});gtag('js',new Date());gtag('config',@json($gaMeasurementId),{anonymize_ip:true});</script>
         @endif
         {{ $head ?? '' }}
     </x-slot:meta>

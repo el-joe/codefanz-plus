@@ -44,7 +44,7 @@ function customerPayload(array $overrides = []): array
 
 test('staff without customer permissions get 403', function () {
     $customer = Customer::factory()->create();
-    $editor = User::factory()->role(Role::ContentManager)->create();
+    $editor = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 
     $this->actingAs($editor)->get(route('admin.customers.index'))->assertForbidden();
     $this->actingAs($editor)->get(route('admin.customers.show', $customer))->assertForbidden();

@@ -10,12 +10,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @if (\Illuminate\Support\Facades\Vite::cspNonce())
+        <meta name="csp-nonce" content="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
+    @endif
     <title>{{ isset($title) ? $title.' · ' : '' }}CodeFanz</title>
     @isset($meta) {{ $meta }} @endisset
     @if ($themeable)
         {{-- Light is the designed default; dark only when the user chose it with the theme toggle (admin, portal). --}}
         <meta name="codefanz-themeable" content="1">
-        <script>
+        <script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
             try { if (localStorage.getItem('codefanz-theme') === 'dark') document.documentElement.classList.add('dark'); } catch (e) {}
         </script>
     @endif

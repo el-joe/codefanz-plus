@@ -8,7 +8,7 @@ use App\Models\Career;
 use App\Models\User;
 
 beforeEach(function () {
-    $this->editor = User::factory()->role(Role::ContentManager)->create();
+    $this->editor = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 });
 
 /**
@@ -32,7 +32,7 @@ function careerPayload(array $overrides = []): array
 }
 
 test('staff without content permission cannot manage careers', function () {
-    $seo = User::factory()->role(Role::SeoSpecialist)->create();
+    $seo = User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create();
 
     $this->actingAs($seo)->get(route('admin.careers.index'))->assertForbidden();
     $this->actingAs($seo)->post(route('admin.careers.store'), careerPayload())->assertForbidden();

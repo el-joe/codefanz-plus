@@ -17,7 +17,7 @@ beforeEach(function () {
     Storage::fake('public');
     Queue::fake();
 
-    $this->editor = User::factory()->role(Role::ContentManager)->create();
+    $this->editor = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 });
 
 test('staff without media permission cannot open the library', function () {

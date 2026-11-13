@@ -17,7 +17,7 @@ class RedirectMap
      */
     public function all(): array
     {
-        return Cache::rememberForever(self::CACHE_KEY, fn (): array => Redirect::query()
+        return Cache::memo()->rememberForever(self::CACHE_KEY, fn (): array => Redirect::query()
             ->where('is_active', true)
             ->get(['id', 'from_path', 'to_path', 'status_code'])
             ->mapWithKeys(fn (Redirect $redirect): array => [$redirect->from_path => ['id' => $redirect->id, 'to' => $redirect->to_path, 'code' => $redirect->status_code]])
@@ -34,6 +34,6 @@ class RedirectMap
 
     public static function flush(): void
     {
-        Cache::forget(self::CACHE_KEY);
+        Cache::memo()->forget(self::CACHE_KEY);
     }
 }

@@ -193,7 +193,7 @@ function fakeGoogleApis(int $ga4Status = 200, mixed $token = null): void
 }
 
 test('the analytics dashboard says credentials are required and shows no numbers when not configured', function () {
-    $seo = User::factory()->role(Role::SeoSpecialist)->create();
+    $seo = User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create();
     Http::fake();
 
     $this->actingAs($seo)->get(route('admin.analytics.index'))->assertOk()
@@ -208,7 +208,7 @@ test('the analytics dashboard says credentials are required and shows no numbers
 test('a sync stores daily snapshots and the dashboard shows real cached numbers with comparisons', function () {
     configureGoogleServiceAccount();
     fakeGoogleApis();
-    $seo = User::factory()->role(Role::SeoSpecialist)->create();
+    $seo = User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create();
 
     $this->actingAs($seo)->post(route('admin.analytics.sync'))->assertRedirect();
 
@@ -244,7 +244,7 @@ test('an expired or revoked connection shows the reconnect state with the last c
 
     expect(app(AnalyticsSync::class)->run()['ga4'])->toContain('invalid_grant');
 
-    $seo = User::factory()->role(Role::SeoSpecialist)->create();
+    $seo = User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create();
     $this->actingAs($seo)->get(route('admin.analytics.index'))->assertOk()
         ->assertSee('data-state="reconnect"', false)
         ->assertSee(__('Reconnect Google to resume the daily sync'))

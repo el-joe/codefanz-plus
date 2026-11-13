@@ -10,7 +10,7 @@ use App\Models\TechnologyCategory;
 use App\Models\User;
 
 beforeEach(function () {
-    $this->editor = User::factory()->role(Role::ContentManager)->create();
+    $this->editor = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
     $this->category = TechnologyCategory::factory()->withTranslation('en', ['name' => 'Frameworks'])->create();
 });
 
@@ -47,7 +47,7 @@ function registerPublishedServicesAsVerification(): void
 }
 
 test('staff without content permission cannot manage technologies', function () {
-    $seo = User::factory()->role(Role::SeoSpecialist)->create();
+    $seo = User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create();
     $technology = Technology::factory()->create();
 
     $this->actingAs($seo)->get(route('admin.technologies.index'))->assertForbidden();

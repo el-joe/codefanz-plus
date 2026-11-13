@@ -1,7 +1,9 @@
 <x-layouts.admin :title="__('Overview')">
     <div>
         <h2 class="text-2xl font-bold text-fg">{{ __('Welcome, :name', ['name' => auth()->user()->name]) }}</h2>
-        <p class="text-sm text-fg-secondary">{{ trans_choice(':count change request is waiting for review.|:count change requests are waiting for review.', $pendingCount) }}</p>
+        @can('viewAny', \App\Models\ChangeRequest::class)
+            <p class="text-sm text-fg-secondary">{{ trans_choice(':count change request is waiting for review.|:count change requests are waiting for review.', $pendingCount) }}</p>
+        @endcan
     </div>
 
     @if ($activeKillSwitches->isNotEmpty())
@@ -11,10 +13,9 @@
     @endif
 
     <div class="grid gap-6 xl:grid-cols-2">
+        @can('viewAny', \App\Models\ChangeRequest::class)
         <x-ui.card :title="__('Approval queue')">
-            @can('viewAny', \App\Models\ChangeRequest::class)
-                <x-slot:action><a href="{{ route('admin.approvals.index') }}" class="text-sm font-semibold text-fg-brand hover:underline">{{ __('Review queue') }}</a></x-slot:action>
-            @endcan
+            <x-slot:action><a href="{{ route('admin.approvals.index') }}" class="text-sm font-semibold text-fg-brand hover:underline">{{ __('Review queue') }}</a></x-slot:action>
             @forelse ($pendingApprovals as $changeRequest)
                 <a href="{{ route('admin.approvals.show', $changeRequest) }}" class="flex items-center gap-3 border-b border-line-subtle py-3 last:border-0">
                     <span class="min-w-0 flex-1">
@@ -27,7 +28,9 @@
                 <x-ui.empty-state :title="__('Nothing to review')" :description="__('AI and MCP proposals will appear here before anything changes on the live site.')" />
             @endforelse
         </x-ui.card>
+        @endcan
 
+        @can(\App\Enums\Permission::AuditView->value)
         <x-ui.card :title="__('Recent activity')">
             @forelse ($recentActivity as $log)
                 <div class="flex items-center gap-3 border-b border-line-subtle py-3 last:border-0">
@@ -41,5 +44,6 @@
                 <x-ui.empty-state :title="__('No activity yet')" />
             @endforelse
         </x-ui.card>
+        @endcan
     </div>
 </x-layouts.admin>

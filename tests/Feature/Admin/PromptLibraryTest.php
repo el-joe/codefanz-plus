@@ -23,7 +23,7 @@ use Illuminate\Support\Sleep;
 beforeEach(function () {
     Sleep::fake();
     Http::preventStrayRequests();
-    $this->manager = User::factory()->role(Role::ContentManager)->create();
+    $this->manager = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 });
 
 /**
@@ -128,7 +128,7 @@ test('only prompt managers reach the prompt library and the brand voice', functi
     $template = PromptTemplate::factory()->create();
 
     foreach ([Role::SeoSpecialist, Role::SalesManager] as $role) {
-        $user = User::factory()->role($role)->create();
+        $user = User::factory()->role($role)->withConfirmedTwoFactor()->create();
         $this->actingAs($user)->get(route('admin.prompts.index'))->assertForbidden();
         $this->actingAs($user)->put(route('admin.prompts.update', $template), promptPayload())->assertForbidden();
         $this->actingAs($user)->post(route('admin.prompts.test', $template), ['test_locale' => 'en'])->assertForbidden();

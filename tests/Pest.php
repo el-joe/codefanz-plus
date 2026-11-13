@@ -1,5 +1,6 @@
 <?php
 
+use App\Services\Security\OutboundUrlGuard;
 use App\Services\Settings;
 use Database\Seeders\KillSwitchSeeder;
 use Database\Seeders\LanguageSeeder;
@@ -25,6 +26,8 @@ pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
     ->beforeEach(function () {
         $this->seed([LanguageSeeder::class, RolesAndPermissionsSeeder::class, KillSwitchSeeder::class]);
+        // No real DNS in tests: every host name resolves to a public documentation address unless a test says otherwise.
+        OutboundUrlGuard::resolveHostsUsing(fn (string $host): array => ['93.184.216.34']);
     })
     ->in('Feature');
 

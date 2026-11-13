@@ -175,7 +175,7 @@ test('exhausted retries fail over to the caller', function () {
 
 test('a successful call logs tokens, latency and the estimated cost from the price table', function () {
     configureAi();
-    $user = User::factory()->role(Role::ContentManager)->create();
+    $user = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
     Http::fake(['api.openai.com/*' => Http::response(openAiReply('{"reply":"ok"}', 1000, 500, 'gpt-4.1-mini-2025-04-14'))]);
 
     app(AiGateway::class)->complete(AiFeature::ContentStudio, sampleRequest(), ['user_id' => $user->id]);

@@ -7,6 +7,7 @@ use App\Enums\AutomationDirection;
 use App\Enums\AutomationEvent;
 use App\Enums\Permission;
 use App\Models\User;
+use App\Services\Security\OutboundUrlGuard;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -59,6 +60,13 @@ class SaveAutomationWorkflowRequest extends FormRequest
     public function after(): array
     {
         return [
+            // SSRF: an outbound webhook may only target a public host (ALLOW_PRIVATE_OUTBOUND lifts this locally).
+            function (Validator $validator): void {
+                if ($this->input('direction') === AutomationDirection::Outbound->value && ! $validator->errors()->has('url')
+                    && ! app(OutboundUrlGuard::class)->isAllowed((string) $this->input('url'))) {
+                    $validator->errors()->add('url', __('The webhook URL must point to a public host.'));
+                }
+            },
             function (Validator $validator): void {
                 if ($validator->errors()->hasAny(['action', 'acts_as_user_id']) || $this->input('direction') !== AutomationDirection::Inbound->value) {
                     return;

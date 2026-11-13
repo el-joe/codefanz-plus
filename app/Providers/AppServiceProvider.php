@@ -74,6 +74,7 @@ use App\Models\User;
 use App\Services\Ai\AiGateway;
 use App\Services\Analytics\MeasurementProtocol;
 use App\Services\CurrentCustomer;
+use App\Services\LocaleAwareVite;
 use App\Services\MenuResolver;
 use App\Services\Payments\PaymentGatewayManager;
 use App\Services\Seo\RedirectMap;
@@ -82,12 +83,14 @@ use App\Services\Seo\SitemapBuilder;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Foundation\Vite;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -105,6 +108,9 @@ class AppServiceProvider extends ServiceProvider
         // The provider selected in Settings → Integrations (a NullAiProvider until credentials are saved).
         // Features should call AiGateway, which adds the kill switch, budget and usage logging.
         $this->app->bind(AiProvider::class, fn ($app): AiProvider => $app->make(AiGateway::class)->provider());
+
+        // @vite / @fonts: locale-aware font preloads, WOFF2 only (M11 performance).
+        $this->app->singleton(Vite::class, LocaleAwareVite::class);
     }
 
     /**
@@ -172,6 +178,17 @@ class AppServiceProvider extends ServiceProvider
             'radar_proposal' => RadarProposal::class,
             'automation_workflow' => AutomationWorkflow::class,
         ]);
+
+        // Password policy (docs/SECURITY_POLICY.md §1): min 12 characters, breached-password check.
+        Password::defaults(function (): Password {
+            $rule = Password::min((int) config('codefanz.security.password_min_length'))->max(128);
+
+            return config('codefanz.security.check_breached_passwords') ? $rule->uncompromised() : $rule;
+        });
+
+        // Fortify's password reset / confirmation / change and 2FA confirmation routes (ThrottleSensitiveAuthRoutes).
+        RateLimiter::for('auth-sensitive', fn (Request $request): Limit => Limit::perMinute((int) config('codefanz.security.auth_attempts_per_minute'))
+            ->by('auth-sensitive:'.$request->route()?->getName().'|'.$request->ip()));
 
         // Payment gateway webhooks: generous per gateway and IP; bad signatures are rejected before any work.
         RateLimiter::for('webhooks', fn (Request $request): Limit => Limit::perMinute(120)->by('webhooks:'.$request->ip()));

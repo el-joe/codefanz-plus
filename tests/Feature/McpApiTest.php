@@ -214,7 +214,7 @@ test('cursor pagination walks through every item', function () {
 
 test('proposing a content change creates a pending MCP change request and never touches the target', function () {
     Notification::fake();
-    $reviewer = User::factory()->role(Role::ContentManager)->create();
+    $reviewer = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
     [$client, $token] = mcpClient([McpScope::ContentDraft]);
 
     $response = $this->withToken($token)->postJson("/api/v1/mcp/content/service/{$this->service->id}/proposals", [
@@ -268,7 +268,7 @@ test('proposing SEO metadata creates a pending change request needing seo approv
 });
 
 test('a blog draft is created as a draft with origin mcp that its owner cannot approve', function () {
-    $owner = User::factory()->role(Role::ContentManager)->create();
+    $owner = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
     [$client, $token] = mcpClient([McpScope::ContentDraft], ['owner_id' => $owner->id]);
 
     $response = $this->withToken($token)->postJson('/api/v1/mcp/posts/drafts', [
@@ -373,7 +373,7 @@ test('approvals list shows status, and apply refuses requests a human has not ap
 });
 
 test('apply works for a human-approved MCP request and refuses stale ones', function () {
-    $reviewer = User::factory()->role(Role::ContentManager)->create();
+    $reviewer = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
     [$client, $token] = mcpClient([McpScope::ContentDraft, McpScope::ApprovalsRead, McpScope::ApprovalsApply]);
     $uri = "/api/v1/mcp/content/service/{$this->service->id}/proposals";
 

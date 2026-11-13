@@ -53,3 +53,42 @@ Baseline: OWASP ASVS L2 / OWASP Top 10.
 - Daily encrypted DB backups + off-site copy; monthly restore test.
 - Dependency audit (`composer audit`, `npm audit`) in CI.
 - Vulnerability reports: security@codefanz.com (to be confirmed by owner).
+
+## 11. Security review — M11 (slice 1)
+
+Scope: OWASP Top 10 (2021) / ASVS L2 against every route (`php artisan route:list --except-vendor`: 422 app routes
+plus Fortify), every admin/portal controller, models, uploads, Blade output, outbound HTTP, webhooks, config.
+Tests live in `tests/Feature/Security/*` and `tests/Feature/PerformanceBudgetTest.php`.
+
+### Findings and fixes
+
+| # | Finding | Severity | Fix | Regression test |
+|---|---------|----------|-----|-----------------|
+| 1 | **SSRF** — the SEO audit's external link check sent HEAD requests to any link in published content (incl. AI/MCP-proposed content) and followed redirects, so `http://169.254.169.254/…` or intranet hosts could be probed; n8n outbound workflow URLs were only syntax-checked, followed redirects and the stored response body was shown in the run log (full-read SSRF for `automation.manage`). | High | `App\Services\Security\OutboundUrlGuard`: http(s) only, every resolved A/AAAA record must be public (blocks loopback, RFC 1918, link-local/metadata, CGNAT, reserved, IPv4-mapped IPv6), connection pinned to the vetted IP (`CURLOPT_RESOLVE`), redirects re-checked per hop. Applied to the link check (unsafe links are reported unreachable, never requested), to workflow validation (`The webhook URL must point to a public host.`) and to every delivery (no redirects). `ALLOW_PRIVATE_OUTBOUND=true` only for local n8n. | `OutboundUrlGuardTest` (18 address cases, redirect hook, form validation, delivery, crawler) |
+| 2 | **No CSP / browser hardening headers** (no CSP, `X-Frame-Options`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, HSTS). | Medium | Global `SecurityHeaders` middleware: nonce-based CSP shared with Vite (`Vite::useCspNonce()`, `@vite`/`@fonts` and the three inline scripts carry it; TipTap gets it via `<meta name="csp-nonce">` → `injectNonce`), `object-src 'none'`, `base-uri 'self'`, `frame-ancestors 'none'`, frames only youtube-nocookie / player.vimeo, GA hosts only when a GA4 id is configured, Vite dev-server origin only while `npm run dev` runs; `style-src-attr 'unsafe-inline'` (style attributes cannot carry nonces). HSTS + `upgrade-insecure-requests` on HTTPS. CSP skipped on non-HTML and on debug exception pages; `CSP_REPORT_ONLY` switch. Verified in the browser on /en, /ar, portfolio, blog, quote, assistant, contact and login: no violations; an injected inline script is blocked. | `SecurityHeadersTest` |
+| 3 | **Password policy below policy** — `Password::default()` without `Password::defaults()` meant 8 characters and no breach check (policy: 12 + uncompromised). | Medium | `Password::defaults()`: min 12, max 128, `uncompromised()` (HIBP k-anonymity) unless `CHECK_BREACHED_PASSWORDS=false` (test suite only). | `AuthenticationHardeningTest` |
+| 4 | **Unthrottled credential endpoints** — Fortify throttles only login and the 2FA challenge; reset-link requests (mail flooding / enumeration timing), password reset, password confirmation (`/user/confirm-password`, brute force of a signed-in session's password), password change and 2FA confirmation had no limiter. | Medium | `ThrottleSensitiveAuthRoutes` (web group) applies the `auth-sensitive` limiter (5/min per route + IP) to those five Fortify routes. | `AuthenticationHardeningTest` |
+| 5 | **2FA not enforced for approvers** — policy requires TOTP for "any user with approval permissions", but only Super Admin/Administrator/Finance Manager were checked; Content Manager, SEO Specialist, Social Media Manager (and anyone granted an approve permission directly) could approve AI/MCP changes with a password only. | Medium | `User::requiresTwoFactor()` also checks `Permission::twoFactorPermissions()` (content/seo/social approve + refund approve) through roles or direct grants. | `AuthenticationHardeningTest` |
+| 6 | **Information disclosure on the admin overview** — every `admin.access` user saw pending change-request summaries and the latest audit-log operations, regardless of `approvals`/`audit.view` permissions. | Low | Dashboard loads and renders the queue only for `viewAny ChangeRequest` and the activity card only for `audit.view`. | `AuthenticationHardeningTest` |
+| 7 | **Session defaults** — `SESSION_SECURE_COOKIE` defaulted to unset (cookie sent over http in production unless configured), session payload unencrypted by default. | Low | `secure` defaults to true when `APP_URL` is https; `encrypt` defaults to true (`.env.example` updated). `http_only`, `same_site=lax` unchanged. | `AuthenticationHardeningTest` (cookie flags) |
+| 8 | **Private disk served over HTTP** — `local` disk had `serve => true`, registering signed `/storage/{path}` GET/PUT routes for private files; unused (downloads go through authorized controllers). | Low (defence in depth) | `serve => false`. | `RouteAuthorizationTest` |
+
+### Reviewed — no change needed
+
+- **Access control**: all 333 admin routes carry `auth`, `active`, `can:admin.access` and (except security/profile) `two-factor`, plus a permission or policy check — enforced by `RouteAuthorizationTest` (guests redirected and clients refused on every admin route, guests redirected on every portal route, tokenless and session-only requests 401 on every API route, and a static check that each admin action has `can:` middleware, a Gate/authorize call or a non-trivial Form Request `authorize()`; the 6 self-service routes are listed explicitly). Portal: every controller resolves records through `forCurrentCustomer()` by ulid/uuid (spot-checked all 12; isolation tests in `tests/Feature/Portal`). Nested admin routes use `scopeBindings()` or explicit membership checks.
+- **Mass assignment**: no `$guarded = []`, no `$request->all()`; models use `#[Fillable]`, controllers pass `validated()`.
+- **SQL injection**: all `*Raw` calls use static SQL or bindings; sorting is whitelisted (`Rule::in`).
+- **XSS** (`{!! !!}`): article bodies (`HtmlSanitizer` allow-list, applied on write), page/service/career/product/portfolio/FAQ bodies (`Str::markdown` with `html_input=strip`, `allow_unsafe_links=false`), 2FA QR SVG (generated by Fortify), static SVG icons / `$newTab()` attribute helper / pagination icons / language-switch label (server constants), RSS XML prolog. JSON-LD uses `JSON_HEX_TAG|AMP|APOS|QUOT`. No inline event handlers.
+- **Open redirects**: notification links keep only same-area paths; consent fallback keeps same-host paths; `redirect()->away()` only to gateway/OAuth URLs from config/provider responses; managed redirects are admin-authored. `back()` honours the Referer header on CSRF-protected POSTs only (informational).
+- **CSRF**: no exemptions; webhook routes live outside the `web` group and verify HMAC signatures (Stripe, Paymob, PayTabs, Fawry, n8n with timestamp + delivery id).
+- **Uploads**: MIME sniff + extension allow-list + size/dimension limits, private disk, random names, original names sanitised, downloads authorized with `nosniff` + `attachment`.
+- **Secrets**: encrypted Settings, masked in the UI, MCP arguments redacted; Telegram bot token never logged (connection errors are logged without the URL).
+- **Rate limiting**: login 5/min (email+IP), 2FA challenge 5/min, contact/quote/assistant/pay/webhooks/MCP named limiters, portal write routes throttled.
+- **Dependencies** (2026-11-13): `composer audit` — no advisories; `npm audit --omit=dev` — 0 vulnerabilities.
+- **APP_DEBUG**: must be `false` in production (docs/DEPLOYMENT_GUIDE.md §2); local `.env` keeps `true`.
+
+### Open items
+
+- CSP `form-action` allows `https:` (checkout and social OAuth forms are redirected to provider hosts); tighten to the configured gateway hosts once production gateways are fixed.
+- The guard pins the first hop only; redirect hops are re-validated but resolved again by cURL (residual DNS-rebinding window on redirects of the opt-in external link check).
+- Admin TipTap editor and chart.js pages were verified by tests (nonce exposure, `style-src-attr`) but not clicked through in a browser: the dev database has no staff account.

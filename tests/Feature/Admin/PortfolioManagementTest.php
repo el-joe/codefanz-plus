@@ -15,7 +15,7 @@ use App\Models\Technology;
 use App\Models\User;
 
 beforeEach(function () {
-    $this->editor = User::factory()->role(Role::ContentManager)->create();
+    $this->editor = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 });
 
 /**
@@ -48,7 +48,7 @@ function projectPayload(array $overrides = []): array
 }
 
 test('staff without content permission cannot manage the portfolio', function () {
-    $seo = User::factory()->role(Role::SeoSpecialist)->create();
+    $seo = User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create();
     $project = PortfolioProject::factory()->withTranslation('en')->create();
     $category = PortfolioCategory::factory()->withTranslation('en')->create();
 

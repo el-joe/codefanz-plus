@@ -52,7 +52,24 @@ class MenuResolver
         $locale ??= app()->getLocale();
         $key = sprintf('menus.%s.%s.%s', self::version(), $location->value, $locale);
 
-        return Cache::remember($key, now()->addDay(), fn (): array => $this->build($location, $locale));
+        return self::absolute(Cache::memo()->remember($key, now()->addDay(), fn (): array => $this->build($location, $locale)));
+    }
+
+    /**
+     * Cached menus hold root-relative paths; the host is added per request from the current root URL (APP_URL),
+     * so a cache built by a CLI run, a test or another host never leaks a wrong domain into the page.
+     *
+     * @param  list<array{label: string, url: string, new_tab: bool, children: list<mixed>}>  $items
+     * @return list<array{label: string, url: string, new_tab: bool, children: list<mixed>}>
+     */
+    private static function absolute(array $items): array
+    {
+        return array_map(function (array $item): array {
+            $item['url'] = str_starts_with($item['url'], '/') ? url($item['url']) : $item['url'];
+            $item['children'] = self::absolute($item['children'] ?? []);
+
+            return $item;
+        }, $items);
     }
 
     /**
@@ -67,12 +84,12 @@ class MenuResolver
 
     public static function flush(): void
     {
-        Cache::forever(self::VERSION_KEY, self::version() + 1);
+        Cache::memo()->forever(self::VERSION_KEY, self::version() + 1);
     }
 
     private static function version(): int
     {
-        return (int) Cache::get(self::VERSION_KEY, 1);
+        return (int) Cache::memo()->get(self::VERSION_KEY, 1);
     }
 
     /**
@@ -159,7 +176,7 @@ class MenuResolver
 
         $query = array_filter((array) $item->route_params, fn (mixed $value, mixed $key): bool => is_string($key) && is_scalar($value) && $key !== 'locale', ARRAY_FILTER_USE_BOTH);
 
-        return route($item->route_name, ['locale' => $locale, ...$query]);
+        return route($item->route_name, ['locale' => $locale, ...$query], false);
     }
 
     private function linkableUrl(?Model $linkable, ?string $type, string $locale): ?string
@@ -170,7 +187,7 @@ class MenuResolver
 
         $translation = $linkable->translations->firstWhere('locale', $locale);
 
-        return $translation?->slug ? route(self::LINKABLE_ROUTES[$type], ['locale' => $locale, 'slug' => $translation->slug]) : null;
+        return $translation?->slug ? route(self::LINKABLE_ROUTES[$type], ['locale' => $locale, 'slug' => $translation->slug], false) : null;
     }
 
     private function isPublic(Model $linkable): bool
@@ -216,12 +233,12 @@ class MenuResolver
     {
         $key = sprintf('menus.%s.legal-fallback.%s', self::version(), $locale);
 
-        return Cache::remember($key, now()->addDay(), fn (): array => PageTranslation::query()
+        return self::absolute(Cache::memo()->remember($key, now()->addDay(), fn (): array => PageTranslation::query()
             ->where('locale', $locale)
             ->whereHas('page', fn ($query) => $query->where('template', 'legal')->where('status', PageStatus::Published))
             ->orderBy('page_id')
             ->get(['title', 'slug'])
-            ->map(fn (PageTranslation $translation): array => ['label' => $translation->title, 'url' => route('pages.show', ['locale' => $locale, 'slug' => $translation->slug]), 'new_tab' => false, 'children' => []])
-            ->all());
+            ->map(fn (PageTranslation $translation): array => ['label' => $translation->title, 'url' => route('pages.show', ['locale' => $locale, 'slug' => $translation->slug], false), 'new_tab' => false, 'children' => []])
+            ->all()));
     }
 }

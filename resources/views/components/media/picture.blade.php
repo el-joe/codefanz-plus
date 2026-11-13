@@ -14,7 +14,7 @@
             <source type="image/webp" srcset="{{ $srcset('webp') }}" sizes="{{ $sizes }}">
         @endif
         <img src="{{ $fallback->url() }}" width="{{ $fallback->width }}" height="{{ $fallback->height }}"
-             alt="{{ $alt ?? $media->altText() }}" decoding="async" loading="{{ $eager ? 'eager' : 'lazy' }}"
+             alt="{{ $alt ?? $media->altText() }}" decoding="async" loading="{{ $eager ? 'eager' : 'lazy' }}" @if ($eager) fetchpriority="high" @endif
              {{ $attributes->merge(['class' => 'h-auto max-w-full']) }}>
     </picture>
 @endif

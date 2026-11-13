@@ -171,6 +171,8 @@ function enhance(textarea, picker, onChange) {
     const editor = new Editor({
         element: content,
         content: textarea.value,
+        // The editor's base styles are injected as a <style> tag, allowed by the page's CSP nonce.
+        injectNonce: document.querySelector('meta[name="csp-nonce"]')?.content || undefined,
         extensions: [
             StarterKit.configure({
                 heading: { levels: [2, 3, 4] },

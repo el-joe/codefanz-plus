@@ -7,6 +7,7 @@ use App\Enums\SeoIssueType;
 use App\Enums\SeoSeverity;
 use App\Models\SeoAudit;
 use App\Models\SeoIssue;
+use App\Services\Security\OutboundUrlGuard;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Throwable;
@@ -33,6 +34,7 @@ class SeoCrawler
         private HtmlInspector $inspector,
         private IndexingPolicy $indexing,
         private SeoTargets $seoTargets,
+        private OutboundUrlGuard $guard,
     ) {}
 
     public function run(SeoAudit $audit): SeoAudit
@@ -256,8 +258,11 @@ class SeoCrawler
         }
 
         foreach (array_slice($external, 0, (int) config('codefanz.seo.audit.max_external_links'), true) as $link => $sources) {
+            // SSRF: links in content may point anywhere; only public hosts are requested, every redirect re-checked.
             try {
-                $status = Http::timeout(5)->connectTimeout(3)->withOptions(['allow_redirects' => ['max' => 3, 'protocols' => ['http', 'https']]])->head($link)->status();
+                $status = $this->guard->isAllowed($link)
+                    ? Http::timeout(5)->connectTimeout(3)->withOptions($this->guard->requestOptions($link, 3))->head($link)->status()
+                    : 0;
             } catch (Throwable) {
                 $status = 0;
             }

@@ -11,7 +11,7 @@ use App\Models\Page;
 use App\Models\User;
 
 beforeEach(function () {
-    $this->editor = User::factory()->role(Role::ContentManager)->create();
+    $this->editor = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 });
 
 /**
@@ -29,7 +29,7 @@ function pagePayload(array $overrides = []): array
 }
 
 test('staff without content permission cannot manage pages', function () {
-    $seo = User::factory()->role(Role::SeoSpecialist)->create();
+    $seo = User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create();
 
     $this->actingAs($seo)->get(route('admin.pages.index'))->assertForbidden();
     $this->actingAs($seo)->post(route('admin.pages.store'), pagePayload())->assertForbidden();

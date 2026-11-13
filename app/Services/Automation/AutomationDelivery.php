@@ -6,6 +6,7 @@ use App\Enums\AutomationRunStatus;
 use App\Enums\KillSwitchKey;
 use App\Models\AutomationRun;
 use App\Services\KillSwitches;
+use App\Services\Security\OutboundUrlGuard;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\Http;
  */
 class AutomationDelivery
 {
-    public function __construct(private WebhookSigner $signer, private KillSwitches $killSwitches) {}
+    public function __construct(private WebhookSigner $signer, private KillSwitches $killSwitches, private OutboundUrlGuard $guard) {}
 
     public function attempt(AutomationRun $run): AutomationRunStatus
     {
@@ -25,6 +26,13 @@ class AutomationDelivery
             return $this->finish($run, AutomationRunStatus::Failed, error: $this->killSwitches->isActive(KillSwitchKey::AutomationWebhooks)
                 ? 'Paused by an emergency control.'
                 : 'Workflow disabled or deleted.');
+        }
+
+        // SSRF: the stored URL must still resolve to a public address; redirects are never followed.
+        if ($this->guard->reason((string) $workflow->url) !== null) {
+            $run->attempts++;
+
+            return $this->finish($run, AutomationRunStatus::Failed, error: 'Blocked: the webhook URL does not resolve to a public address.');
         }
 
         $body = (string) json_encode($run->payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -41,6 +49,7 @@ class AutomationDelivery
                     WebhookSigner::HEADER_SIGNATURE => $this->signer->sign((string) $workflow->secret, $timestamp, $body),
                     'User-Agent' => 'CodeFanz-Webhooks/1.0',
                 ])
+                ->withOptions($this->guard->requestOptions((string) $workflow->url))
                 ->withBody($body, 'application/json')
                 ->post((string) $workflow->url);
         } catch (ConnectionException) {

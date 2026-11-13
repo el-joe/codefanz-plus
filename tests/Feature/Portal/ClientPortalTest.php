@@ -30,7 +30,7 @@ test('a client cannot open the admin area', function () {
 });
 
 test('staff are sent from the portal to the admin', function () {
-    $staff = User::factory()->role(Role::ContentManager)->create();
+    $staff = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 
     $this->actingAs($staff)->get(route('portal.dashboard'))->assertRedirect(route('admin.dashboard'));
     $this->actingAs($staff)->get(route('portal.profile'))->assertRedirect(route('admin.dashboard'));

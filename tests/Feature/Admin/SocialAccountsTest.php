@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Queue;
 
 beforeEach(function () {
     Http::preventStrayRequests();
-    $this->manager = User::factory()->role(Role::SocialMediaManager)->create();
+    $this->manager = User::factory()->role(Role::SocialMediaManager)->withConfirmedTwoFactor()->create();
 });
 
 function configureSocialApp(string $provider): void
@@ -140,7 +140,7 @@ test('an invalid, missing or expired state is rejected before any token request'
 test('another staff member cannot complete someone else\'s connection', function () {
     configureSocialApp('x');
     ['state' => $state] = startSocialConnect($this, $this->manager, 'x');
-    $other = User::factory()->role(Role::SocialMediaManager)->create();
+    $other = User::factory()->role(Role::SocialMediaManager)->withConfirmedTwoFactor()->create();
 
     $this->actingAs($other)->withSession(['social_oauth' => session('social_oauth')])
         ->get(route('admin.social.oauth.callback', ['provider' => 'x', 'state' => $state, 'code' => 'auth-code']));

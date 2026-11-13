@@ -8,7 +8,12 @@ Redis · Supervisor (queue workers) · cron (scheduler) · Certbot (Let's Encryp
 
 ## 2. Environment
 - `.env` lives only on the server; template in `.env.example` (no secrets).
-- Production: `APP_ENV=production`, `APP_DEBUG=false`, `SESSION_SECURE_COOKIE=true`, `QUEUE_CONNECTION=redis`, `CACHE_STORE=redis`.
+- Production: `APP_ENV=production`, `APP_DEBUG=false` (never true on a public host: debug pages expose
+  configuration, queries and stack traces), `SESSION_SECURE_COOKIE=true` (defaults to true when `APP_URL` is https),
+  `SESSION_ENCRYPT=true`, `QUEUE_CONNECTION=redis`, `CACHE_STORE=redis` (the database cache store costs one query
+  per distinct key per request), `CHECK_BREACHED_PASSWORDS=true`, `ALLOW_PRIVATE_OUTBOUND=false`.
+- Optional: `CSP_REPORT_ONLY=true` for a first deploy behind a new CDN, `CSP_IMG_SRC` / `CSP_CONNECT_SRC`
+  (comma-separated origins) when media is served from another host.
 - Integration credentials are entered via Admin → Settings and stored encrypted in DB.
 
 ## 3. Deploy steps (zero-downtime, release directories)
@@ -28,7 +33,27 @@ Redis · Supervisor (queue workers) · cron (scheduler) · Certbot (Let's Encryp
 - Supervisor programs: `codefanz-queue-payments`, `codefanz-queue-default`, `codefanz-queue-media`, `codefanz-queue-ai`, `codefanz-queue-social`, `codefanz-queue-radar`.
 - Social publishing (M8.2): the `social` queue worker runs `PublishSocialPost`, token refresh and metrics jobs; the scheduler runs `social:publish-due` (every minute), `social:refresh-tokens` (15 min) and `social:fetch-metrics` (6 h). Register each OAuth app's redirect URI shown on Admin → Social → Accounts (`/admin/social/oauth/{linkedin|meta|x}/callback`). Meta downloads images from signed `/social-media/{uuid}` URLs, so `APP_URL` must be the public HTTPS host.
 - Cron: `* * * * * cd /var/www/codefanz/current && php artisan schedule:run >> /dev/null 2>&1`
-- Nginx server block: HTTP→HTTPS redirect, HSTS, gzip/brotli, long cache for `/build/*` assets, `client_max_body_size` aligned with upload limits.
+- Nginx server block: HTTP→HTTPS redirect, gzip/brotli, long cache for `/build/*` assets, `client_max_body_size` aligned with upload limits.
+  Security headers (CSP with per-request nonce, HSTS on HTTPS, `X-Frame-Options`, `nosniff`, `Referrer-Policy`,
+  `Permissions-Policy`) are sent by the app's `SecurityHeaders` middleware — do not add a second CSP in Nginx.
+  Static asset caching and compression (M11):
+
+  ```nginx
+  location /build/assets/ {                 # content-hashed Vite output
+      add_header Cache-Control "public, max-age=31536000, immutable";
+      access_log off;
+      try_files $uri =404;
+  }
+  location /storage/media/ {                # optimized image variants (uuid file names)
+      add_header Cache-Control "public, max-age=2592000";
+      try_files $uri =404;
+  }
+  gzip on; gzip_comp_level 5; gzip_min_length 1024; gzip_vary on;
+  gzip_types text/plain text/css text/xml application/xml application/rss+xml application/javascript application/json image/svg+xml;
+  # With ngx_brotli: brotli on; brotli_comp_level 5; brotli_types <same list>;
+  ```
+  WOFF2 fonts, AVIF/WebP images are already compressed — do not gzip them. The local Apache vhost
+  (`deploy/local/codefanz.loc.conf`) sets the same `/build` cache header and `mod_deflate`.
 
 ## 5. Backups & restore
 - Nightly `mysqldump --single-transaction` + private storage archive, encrypted, kept 30 days, synced off-site.

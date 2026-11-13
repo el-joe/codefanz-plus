@@ -133,7 +133,7 @@ test('staff with leads.view read the inbox; others are forbidden', function () {
     $this->actingAs($sales)->get(route('admin.contact-messages.show', $message))->assertSuccessful()->assertSee('A message for the sales team.');
     $this->actingAs($sales)->get(route('admin.contact-messages.index', ['topic' => 'demo']))->assertSuccessful()->assertDontSee('Inbox Visitor');
 
-    $editor = User::factory()->role(Role::ContentManager)->create();
+    $editor = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
     $this->actingAs($editor)->get(route('admin.contact-messages.index'))->assertForbidden();
     $this->actingAs($editor)->get(route('admin.contact-messages.show', $message))->assertForbidden();
 });

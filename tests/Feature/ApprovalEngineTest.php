@@ -31,7 +31,7 @@ function proposeSeoChange(Page $page, ?User $requester = null, ChangeOrigin $ori
 
 beforeEach(function () {
     $this->page = Page::factory()->withTranslation('en', ['seo_title' => 'Services | CodeFanz'])->create();
-    $this->reviewer = User::factory()->role(Role::SeoSpecialist)->create();
+    $this->reviewer = User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create();
 });
 
 test('proposing a change records a pending request with a before snapshot and an audit entry', function () {

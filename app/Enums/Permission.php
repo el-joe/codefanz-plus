@@ -40,4 +40,15 @@ enum Permission: string
     {
         return [self::ContentApprove, self::SeoApprove, self::SocialApprove];
     }
+
+    /**
+     * Permissions whose holders must confirm two-factor authentication before using the admin area
+     * (docs/SECURITY_POLICY.md §1): every approval permission and refund approval, whatever the role.
+     *
+     * @return list<self>
+     */
+    public static function twoFactorPermissions(): array
+    {
+        return [...self::approvalPermissions(), self::PaymentsRefundApprove];
+    }
 }

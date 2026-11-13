@@ -32,7 +32,7 @@ beforeEach(function () {
     Http::preventStrayRequests();
     $this->writer = User::factory()->create(['timezone' => 'Africa/Cairo']);
     $this->writer->givePermissionTo([Permission::AdminAccess->value, Permission::SocialManage->value, Permission::AiUse->value]);
-    $this->approver = User::factory()->role(Role::SocialMediaManager)->create(['timezone' => 'Africa/Cairo']);
+    $this->approver = User::factory()->role(Role::SocialMediaManager)->withConfirmedTwoFactor()->create(['timezone' => 'Africa/Cairo']);
     $this->linkedin = SocialAccount::factory()->connected(SocialPlatform::LinkedinPage)->create(['name' => 'CodeFanz']);
     $this->x = SocialAccount::factory()->connected(SocialPlatform::X)->create(['name' => 'codefanz']);
 });
@@ -180,7 +180,7 @@ test('the person who generated an AI post cannot approve or schedule it, even as
     $post->update(['generated_by' => $admin->id]);
     $this->actingAs($admin)->post(route('admin.social.posts.approve', $post))->assertForbidden();
 
-    $other = User::factory()->role(Role::SocialMediaManager)->create();
+    $other = User::factory()->role(Role::SocialMediaManager)->withConfirmedTwoFactor()->create();
     $this->actingAs($other)->post(route('admin.social.posts.approve', $post))->assertSessionHasNoErrors();
     expect($post->refresh()->status)->toBe(SocialPostStatus::Approved);
 

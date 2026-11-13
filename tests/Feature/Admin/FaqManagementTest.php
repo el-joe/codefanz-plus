@@ -8,11 +8,11 @@ use App\Models\FaqCategory;
 use App\Models\User;
 
 beforeEach(function () {
-    $this->editor = User::factory()->role(Role::ContentManager)->create();
+    $this->editor = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 });
 
 test('staff without content permission cannot manage faqs', function () {
-    $seo = User::factory()->role(Role::SeoSpecialist)->create();
+    $seo = User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create();
 
     $this->actingAs($seo)->get(route('admin.faqs.index'))->assertForbidden();
     $this->actingAs($seo)->post(route('admin.faq-categories.store'), ['sort_order' => 0, 'translations' => ['en' => ['name' => 'Pricing']]])->assertForbidden();

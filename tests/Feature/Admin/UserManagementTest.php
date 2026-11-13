@@ -73,7 +73,7 @@ test('staff details are validated', function (array $overrides, string $field) {
 ]);
 
 test('the user list can be searched and filtered by role', function () {
-    User::factory()->role(Role::SeoSpecialist)->create(['name' => 'Karim SEO']);
+    User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create(['name' => 'Karim SEO']);
     User::factory()->role(Role::Developer)->create(['name' => 'Laila Dev']);
     User::factory()->role(Role::Client)->create(['name' => 'Client Person']);
 
@@ -117,7 +117,7 @@ test('you cannot lock yourself out', function (array $overrides, string $field) 
 ]);
 
 test('only a super admin can grant or edit the super admin role', function () {
-    $manager = User::factory()->role(Role::ContentManager)->create();
+    $manager = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
     $manager->givePermissionTo('users.manage');
     $colleague = User::factory()->role(Role::SupportAgent)->create();
 
@@ -163,7 +163,7 @@ test('an invitation can be resent', function () {
 });
 
 test('the edit screen and permission matrix render', function () {
-    $user = User::factory()->role(Role::SeoSpecialist)->create();
+    $user = User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create();
 
     $this->actingAs($this->superAdmin)->get(route('admin.users.edit', $user))->assertSuccessful()->assertSee($user->email);
     $this->actingAs($this->superAdmin)->get(route('admin.users.create'))->assertSuccessful();

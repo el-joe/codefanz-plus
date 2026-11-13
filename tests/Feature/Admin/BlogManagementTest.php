@@ -21,8 +21,8 @@ use App\Services\Blog\EditorialChecklist;
 use Illuminate\Support\Facades\Notification;
 
 beforeEach(function () {
-    $this->editor = User::factory()->role(Role::ContentManager)->create();
-    $this->reviewer = User::factory()->role(Role::ContentManager)->create();
+    $this->editor = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
+    $this->reviewer = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 });
 
 /**
@@ -51,7 +51,7 @@ function bilingualPost(array $state = []): Post
 }
 
 test('staff without content permission cannot reach the blog admin', function () {
-    $seo = User::factory()->role(Role::SeoSpecialist)->create();
+    $seo = User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create();
     $post = bilingualPost(['status' => PostStatus::Draft]);
 
     $this->actingAs($seo)->get(route('admin.posts.index'))->assertForbidden();
@@ -373,7 +373,7 @@ test('the live checklist endpoint evaluates the unsaved form', function () {
         ->assertSee('data-check="heading_structure" data-passed="true"', false)
         ->assertSee('data-check="internal_link" data-passed="true"', false);
 
-    $this->actingAs(User::factory()->role(Role::SeoSpecialist)->create())->post(route('admin.posts.checklist'), postPayload())->assertForbidden();
+    $this->actingAs(User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create())->post(route('admin.posts.checklist'), postPayload())->assertForbidden();
 });
 
 test('the posts index filters by status, author and category', function () {

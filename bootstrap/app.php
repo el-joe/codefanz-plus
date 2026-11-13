@@ -12,8 +12,10 @@ use App\Http\Middleware\EnsurePortalAccess;
 use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\HandleRedirects;
 use App\Http\Middleware\RequireTwoFactor;
+use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\SetLocaleFromPreference;
 use App\Http\Middleware\SetLocaleFromRoute;
+use App\Http\Middleware\ThrottleSensitiveAuthRoutes;
 use App\Services\Analytics\AnalyticsConsent;
 use App\Services\Mcp\McpErrors;
 use Illuminate\Foundation\Application;
@@ -66,8 +68,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(AssignRequestId::class);
         // Managed redirects answer requests that would otherwise 404; staging responses carry X-Robots-Tag.
-        $middleware->append([HandleRedirects::class, AddRobotsHeader::class]);
+        // SecurityHeaders: CSP (nonce shared with Vite), HSTS on https, nosniff, frame and referrer policies (M11).
+        $middleware->append([HandleRedirects::class, AddRobotsHeader::class, SecurityHeaders::class]);
         // The consent cookie (written by the banner script) and GA4's own _ga cookie are read as plain text.
+        // Rate limits for Fortify's credential routes that Fortify itself does not throttle (M11).
+        $middleware->web(append: [ThrottleSensitiveAuthRoutes::class]);
         $middleware->encryptCookies(except: [AnalyticsConsent::COOKIE, '_ga']);
         $middleware->alias([
             'active' => EnsureUserIsActive::class,

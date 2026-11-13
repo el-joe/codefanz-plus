@@ -19,7 +19,7 @@ class SeoMetaResolver
      */
     public function forRoute(string $routeName, string $locale): ?array
     {
-        $map = Cache::rememberForever(self::ROUTES_CACHE_KEY, fn (): array => SeoMeta::query()
+        $map = Cache::memo()->rememberForever(self::ROUTES_CACHE_KEY, fn (): array => SeoMeta::query()
             ->whereNotNull('route_key')
             ->get(['route_key', 'locale', 'title', 'description', 'focus_keyword', 'canonical_url', 'noindex'])
             ->groupBy('route_key')
@@ -45,7 +45,7 @@ class SeoMetaResolver
 
     public static function flush(): void
     {
-        Cache::forget(self::ROUTES_CACHE_KEY);
+        Cache::memo()->forget(self::ROUTES_CACHE_KEY);
     }
 
     /**

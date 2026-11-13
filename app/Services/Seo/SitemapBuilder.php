@@ -43,7 +43,7 @@ class SitemapBuilder
 
     public function index(): string
     {
-        return Cache::rememberForever(self::CACHE_PREFIX.'index', function (): string {
+        return Cache::rememberForever(self::cacheKey('index'), function (): string {
             $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
 
             foreach ($this->childNames() as $name) {
@@ -65,7 +65,7 @@ class SitemapBuilder
             return null;
         }
 
-        return Cache::rememberForever(self::CACHE_PREFIX.$name, function () use ($matches): string {
+        return Cache::rememberForever(self::cacheKey($name), function () use ($matches): string {
             $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n"
                 .'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n";
 
@@ -107,15 +107,18 @@ class SitemapBuilder
         return $urls;
     }
 
+    /**
+     * Sitemaps hold absolute URLs, so the cache is keyed by the root URL (APP_URL or the request host) and a version
+     * that every flush bumps — a sitemap built by a CLI run, a test or another host is never served for this one.
+     */
+    private static function cacheKey(string $name): string
+    {
+        return self::CACHE_PREFIX.Cache::get(self::CACHE_PREFIX.'version', 1).'.'.substr(md5(url('/')), 0, 12).'.'.$name;
+    }
+
     public static function flush(): void
     {
-        Cache::forget(self::CACHE_PREFIX.'index');
-
-        foreach (Language::active()->keys() as $locale) {
-            foreach (['static', 'pages', 'services', 'portfolio', 'products', 'careers', 'posts'] as $name) {
-                Cache::forget(self::CACHE_PREFIX.$name.'-'.$locale);
-            }
-        }
+        Cache::forever(self::CACHE_PREFIX.'version', (int) Cache::get(self::CACHE_PREFIX.'version', 1) + 1);
     }
 
     /**

@@ -15,13 +15,15 @@ class Settings
     public function get(string $group, string $key, mixed $default = null): mixed
     {
         // Cache the stored (possibly encrypted) row as a plain array; the cache store does not unserialize objects.
-        $setting = Cache::remember("settings.{$group}.{$key}", now()->addHour(), fn (): ?array => Setting::query()
+        // A missing row is cached as a null value too: a null result would never be cached and every request would
+        // query and re-write the cache. The memoized store answers repeated reads within one request.
+        $setting = Cache::memo()->remember("settings.{$group}.{$key}", now()->addHour(), fn (): array => Setting::query()
             ->where('group', $group)
             ->where('key', $key)
             ->first(['value', 'is_encrypted'])
-            ?->only(['value', 'is_encrypted']));
+            ?->only(['value', 'is_encrypted']) ?? ['value' => null, 'is_encrypted' => false]);
 
-        if ($setting === null || $setting['value'] === null) {
+        if (! is_array($setting) || $setting['value'] === null) {
             return $default;
         }
 
@@ -43,14 +45,14 @@ class Settings
             ],
         );
 
-        Cache::forget("settings.{$group}.{$key}");
+        Cache::memo()->forget("settings.{$group}.{$key}");
     }
 
     public function forget(string $group, string $key): void
     {
         Setting::query()->where('group', $group)->where('key', $key)->delete();
 
-        Cache::forget("settings.{$group}.{$key}");
+        Cache::memo()->forget("settings.{$group}.{$key}");
     }
 
     public function has(string $group, string $key): bool

@@ -15,7 +15,7 @@ if ! grep -qE '^[^#]*\scodefanz\.loc(\s|$)' /etc/hosts; then
 fi
 
 install -m 644 "$project_dir/deploy/local/codefanz.loc.conf" /etc/apache2/sites-available/codefanz.loc.conf
-a2enmod rewrite >/dev/null
+a2enmod rewrite headers deflate >/dev/null
 a2ensite codefanz.loc.conf >/dev/null
 
 apache2ctl configtest

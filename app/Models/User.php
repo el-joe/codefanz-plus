@@ -112,11 +112,13 @@ class User extends Authenticatable implements HasLocalePreference
         return $this->roles->contains(fn ($role): bool => $role->name !== Role::Client->value);
     }
 
+    /**
+     * Privileged roles, and anyone who can approve changes or refunds (through any role or a direct grant).
+     */
     public function requiresTwoFactor(): bool
     {
-        return $this->roles->contains(
-            fn ($role): bool => Role::tryFrom($role->name)?->requiresTwoFactor() ?? false,
-        );
+        return $this->roles->contains(fn ($role): bool => Role::tryFrom($role->name)?->requiresTwoFactor() ?? false)
+            || $this->hasAnyPermission(array_map(fn (Permission $permission): string => $permission->value, Permission::twoFactorPermissions()));
     }
 
     public function hasConfirmedTwoFactor(): bool

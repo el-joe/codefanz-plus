@@ -470,4 +470,43 @@ return [
         'reply_max_length' => 5000,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Security headers and outbound requests (M11)
+    |--------------------------------------------------------------------------
+    |
+    | The SecurityHeaders middleware sends a nonce-based Content-Security-Policy
+    | on HTML responses. Extra origins (a CDN for media, for example) can be
+    | added per directive. HSTS is only sent on HTTPS requests.
+    |
+    | Outbound URLs that come from content or admin input (SEO external link
+    | check, n8n webhooks) must resolve to public addresses; set
+    | ALLOW_PRIVATE_OUTBOUND=true only on a development machine that runs n8n
+    | locally.
+    |
+    */
+
+    'security' => [
+        'csp' => [
+            'enabled' => (bool) env('CSP_ENABLED', true),
+            'report_only' => (bool) env('CSP_REPORT_ONLY', false),
+            'img_src' => array_values(array_filter(explode(',', (string) env('CSP_IMG_SRC', '')))),
+            'connect_src' => array_values(array_filter(explode(',', (string) env('CSP_CONNECT_SRC', '')))),
+            'frame_src' => ['https://www.youtube-nocookie.com', 'https://player.vimeo.com'],
+            'analytics' => [
+                'script_src' => ['https://www.googletagmanager.com'],
+                'connect_src' => ['https://*.google-analytics.com', 'https://*.analytics.google.com', 'https://*.googletagmanager.com'],
+                'img_src' => ['https://*.google-analytics.com', 'https://*.googletagmanager.com'],
+            ],
+        ],
+        'hsts_max_age' => (int) env('HSTS_MAX_AGE', 31536000),
+        // Password::defaults(): at least 12 characters and, when enabled, not found in a known data breach
+        // (k-anonymity range query to the Have I Been Pwned API; the test suite turns it off).
+        'password_min_length' => 12,
+        'check_breached_passwords' => (bool) env('CHECK_BREACHED_PASSWORDS', true),
+        // Password reset, password confirmation, password change and 2FA confirmation: per IP and route.
+        'auth_attempts_per_minute' => 5,
+        'allow_private_outbound' => (bool) env('ALLOW_PRIVATE_OUTBOUND', false),
+    ],
+
 ];

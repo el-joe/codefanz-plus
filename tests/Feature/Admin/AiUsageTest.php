@@ -40,7 +40,7 @@ test('the ai usage page shows monthly tokens, cost per feature and the budget st
 
 test('only settings managers can see ai usage', function () {
     foreach ([Role::ContentManager, Role::SalesManager] as $role) {
-        $this->actingAs(User::factory()->role($role)->create())->get(route('admin.ai-usage'))->assertForbidden();
+        $this->actingAs(User::factory()->role($role)->withConfirmedTwoFactor()->create())->get(route('admin.ai-usage'))->assertForbidden();
     }
 });
 
@@ -81,7 +81,7 @@ test('assistant leads show the read-only, escaped transcript to lead viewers onl
         ->assertDontSee('<script>alert(1)</script>', false)
         ->assertSee('Guided questionnaire');
 
-    $this->actingAs(User::factory()->role(Role::ContentManager)->create())->get(route('admin.leads.show', $lead))->assertForbidden();
+    $this->actingAs(User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create())->get(route('admin.leads.show', $lead))->assertForbidden();
 });
 
 test('pruned assistant transcripts are reported honestly on the lead', function () {

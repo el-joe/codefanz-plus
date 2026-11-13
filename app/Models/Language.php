@@ -19,8 +19,8 @@ class Language extends Model
 
     protected static function booted(): void
     {
-        static::saved(fn () => Cache::forget(self::CACHE_KEY));
-        static::deleted(fn () => Cache::forget(self::CACHE_KEY));
+        static::saved(fn () => Cache::memo()->forget(self::CACHE_KEY));
+        static::deleted(fn () => Cache::memo()->forget(self::CACHE_KEY));
     }
 
     /**
@@ -42,7 +42,7 @@ class Language extends Model
     public static function active(): Collection
     {
         // Cache plain arrays only: the cache store does not unserialize objects.
-        $rows = Cache::rememberForever(self::CACHE_KEY, fn (): array => static::query()
+        $rows = Cache::memo()->rememberForever(self::CACHE_KEY, fn (): array => static::query()
             ->where('is_active', true)
             ->orderBy('sort_order')
             ->orderBy('id')

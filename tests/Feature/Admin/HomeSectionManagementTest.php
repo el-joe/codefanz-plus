@@ -7,7 +7,7 @@ use App\Models\PageSection;
 use App\Models\User;
 
 beforeEach(function () {
-    $this->editor = User::factory()->role(Role::ContentManager)->create();
+    $this->editor = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 });
 
 function homeSection(PageSectionType $type): PageSection
@@ -18,7 +18,7 @@ function homeSection(PageSectionType $type): PageSection
 }
 
 test('staff without content permission cannot manage homepage sections', function () {
-    $seo = User::factory()->role(Role::SeoSpecialist)->create();
+    $seo = User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create();
 
     $this->actingAs($seo)->get(route('admin.home-sections.index'))->assertForbidden();
     $this->actingAs($seo)->post(route('admin.home-sections.visibility', homeSection(PageSectionType::Hero)))->assertForbidden();

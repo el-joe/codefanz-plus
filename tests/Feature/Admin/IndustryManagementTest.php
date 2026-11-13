@@ -7,7 +7,7 @@ use App\Models\Industry;
 use App\Models\User;
 
 beforeEach(function () {
-    $this->editor = User::factory()->role(Role::ContentManager)->create();
+    $this->editor = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 });
 
 /**
@@ -26,7 +26,7 @@ function industryPayload(array $overrides = []): array
 }
 
 test('staff without content permission cannot manage industries', function () {
-    $seo = User::factory()->role(Role::SeoSpecialist)->create();
+    $seo = User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create();
 
     $this->actingAs($seo)->get(route('admin.industries.index'))->assertForbidden();
     $this->actingAs($seo)->post(route('admin.industries.store'), industryPayload())->assertForbidden();

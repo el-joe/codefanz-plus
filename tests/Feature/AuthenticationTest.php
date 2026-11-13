@@ -46,14 +46,14 @@ test('privileged staff with confirmed two-factor authentication reach the admin 
 });
 
 test('staff without a two-factor requirement reach the dashboard through the role-based redirect', function () {
-    $editor = User::factory()->role(Role::ContentManager)->create();
+    $editor = User::factory()->role(Role::SalesManager)->create();
 
     $this->actingAs($editor)->get('/dashboard')->assertRedirect(route('admin.dashboard'));
     $this->actingAs($editor)->get(route('admin.dashboard'))->assertSuccessful();
 });
 
 test('a deactivated user is signed out on the next request', function () {
-    $editor = User::factory()->role(Role::ContentManager)->create();
+    $editor = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
     $editor->forceFill(['is_active' => false])->save();
 
     $this->actingAs($editor)->get(route('admin.dashboard'))->assertRedirect(route('login'));

@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Queue;
 
 beforeEach(function () {
     Http::preventStrayRequests();
-    $this->manager = User::factory()->role(Role::SocialMediaManager)->create();
+    $this->manager = User::factory()->role(Role::SocialMediaManager)->withConfirmedTwoFactor()->create();
 });
 
 function publishedVariant(SocialAccount $account, array $attributes = []): SocialPostVariant

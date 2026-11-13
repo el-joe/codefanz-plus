@@ -16,7 +16,7 @@ use App\Models\Technology;
 use App\Models\User;
 
 beforeEach(function () {
-    $this->editor = User::factory()->role(Role::ContentManager)->create();
+    $this->editor = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 });
 
 /**
@@ -45,7 +45,7 @@ function servicePayload(array $overrides = []): array
 }
 
 test('staff without content permission cannot manage services', function () {
-    $seo = User::factory()->role(Role::SeoSpecialist)->create();
+    $seo = User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create();
     $service = Service::factory()->withTranslation('en')->create();
 
     $this->actingAs($seo)->get(route('admin.services.index'))->assertForbidden();

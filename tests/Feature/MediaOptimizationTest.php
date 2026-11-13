@@ -106,5 +106,10 @@ test('the picture component outputs avif before webp with dimensions and localiz
         ->and($html)->toContain('width="800" height="400"')
         ->and($html)->toContain('alt="مكتبنا"')
         ->and($html)->toContain('loading="lazy"')
+        ->and($html)->not->toContain('fetchpriority')
         ->and($html)->toContain('sizes="50vw"');
+
+    // Above-the-fold images (LCP candidates) load eagerly with high fetch priority.
+    $eager = Blade::render('<x-media.picture :media="$media" :eager="true" />', ['media' => $media]);
+    expect($eager)->toContain('loading="eager"')->toContain('fetchpriority="high"');
 });

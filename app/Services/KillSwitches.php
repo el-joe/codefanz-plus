@@ -24,7 +24,7 @@ class KillSwitches
         $before = ['is_active' => (bool) $switch->is_active];
 
         $switch->fill(['is_active' => $active, 'reason' => $reason, 'changed_by' => $user->getKey()])->save();
-        Cache::forget(self::CACHE_KEY);
+        Cache::memo()->forget(self::CACHE_KEY);
 
         $this->audit->record(
             operation: 'kill_switch.'.($active ? 'activated' : 'deactivated'),
@@ -42,7 +42,7 @@ class KillSwitches
      */
     private function states(): array
     {
-        return Cache::remember(self::CACHE_KEY, now()->addMinutes(5), fn (): array => KillSwitch::query()
+        return Cache::memo()->remember(self::CACHE_KEY, now()->addMinutes(5), fn (): array => KillSwitch::query()
             ->pluck('is_active', 'key')
             ->map(fn ($value): bool => (bool) $value)
             ->all());

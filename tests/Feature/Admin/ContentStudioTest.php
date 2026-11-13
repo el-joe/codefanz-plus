@@ -31,7 +31,7 @@ beforeEach(function () {
     Sleep::fake();
     Http::preventStrayRequests();
     BrandProfile::factory()->create();
-    $this->writer = User::factory()->role(Role::ContentManager)->create();
+    $this->writer = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 });
 
 function configureStudioAi(): void
@@ -153,8 +153,8 @@ test('copy for an existing service becomes a pending AI change request that is n
     $service = studioService();
     $version = $service->lock_version;
     $template = PromptTemplate::factory()->purpose(PromptPurpose::ServiceCopy)->create();
-    $reviewer = User::factory()->role(Role::ContentManager)->create();
-    $seo = User::factory()->role(Role::SeoSpecialist)->create();
+    $reviewer = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
+    $seo = User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create();
     fakeStudioReply(['en' => ['title' => 'Web development', 'summary' => 'We design and build fast web applications.', 'body' => 'Laravel projects for growing teams.']]);
 
     $this->actingAs($this->writer)->post(route('admin.ai-studio.generations.store'), [
@@ -354,7 +354,7 @@ test('a per-user daily request cap stops the call with a friendly message while 
         ->assertSessionHasErrors(['ai' => __('You have reached your personal AI usage limit. It resets automatically; an administrator can raise it in Settings → AI limits.')]);
     Http::assertNothingSent();
 
-    $colleague = User::factory()->role(Role::ContentManager)->create();
+    $colleague = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
     fakeStudioReply(['en' => ['title' => 'T', 'excerpt' => 'E', 'body' => 'B', 'seo_title' => 'S', 'seo_description' => 'D']]);
     $this->actingAs($colleague)->post(route('admin.ai-studio.generations.store'), ['template' => $template->key, 'locales' => ['en'], 'inputs' => ['topic' => 'X']])->assertSessionHasNoErrors();
 });
@@ -391,7 +391,7 @@ test('a failed provider call is recorded in the history and reported without cre
 
 test('generations are private to their author; reviewers may read them but only the author can use them', function () {
     $generation = AiGeneration::factory()->create(['user_id' => $this->writer->id]);
-    $other = User::factory()->role(Role::SocialMediaManager)->create();
+    $other = User::factory()->role(Role::SocialMediaManager)->withConfirmedTwoFactor()->create();
 
     $this->actingAs(User::factory()->role(Role::Developer)->create())->get(route('admin.ai-studio.generations.show', $generation))->assertForbidden();
     $this->actingAs($other)->get(route('admin.ai-studio.generations.show', $generation))->assertOk()->assertDontSee('data-generation-actions', false);

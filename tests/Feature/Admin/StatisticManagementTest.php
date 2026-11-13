@@ -7,11 +7,11 @@ use App\Models\Statistic;
 use App\Models\User;
 
 beforeEach(function () {
-    $this->editor = User::factory()->role(Role::ContentManager)->create();
+    $this->editor = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 });
 
 test('staff without content permission cannot manage statistics', function () {
-    $seo = User::factory()->role(Role::SeoSpecialist)->create();
+    $seo = User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create();
 
     $this->actingAs($seo)->get(route('admin.statistics.index'))->assertForbidden();
     $this->actingAs($seo)->post(route('admin.statistics.store'), ['value' => 1, 'sort_order' => 0, 'translations' => ['en' => ['label' => 'x']]])->assertForbidden();

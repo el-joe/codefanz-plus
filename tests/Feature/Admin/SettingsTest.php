@@ -11,7 +11,7 @@ beforeEach(function () {
 });
 
 test('staff without the settings permission cannot open settings', function () {
-    $this->actingAs(User::factory()->role(Role::ContentManager)->create())
+    $this->actingAs(User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create())
         ->get(route('admin.settings.edit', 'general'))
         ->assertForbidden();
 });

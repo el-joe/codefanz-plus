@@ -4,7 +4,7 @@
 <x-layouts.base :title="$title">
     <x-slot:meta>
         <meta name="robots" content="noindex, nofollow">
-        <style>@page { size: A4; margin: 14mm; }</style>
+        <style nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">@page { size: A4; margin: 14mm; }</style>
     </x-slot:meta>
     <div class="min-h-screen bg-subtle py-6 print:bg-white print:py-0">
         <div class="mx-auto mb-4 flex max-w-3xl flex-wrap items-center justify-between gap-3 px-4 print:hidden">

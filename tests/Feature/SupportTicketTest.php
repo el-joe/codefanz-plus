@@ -106,7 +106,7 @@ test('the full lifecycle stamps SLA times and hides internal notes from the clie
 
 test('only support staff can be assigned and only support.manage opens the queue', function () {
     $ticket = SupportTicket::factory()->create(['customer_id' => $this->customer->id, 'subject' => 'Queue item']);
-    $editor = User::factory()->role(Role::ContentManager)->create();
+    $editor = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 
     $this->actingAs($this->agent)->get(route('admin.tickets.index'))->assertSuccessful()->assertSee('Queue item');
     $this->actingAs($editor)->get(route('admin.tickets.index'))->assertForbidden();

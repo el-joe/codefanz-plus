@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 
 beforeEach(function () {
-    $this->seo = User::factory()->role(Role::SeoSpecialist)->create();
+    $this->seo = User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create();
 });
 
 function seoService(array $en = [], array $ar = []): Service
@@ -54,7 +54,7 @@ function seoMetaPayload(Service $service, array $overrides = []): array
 }
 
 test('staff without the seo permission cannot open or write any SEO screen', function () {
-    $editor = User::factory()->role(Role::ContentManager)->create();
+    $editor = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
     $service = seoService();
 
     $this->actingAs($editor)->get(route('admin.seo.audit'))->assertForbidden();

@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\URL;
 beforeEach(function () {
     Http::preventStrayRequests();
     Storage::fake('local');
-    $this->approver = User::factory()->role(Role::SocialMediaManager)->create();
+    $this->approver = User::factory()->role(Role::SocialMediaManager)->withConfirmedTwoFactor()->create();
 });
 
 /**

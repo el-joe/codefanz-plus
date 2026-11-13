@@ -26,7 +26,7 @@ beforeEach(function () {
 
 test('staff without lead permissions cannot open the CRM', function () {
     $lead = Lead::factory()->create();
-    $editor = User::factory()->role(Role::ContentManager)->create();
+    $editor = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 
     $this->actingAs($editor)->get(route('admin.leads.index'))->assertForbidden();
     $this->actingAs($editor)->get(route('admin.leads.board'))->assertForbidden();
@@ -273,7 +273,7 @@ test('attachments download only for authorized staff, always as attachment', fun
         ->assertHeader('X-Content-Type-Options', 'nosniff')
         ->assertDownload();
 
-    $this->actingAs(User::factory()->role(Role::ContentManager)->create())
+    $this->actingAs(User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create())
         ->get(route('admin.leads.attachments.show', [$lead, $attachment]))->assertForbidden();
 
     $this->app['auth']->forgetGuards();

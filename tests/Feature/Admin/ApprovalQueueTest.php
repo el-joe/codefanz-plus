@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Notification;
 beforeEach(function () {
     $this->page = Page::factory()->withTranslation('en', ['seo_title' => 'Old title'])->create();
     $this->changeRequest = ChangeRequest::factory()->create(['target_id' => $this->page->id]);
-    $this->reviewer = User::factory()->role(Role::SeoSpecialist)->create();
+    $this->reviewer = User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create();
 });
 
 test('reviewers see pending change requests in the queue', function () {
@@ -55,7 +55,7 @@ test('requesting changes requires a note', function () {
 });
 
 test('a reviewer without the required permission cannot decide', function () {
-    $contentManager = User::factory()->role(Role::ContentManager)->create();
+    $contentManager = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 
     $this->actingAs($contentManager)
         ->post(route('admin.approvals.decide', $this->changeRequest), ['decision' => 'approve'])
@@ -178,7 +178,7 @@ test('bulk approval skips AI items with guardrail flags and the reviewer’s own
 
 test('the requester is notified of the decision', function () {
     Notification::fake();
-    $requester = User::factory()->role(Role::ContentManager)->create();
+    $requester = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
     $this->changeRequest->forceFill(['requested_by' => $requester->id])->save();
 
     $this->actingAs($this->reviewer)

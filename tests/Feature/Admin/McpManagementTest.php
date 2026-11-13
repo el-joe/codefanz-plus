@@ -34,7 +34,7 @@ function mcpClientPayload(User $owner, array $overrides = []): array
 }
 
 test('only users with mcp.manage can open MCP management', function () {
-    $contentManager = User::factory()->role(Role::ContentManager)->create();
+    $contentManager = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 
     $this->actingAs($contentManager)->get(route('admin.mcp.index'))->assertForbidden();
     $this->actingAs($contentManager)->post(route('admin.mcp.clients.store'), mcpClientPayload($contentManager))->assertForbidden();

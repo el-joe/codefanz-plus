@@ -8,7 +8,7 @@ use App\Models\Testimonial;
 use App\Models\User;
 
 beforeEach(function () {
-    $this->editor = User::factory()->role(Role::ContentManager)->create();
+    $this->editor = User::factory()->role(Role::ContentManager)->withConfirmedTwoFactor()->create();
 });
 
 /**
@@ -31,7 +31,7 @@ function testimonialPayload(array $overrides = []): array
 }
 
 test('staff without content permission cannot manage testimonials', function () {
-    $seo = User::factory()->role(Role::SeoSpecialist)->create();
+    $seo = User::factory()->role(Role::SeoSpecialist)->withConfirmedTwoFactor()->create();
     $testimonial = Testimonial::factory()->withTranslation()->create();
 
     $this->actingAs($seo)->get(route('admin.testimonials.index'))->assertForbidden();
