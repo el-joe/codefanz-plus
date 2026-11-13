@@ -104,7 +104,9 @@ test('the public layout renders menus with a fallback and an accessible mobile t
     $this->get('/en/services')
         ->assertSee('Our services')
         ->assertSee('Stack')
-        ->assertSee('data-dropdown-trigger', false)
+        ->assertSee('data-nav-trigger', false)
+        ->assertSee('aria-haspopup="true"', false)
+        ->assertSee('All our services')
         ->assertSee('href="https://example.com/terms" target="_blank" rel="noopener noreferrer"', false);
 
     $this->get('/ar/services')->assertSee('خدماتنا')->assertSee(route('technologies.index', ['locale' => 'ar']), false);

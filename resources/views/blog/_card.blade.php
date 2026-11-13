@@ -5,10 +5,19 @@
     $cardCover = $post->coverImage();
     $cardCategory = $post->category?->exactTranslation($cardLocale);
     $headingTag = $headingTag ?? 'h3';
+    // Figma Blog grid: each placeholder thumbnail gets its own gradient (teal, amber, violet, blue, green, ink).
+    $cardGradients = [
+        'bg-[linear-gradient(137deg,var(--color-accent-900)_12.5%,var(--color-accent-400)_75%)]',
+        'bg-[linear-gradient(137deg,#92400e_12.5%,var(--color-warning-500)_75%)]',
+        'bg-[linear-gradient(137deg,var(--color-brand-700)_12.5%,var(--color-brand-300)_75%)]',
+        'bg-[linear-gradient(137deg,#1e3a8a_12.5%,#3b82f6_75%)]',
+        'bg-[linear-gradient(137deg,#14532d_12.5%,#22c55e_75%)]',
+        'bg-[linear-gradient(137deg,var(--color-ink-900)_12.5%,var(--color-brand-600)_75%)]',
+    ];
 @endphp
 
 <li class="group relative flex flex-col items-start gap-4" data-post-card>
-    <div class="relative aspect-[41/23] w-full overflow-hidden rounded-xl bg-[linear-gradient(137deg,var(--color-ink-900)_12.5%,var(--color-brand-600)_75%)] transition-shadow group-hover:shadow-lg">
+    <div class="relative aspect-[41/23] w-full overflow-hidden rounded-xl {{ $cardGradients[$post->id % count($cardGradients)] }} transition-shadow group-hover:shadow-lg">
         @if ($cardCover)
             <x-media.picture :media="$cardCover" sizes="(min-width: 1024px) 410px, (min-width: 640px) 50vw, 100vw" class="size-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" />
         @else

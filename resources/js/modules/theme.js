@@ -4,6 +4,13 @@
 const KEY = 'codefanz-theme';
 
 export function applyStoredTheme() {
+    // Only the admin and portal offer a theme toggle; the public site always uses the designed light theme.
+    if (!document.querySelector('meta[name="codefanz-themeable"]')) {
+        document.documentElement.classList.remove('dark');
+
+        return;
+    }
+
     let stored = null;
 
     try {
@@ -12,8 +19,8 @@ export function applyStoredTheme() {
         stored = null;
     }
 
-    const dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
-    document.documentElement.classList.toggle('dark', dark);
+    // Light is the default; dark applies only after the user explicitly chose it.
+    document.documentElement.classList.toggle('dark', stored === 'dark');
 }
 
 export function init() {

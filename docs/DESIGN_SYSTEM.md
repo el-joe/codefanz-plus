@@ -212,6 +212,17 @@ Blade components mirroring the Figma library live in `resources/views/components
 | Portfolio filter bar | Pill tabs (`bg-muted` track, `shadow-xs` active) + 48px search and native select; `data-auto-submit` submits on change, `<noscript>` Filter button as fallback |
 | `PricingModel::highlights()` | Three checklist lines per licensing model on the product page (no prices; quotes stay preliminary) |
 | Restyle slice 3 pages | Portfolio (featured card 720/558 split, Card/Project grid), Project Detail (hero link buttons with icons, gallery, story + facts sidebar, "What we built" services tiles + testimonial, related), Products (Card/Product grid, Why a product), Product Detail (id row badges, screens, feature cards, licensing plans with "Most chosen", changelog + resource cards, demo card). `x-site.product-card` "Request a demo" opens the contact form with `topic=demo` |
+| `x-site.page-hero` `align="center"` | Blog hero: centred copy + search, teal bottom glow; the breadcrumb stays for assistive technology only |
+| `x-ui.input` / `x-ui.select` `size="lg"`, `icon` | 48px public form fields (Figma Input LG); `icon` = user / mail / phone / globe / code / calendar / search; `select` lg draws the Figma chevron. Admin keeps `md` |
+| Char counter `data-char-count` + `[data-char-count-output][data-char-count-quiet]` | Figma "0 / 2000" counters on public textareas (not announced per keystroke; `maxlength` enforces the limit) |
+| Upload dropzone (`[data-dropzone]`, `input[type=file][data-file-list]`) | Native file input stretched over the zone (click, keyboard, drag-and-drop stay native); chosen names listed by `stepper.js` |
+| TOC scroll spy (`toc.js`, `[data-toc]` / `[data-legal-toc]`) | Marks the section being read with `aria-current="location"` (brand bar + text) |
+| `data-copy-text` | `copy.js` swaps only that child's text, so icon buttons keep their icon |
+| Navbar "Services ▾" (`[data-nav-item]`, `[data-nav-trigger]`, `[data-nav-dropdown]`) | One link (label + chevron) to the services index; panel opens on hover (pointer devices, 150ms close delay, padding bridge) and focus-within in plain CSS; `nav.js` syncs `aria-expanded`, ArrowDown/Esc, first-tap-opens on touch. Drawer: label link + `[data-nav-sub-toggle]` chevron. Panel starts with "All :item" |
+| `x-site.assistant-launcher` | Floating AI assistant link (56px brand circle, teal dot, hover/focus tooltip, one motion-safe pulse), bottom-end, z-30 under the cookie banner/toasts, hidden while the banner or drawer is open and when printing; not on /assistant. Figma has no launcher component |
+| Theme | Public pages are always light (Figma); `x-layouts.base :themeable` (admin, portal) enables the stored dark choice only |
+| Error layout | Static Figma navbar (route() links, «عربي» switch, Client Portal, Start Your Project) and footer columns; `:footer="false"` on 500 as in the frame; 96/160px gradient code |
+| Restyle slice 4 pages | Blog, Blog Article, Contact, Request a Quote, AI Project Assistant, Careers (+ detail), FAQ, Testimonials, legal template, Search, 404/500 (+403/410/419/429/503 share the shell) |
 
 ## Next
 Milestone 4: corporate website (services, portfolio, technologies, contact/lead form).

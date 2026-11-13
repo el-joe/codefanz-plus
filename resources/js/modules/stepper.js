@@ -6,6 +6,8 @@
  * still validates everything on submit. Groups marked [data-required-group] need at least one checkbox.
  */
 export function init() {
+    initFileDropzones();
+
     document.querySelectorAll('form[data-stepper]').forEach((form) => {
         const steps = [...form.querySelectorAll('[data-step]')];
         const back = form.querySelector('[data-stepper-back]');
@@ -112,5 +114,32 @@ export function init() {
 
         progress?.classList.replace('hidden', 'flex');
         show(current, form.dataset.initialStep !== '1');
+    });
+}
+
+/**
+ * Figma upload dropzone: the native file input covers the zone (so click, keyboard and drag-and-drop stay native)
+ * and [data-file-list] lists the chosen file names.
+ */
+function initFileDropzones() {
+    document.querySelectorAll('input[type=file][data-file-list]').forEach((input) => {
+        const list = document.getElementById(input.dataset.fileList);
+        const zone = input.closest('[data-dropzone]');
+
+        if (!list) {
+            return;
+        }
+
+        input.addEventListener('change', () => {
+            list.replaceChildren(...[...input.files].map((file) => {
+                const item = document.createElement('li');
+                item.textContent = file.name;
+                return item;
+            }));
+            list.hidden = input.files.length === 0;
+        });
+
+        ['dragenter', 'dragover'].forEach((type) => input.addEventListener(type, () => zone?.setAttribute('data-dragging', '')));
+        ['dragleave', 'drop'].forEach((type) => input.addEventListener(type, () => zone?.removeAttribute('data-dragging')));
     });
 }

@@ -19,38 +19,38 @@
                       :lead="__('Choose the channel that suits you. We reply within one business day — in Arabic or English.')"
                       :crumbs="[__('Contact') => null]" />
 
-    <div class="mx-auto grid max-w-7xl gap-8 px-5 py-14 lg:grid-cols-[minmax(0,5fr)_minmax(0,9fr)] lg:px-20 lg:py-20">
+    <x-site.section tone="surface" inner="grid items-start gap-8 lg:grid-cols-[24rem_minmax(0,1fr)] lg:gap-10">
         <section aria-labelledby="contact-channels">
             <h2 id="contact-channels" class="sr-only">{{ __('Contact channels') }}</h2>
-            <ul class="flex flex-col gap-3" data-contact-channels>
+            <ul class="flex flex-col gap-4" data-contact-channels>
                 @foreach ($channels as $channel)
                     @php
-                        $inner = '<span class="flex size-11 shrink-0 items-center justify-center rounded-lg bg-brand-subtle text-fg-brand"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.$icons[$channel['icon']].'</svg></span>';
+                        $inner = '<span class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-brand-subtle text-icon-brand"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.$icons[$channel['icon']].'</svg></span>';
                     @endphp
                     <li data-channel="{{ $channel['key'] }}">
                         @if ($channel['href'])
                             <a href="{{ $channel['href'] }}" @if ($channel['external']) target="_blank" rel="noopener noreferrer" @endif
-                               class="group flex items-center gap-4 rounded-xl border border-line bg-surface p-4 hover:border-line-strong hover:bg-subtle">
+                               class="group flex items-center gap-4 rounded-xl border border-line bg-surface p-5 shadow-xs transition hover:border-line-brand hover:shadow-md">
                                 {!! $inner !!}
-                                <span class="flex min-w-0 flex-1 flex-col">
-                                    <span class="text-base font-semibold text-fg">{{ $channel['label'] }}</span>
-                                    <span class="truncate text-fg-brand" @if (in_array($channel['key'], ['email', 'whatsapp', 'phone'], true)) dir="ltr" @endif>{{ $channel['value'] }}</span>
+                                <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+                                    <span class="type-label-lg text-fg">{{ $channel['label'] }}</span>
+                                    <span class="truncate type-body-md text-fg-brand" @if (in_array($channel['key'], ['email', 'whatsapp', 'phone'], true)) dir="ltr" @endif>{{ $channel['value'] }}</span>
                                     @if ($channel['hint'])
-                                        <span class="text-xs text-fg-tertiary">{{ $channel['hint'] }}</span>
+                                        <span class="type-body-xs text-fg-tertiary">{{ $channel['hint'] }}</span>
                                     @endif
                                 </span>
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="shrink-0 text-fg-tertiary rtl:-scale-x-100"><path d="m9 6 6 6-6 6"/></svg>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0 text-icon-secondary transition-transform group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5"><path d="m9 6 6 6-6 6"/></svg>
                                 @if ($channel['external'])
                                     <span class="sr-only">{{ __('(opens in a new tab)') }}</span>
                                 @endif
                             </a>
                         @else
-                            <div class="flex items-center gap-4 rounded-xl border border-dashed border-line bg-surface p-4" aria-disabled="true">
+                            <div class="flex items-center gap-4 rounded-xl border border-dashed border-line bg-surface p-5" aria-disabled="true">
                                 {!! $inner !!}
-                                <span class="flex min-w-0 flex-1 flex-col">
-                                    <span class="text-base font-semibold text-fg">{{ $channel['label'] }}</span>
+                                <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+                                    <span class="type-label-lg text-fg">{{ $channel['label'] }}</span>
                                     @if ($channel['hint'])
-                                        <span class="text-xs text-fg-tertiary">{{ $channel['hint'] }}</span>
+                                        <span class="type-body-xs text-fg-tertiary">{{ $channel['hint'] }}</span>
                                     @endif
                                 </span>
                                 <x-ui.badge tone="neutral" :dot="false">{{ __('Coming soon') }}</x-ui.badge>
@@ -61,8 +61,8 @@
             </ul>
         </section>
 
-        <section aria-labelledby="contact-form-title" class="rounded-2xl border border-line bg-surface p-6 sm:p-8">
-            <h2 id="contact-form-title" class="text-2xl font-bold text-fg">{{ __('Send us a message') }}</h2>
+        <section aria-labelledby="contact-form-title" class="rounded-2xl border border-line bg-surface p-6 shadow-xs sm:p-8">
+            <h2 id="contact-form-title" class="type-h4 text-fg sm:type-h3">{{ __('Send us a message') }}</h2>
 
             @if ($sent)
                 <x-ui.alert tone="success" :title="__('Thank you — your message is on its way.')" class="mt-6" data-contact-sent>
@@ -85,28 +85,31 @@
                     </div>
 
                     <div class="grid gap-5 sm:grid-cols-2">
-                        <x-ui.input name="name" :label="__('Full name').' *'" required maxlength="120" autocomplete="name" :placeholder="__('Your name')" />
-                        <x-ui.input name="email" type="email" :label="__('Email').' *'" required maxlength="255" autocomplete="email" dir="ltr" placeholder="you@company.com" />
-                        <x-ui.input name="phone" type="tel" :label="__('Phone')" maxlength="30" autocomplete="tel" dir="ltr" placeholder="+20 …" />
-                        <x-ui.select name="topic" :label="__('Subject').' *'" :options="\App\Enums\ContactTopic::options()" :value="$topic->value" required />
+                        <x-ui.input name="name" size="lg" icon="user" :label="__('Full name').' *'" required maxlength="120" autocomplete="name" :placeholder="__('Your name')" />
+                        <x-ui.input name="email" size="lg" icon="mail" type="email" :label="__('Email').' *'" required maxlength="255" autocomplete="email" dir="ltr" placeholder="you@company.com" />
+                        <x-ui.input name="phone" size="lg" icon="phone" type="tel" :label="__('Phone')" maxlength="30" autocomplete="tel" dir="ltr" placeholder="+20 …" />
+                        <x-ui.select name="topic" size="lg" :label="__('Subject').' *'" :options="\App\Enums\ContactTopic::options()" :value="$topic->value" required />
                     </div>
 
                     <div class="flex flex-col gap-1.5">
-                        <label for="message" class="text-sm font-semibold text-fg">{{ __('Message') }} *</label>
-                        <textarea id="message" name="message" rows="6" required minlength="10" maxlength="2000" aria-describedby="@error('message') message-error @enderror message-help"
-                                  @error('message') aria-invalid="true" @enderror placeholder="{{ __('How can we help?') }}"
-                                  class="w-full rounded-md border bg-surface px-3 py-2.5 text-base text-fg placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 {{ $errors->has('message') ? 'border-line-danger' : 'border-line' }}">{{ old('message', $prefill) }}</textarea>
+                        <label for="message" class="type-label-md text-fg">{{ __('Message') }} *</label>
+                        <textarea id="message" name="message" rows="5" required minlength="10" maxlength="2000" aria-describedby="@error('message') message-error @enderror message-help"
+                                  data-char-count="2000" @error('message') aria-invalid="true" @enderror placeholder="{{ __('How can we help?') }}"
+                                  class="w-full rounded-md border bg-surface px-3 py-2.5 type-body-md text-fg placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 {{ $errors->has('message') ? 'border-line-danger' : 'border-line' }}">{{ old('message', $prefill) }}</textarea>
                         @error('message')
                             <p id="message-error" class="text-sm text-fg-danger">{{ $message }}</p>
                         @enderror
-                        <p id="message-help" class="text-sm text-fg-secondary">{{ __('Please don’t share passwords or payment details. Up to 2,000 characters.') }}</p>
+                        <div class="flex items-start justify-between gap-4">
+                            <p id="message-help" class="type-body-xs text-fg-secondary">{{ __('Please don’t share passwords or payment details. Up to 2,000 characters.') }}</p>
+                            <span class="shrink-0 type-body-xs text-fg-tertiary tabular-nums" dir="ltr" data-char-count-output data-char-count-quiet aria-hidden="true"></span>
+                        </div>
                     </div>
 
                     <fieldset class="flex flex-col gap-2">
-                        <legend class="text-sm font-semibold text-fg">{{ __('Preferred language for our reply') }}</legend>
-                        <div class="flex flex-wrap gap-4">
+                        <legend class="mb-2 type-label-md text-fg">{{ __('Preferred language for our reply') }}</legend>
+                        <div class="flex flex-wrap gap-5">
                             @foreach ($languages as $code => $language)
-                                <label class="flex items-center gap-2 text-sm text-fg">
+                                <label class="flex items-center gap-2 type-body-md text-fg">
                                     <input type="radio" name="preferred_locale" value="{{ $code }}" @checked(old('preferred_locale', app()->getLocale()) === $code) class="size-4 accent-brand">
                                     <span lang="{{ $code }}">{{ $language['native_name'] }}</span>
                                 </label>
@@ -118,8 +121,8 @@
                     </fieldset>
 
                     <div class="flex flex-col gap-1.5">
-                        <label class="flex items-start gap-3 text-sm text-fg">
-                            <input type="checkbox" name="consent" value="1" required @checked(old('consent')) @error('consent') aria-invalid="true" aria-describedby="consent-error" @enderror class="mt-0.5 size-4 shrink-0 accent-brand">
+                        <label class="flex items-start gap-3 type-body-md text-fg">
+                            <input type="checkbox" name="consent" value="1" required @checked(old('consent')) @error('consent') aria-invalid="true" aria-describedby="consent-error" @enderror class="mt-1 size-4 shrink-0 accent-brand">
                             <span>{{ __('I agree to the Privacy Policy and to being contacted about my request.') }}</span>
                         </label>
                         @error('consent')
@@ -127,18 +130,15 @@
                         @enderror
                     </div>
 
-                    <div class="flex flex-col gap-3">
-                        <x-ui.button class="w-fit">
-                            {{ __('Send message') }}
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="rtl:-scale-x-100"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
-                        </x-ui.button>
-                        <p class="flex items-center gap-2 text-xs text-fg-tertiary">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="text-fg-success"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                    <div class="flex flex-col items-start gap-4">
+                        <x-ui.button size="lg" arrow>{{ __('Send message') }}</x-ui.button>
+                        <p class="flex items-center gap-2 type-body-xs text-fg-tertiary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0 text-icon-success"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
                             {{ __('Protected by rate limiting and spam checks. No CAPTCHA puzzles.') }}
                         </p>
                     </div>
                 </form>
             @endif
         </section>
-    </div>
+    </x-site.section>
 </x-layouts.public>

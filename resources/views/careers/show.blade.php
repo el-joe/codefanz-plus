@@ -4,7 +4,7 @@
     $email = $settings->get('contact', 'email') ?: 'hello@codefanz.com';
     $company = ($settings->get('general', 'company_name') ?? [])[$locale] ?? 'CodeFanz';
     $applyHref = 'mailto:'.$email.'?subject='.rawurlencode(__('Application: :position', ['position' => $translation->title]));
-    $prose = 'flex flex-col gap-4 leading-relaxed text-fg-secondary [&_a]:text-fg-brand [&_a]:underline [&_h2]:mt-4 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-fg [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-fg [&_ol]:list-decimal [&_ol]:ps-6 [&_strong]:text-fg [&_ul]:list-disc [&_ul]:ps-6';
+    $prose = 'flex flex-col gap-4 type-body-md text-fg-secondary [&_a]:text-fg-brand [&_a]:underline [&_h2]:mt-4 [&_h2]:type-h4 [&_h2]:text-fg [&_h3]:type-h5 [&_h3]:text-fg [&_ol]:list-decimal [&_ol]:ps-6 [&_strong]:text-fg [&_ul]:list-disc [&_ul]:ps-6';
     $facts = array_filter([
         __('Department') => $translation->department,
         __('Location') => $translation->location,
@@ -47,12 +47,12 @@
             </p>
         </x-slot:before>
         <div class="flex flex-wrap gap-3">
-            <x-ui.button :href="$applyHref" size="lg">{{ __('Apply by email') }}</x-ui.button>
+            <x-ui.button :href="$applyHref" size="lg" arrow>{{ __('Apply by email') }}</x-ui.button>
             <x-ui.button :href="route('contact', ['topic' => 'careers', 'ref' => $translation->title])" variant="secondary" size="lg">{{ __('Ask a question') }}</x-ui.button>
         </div>
     </x-site.page-hero>
 
-    <div class="mx-auto grid max-w-7xl gap-10 px-5 py-14 lg:grid-cols-[1fr_340px] lg:px-20 lg:py-20">
+    <x-site.section tone="surface" inner="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_22.5rem] lg:gap-16">
         <div class="flex min-w-0 flex-col gap-10">
             @if (trim($body) !== '')
                 <div class="{{ $prose }}">{!! $body !!}</div>
@@ -60,11 +60,11 @@
             @foreach (['responsibilities' => __('What you will do'), 'requirements' => __('What we are looking for')] as $list => $heading)
                 @if ($translation->{$list})
                     <section aria-labelledby="{{ $list }}" class="flex flex-col gap-4">
-                        <h2 id="{{ $list }}" class="text-2xl font-bold text-fg">{{ $heading }}</h2>
-                        <ul class="flex flex-col gap-2.5 text-fg-secondary">
+                        <h2 id="{{ $list }}" class="type-h3 text-fg">{{ $heading }}</h2>
+                        <ul class="flex flex-col gap-3 type-body-md text-fg-secondary">
                             @foreach ($translation->{$list} as $line)
                                 <li class="flex items-start gap-2.5">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="mt-0.5 shrink-0 text-fg-success"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+                                    <x-ui.check-circle class="mt-0.5" />
                                     {{ $line }}
                                 </li>
                             @endforeach
@@ -74,22 +74,22 @@
             @endforeach
         </div>
 
-        <aside class="lg:sticky lg:top-6 lg:self-start" aria-labelledby="position-facts">
-            <div class="flex flex-col gap-5 rounded-xl border border-line bg-surface p-6">
-                <h2 id="position-facts" class="text-lg font-semibold text-fg">{{ __('About this role') }}</h2>
-                <dl class="flex flex-col divide-y divide-line-subtle text-sm">
+        <aside class="lg:sticky lg:top-24 lg:self-start" aria-labelledby="position-facts">
+            <div class="flex flex-col gap-5 rounded-2xl border border-line bg-surface p-6 shadow-xs">
+                <h2 id="position-facts" class="type-h5 text-fg">{{ __('About this role') }}</h2>
+                <dl class="flex flex-col divide-y divide-line-subtle type-body-sm">
                     @foreach ($facts as $label => $value)
                         <div class="flex justify-between gap-4 py-2.5">
                             <dt class="text-fg-tertiary">{{ $label }}</dt>
-                            <dd class="text-end font-semibold text-fg">{{ $value }}</dd>
+                            <dd class="text-end type-label-md text-fg">{{ $value }}</dd>
                         </div>
                     @endforeach
                 </dl>
-                <x-ui.button :href="$applyHref" class="w-full">{{ __('Send your CV') }}</x-ui.button>
-                <p class="text-xs text-fg-tertiary">{{ __('Email your CV and portfolio to :email. Online applications are coming soon.', ['email' => $email]) }}</p>
+                <x-ui.button :href="$applyHref" size="lg" class="w-full" arrow>{{ __('Send your CV') }}</x-ui.button>
+                <p class="type-body-xs text-fg-tertiary">{{ __('Email your CV and portfolio to :email. Online applications are coming soon.', ['email' => $email]) }}</p>
             </div>
         </aside>
-    </div>
+    </x-site.section>
 
     <script type="application/ld+json">@json($jobPosting, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)</script>
 </x-layouts.public>

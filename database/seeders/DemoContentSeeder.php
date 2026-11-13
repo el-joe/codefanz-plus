@@ -512,7 +512,7 @@ class DemoContentSeeder extends Seeder
                 $route('portfolio.index', ['en' => 'Portfolio', 'ar' => 'أعمالنا']),
                 $route('products.index', ['en' => 'Products', 'ar' => 'المنتجات']),
                 $route('technologies.index', ['en' => 'Technologies', 'ar' => 'التقنيات']),
-                $route('careers.index', ['en' => 'Careers', 'ar' => 'الوظائف']),
+                $route('blog.index', ['en' => 'Blog', 'ar' => 'المدونة']),
                 $route('about', ['en' => 'About', 'ar' => 'من نحن']),
             ],
             MenuLocation::FooterServices->value => $serviceLinks,

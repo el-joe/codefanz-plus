@@ -15,7 +15,7 @@
     :description="__('Describe your idea to our free AI project assistant and get a structured project brief to our team — no payment needed.')"
     :alternates="$languages->keys()->mapWithKeys(fn ($code) => [$code => route('assistant', ['locale' => $code])])->all()">
     <div class="bg-canvas">
-        <div class="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-5 lg:grid-cols-[minmax(0,1fr)_340px] lg:px-20 lg:py-10"
+        <div class="container-page grid gap-6 py-4 max-sm:px-3 sm:py-6 lg:grid-cols-[minmax(0,1fr)_20.625rem] lg:py-8"
              data-assistant
              data-mode="{{ $aiAvailable ? 'ai' : 'guided' }}"
              data-start-url="{{ route('assistant.start') }}"
@@ -31,16 +31,16 @@
              data-strip-text="{{ __('Brief: :collected of :total details collected') }}">
 
             <section class="flex min-w-0 flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-xs" aria-labelledby="assistant-title">
-                <header class="flex items-center gap-3 border-b border-line px-4 py-3 sm:px-5 sm:py-4">
+                <header class="flex items-center gap-3 border-b border-line px-4 py-3 sm:px-6 sm:py-4">
                     <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand text-fg-on-brand sm:size-11">{!! $botIcon !!}</span>
                     <div class="min-w-0 flex-1">
-                        <h1 id="assistant-title" class="truncate text-base font-bold text-fg sm:text-lg">{{ __('AI Project Assistant') }}</h1>
-                        <p class="flex items-center gap-1.5 truncate text-xs text-fg-tertiary">
-                            <span class="size-2 shrink-0 rounded-full bg-fg-success" aria-hidden="true"></span>
+                        <h1 id="assistant-title" class="truncate type-label-lg text-fg">{{ __('AI Project Assistant') }}</h1>
+                        <p class="flex items-center gap-1.5 truncate type-body-xs text-fg-tertiary">
+                            <span class="size-2 shrink-0 rounded-full bg-success-600" aria-hidden="true"></span>
                             <span data-assistant-status data-ai-text="{{ __('Online · replies instantly') }}" data-guided-text="{{ __('Guided questionnaire') }}">{{ $aiAvailable ? __('Online · replies instantly') : __('Guided questionnaire') }}</span>
                         </p>
                     </div>
-                    <x-ui.badge tone="success" class="shrink-0" data-assistant-free>{{ __('Free · no payment needed') }}</x-ui.badge>
+                    <x-ui.badge tone="success" class="shrink-0 max-sm:hidden" data-assistant-free>{{ __('Free · no payment needed') }}</x-ui.badge>
                 </header>
 
                 {{-- Mobile: collapsible brief strip. --}}
@@ -55,17 +55,17 @@
                 <div class="hidden border-b border-line-warning bg-warning-subtle px-4 py-3 text-sm text-fg sm:px-5" role="status" data-assistant-notice
                      @unless ($aiAvailable) data-initial-notice="{{ \App\Services\Assistant\ProjectAssistant::fallbackNotice(null) }}" @endunless></div>
 
-                <div class="flex h-[60vh] min-h-96 flex-col gap-4 overflow-y-auto bg-surface px-4 py-5 sm:px-5" data-assistant-scroll>
+                <div class="flex h-[calc(100dvh-20rem)] min-h-96 flex-col gap-4 overflow-y-auto bg-surface px-4 py-5 sm:px-6 lg:h-[36rem]" data-assistant-scroll>
                     <ol class="flex flex-col gap-4" role="log" aria-live="polite" aria-label="{{ __('Conversation') }}" data-assistant-log>
                         <li class="flex items-end gap-2" data-assistant-intro>
                             <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand text-fg-on-brand">{!! $botIcon !!}</span>
-                            <div class="max-w-[85%] rounded-2xl rounded-es-sm bg-subtle px-4 py-3 text-sm text-fg sm:max-w-[70%]">
+                            <div class="max-w-[85%] rounded-xl rounded-es-sm bg-subtle px-3 py-2.5 type-body-sm text-fg sm:max-w-[60%] sm:type-body-md">
                                 {{ __("Hi! I'm the CodeFanz project assistant. I'll ask a few questions about your idea and prepare a project brief for our team. It's free — no payment needed.") }}
                             </div>
                         </li>
                         <li class="flex items-end gap-2" data-assistant-intro>
                             <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand text-fg-on-brand">{!! $botIcon !!}</span>
-                            <div class="max-w-[85%] rounded-2xl rounded-es-sm bg-subtle px-4 py-3 text-sm text-fg sm:max-w-[70%]">
+                            <div class="max-w-[85%] rounded-xl rounded-es-sm bg-subtle px-3 py-2.5 type-body-sm text-fg sm:max-w-[60%] sm:type-body-md">
                                 {{ $aiAvailable ? __('What would you like to build?') : __('What would you like to build? Give it a short name and tell us about your business.') }}
                             </div>
                         </li>
@@ -74,9 +74,9 @@
                     <p class="hidden text-xs text-fg-tertiary" data-assistant-typing aria-hidden="true">{{ __('The assistant is typing…') }}</p>
 
                     {{-- Confirm-summary card (filled by the script with textContent). --}}
-                    <section class="hidden max-w-xl rounded-2xl border border-line-brand bg-surface p-5 shadow-xs" data-assistant-summary aria-labelledby="summary-title">
-                        <h2 id="summary-title" class="text-sm font-bold text-fg">{{ __('Here’s what I understood — please confirm:') }}</h2>
-                        <dl class="mt-3 flex flex-col gap-2 text-sm" data-summary-rows></dl>
+                    <section class="hidden max-w-xl rounded-xl border border-line-brand bg-surface p-5 shadow-xs" data-assistant-summary aria-labelledby="summary-title">
+                        <h2 id="summary-title" class="type-label-md text-fg">{{ __('Here’s what I understood — please confirm:') }}</h2>
+                        <dl class="mt-3 flex flex-col gap-2 type-body-sm" data-summary-rows></dl>
 
                         <form class="mt-4 flex flex-col gap-3 border-t border-line-subtle pt-4" data-assistant-confirm novalidate>
                             <p class="text-sm font-semibold text-fg">{{ __('Your contact details') }}</p>
@@ -197,7 +197,7 @@
                     <p class="mt-2 hidden text-sm text-fg-danger" role="alert" data-guided-error></p>
                 </div>
 
-                <form class="border-t border-line px-4 py-3 sm:px-5" data-assistant-composer>
+                <form class="border-t border-line px-4 py-3 sm:px-6 sm:py-4" data-assistant-composer>
                     {{-- Honeypot: hidden from people and assistive technology; bots tend to fill it. --}}
                     <div class="hidden" aria-hidden="true">
                         <label for="assistant-website">{{ __('Leave this field empty') }}</label>
@@ -207,7 +207,7 @@
                         <label for="assistant-message" class="sr-only">{{ __('Your message') }}</label>
                         <textarea id="assistant-message" name="message" rows="1" maxlength="{{ config('codefanz.assistant.max_message_length') }}" required dir="auto"
                                   placeholder="{{ __('Type your message…') }}"
-                                  class="max-h-40 min-h-10 flex-1 resize-none bg-transparent px-2 py-2 text-base text-fg placeholder:text-fg-tertiary focus:outline-none"></textarea>
+                                  class="max-h-40 min-h-10 flex-1 resize-none bg-transparent px-2 py-2 type-body-md text-fg placeholder:text-fg-tertiary focus:outline-none"></textarea>
                         <button type="submit" class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-brand text-fg-on-brand hover:bg-brand-hover disabled:bg-disabled disabled:text-fg-disabled" data-composer-send>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="rtl:-scale-x-100"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg>
                             <span class="sr-only">{{ __('Send') }}</span>
@@ -216,7 +216,7 @@
                     <p class="mt-1 hidden text-sm text-fg-danger" role="alert" data-composer-error></p>
                 </form>
 
-                <p class="px-4 pb-4 text-xs text-fg-tertiary sm:px-5">{{ __('Don’t share passwords or payment details. Conversations are stored according to our Privacy Policy.') }}</p>
+                <p class="px-4 pb-4 type-body-xs text-fg-tertiary sm:px-6">{{ __('Don’t share passwords or payment details. Conversations are stored according to our Privacy Policy.') }}</p>
 
                 <noscript>
                     <p class="px-5 pb-5 text-sm text-fg">
@@ -227,19 +227,19 @@
             </section>
 
             <aside class="hidden h-fit rounded-2xl border border-line bg-surface p-6 shadow-xs lg:sticky lg:top-24 lg:block" aria-labelledby="brief-title">
-                <h2 id="brief-title" class="text-lg font-bold text-fg">{{ __('Your project brief') }}</h2>
-                <p class="mt-3 text-sm text-fg-secondary" data-progress-text>{{ __(':collected of :total details collected', ['collected' => $progress['collected'], 'total' => $progress['total']]) }}</p>
+                <h2 id="brief-title" class="type-h5 text-fg">{{ __('Your project brief') }}</h2>
+                <p class="mt-4 type-body-sm text-fg-secondary" data-progress-text>{{ __(':collected of :total details collected', ['collected' => $progress['collected'], 'total' => $progress['total']]) }}</p>
                 <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-muted" role="progressbar" aria-labelledby="brief-title" aria-valuemin="0" aria-valuemax="{{ $progress['total'] }}" aria-valuenow="{{ $progress['collected'] }}" data-progress-bar>
                     <div class="h-full rounded-full bg-brand transition-[width]" style="width: 0%" data-progress-fill></div>
                 </div>
-                <ul class="mt-5 flex flex-col gap-3 text-sm" data-progress-list>
+                <ul class="mt-5 flex flex-col gap-4 type-body-md" data-progress-list>
                     @foreach ($progress['items'] as $item)
-                        <li class="flex items-center gap-2.5 text-fg-secondary">{{ $item['label'] }}</li>
+                        <li class="flex items-center gap-2.5 text-fg-tertiary">{{ $item['label'] }}</li>
                     @endforeach
                 </ul>
-                <p class="mt-5 rounded-lg bg-info-subtle p-3 text-sm text-fg-info">{{ __('After you confirm, our team receives your brief and contacts you within one business day.') }}</p>
-                <p class="mt-3 text-xs text-fg-tertiary">
-                    {{ __('Prefer a form?') }} <a href="{{ route('quote') }}" class="font-semibold text-fg-brand hover:underline">{{ __('Request a Quote') }}</a>
+                <p class="mt-5 rounded-lg bg-info-subtle p-3.5 type-body-sm text-fg-info">{{ __('After you confirm, our team receives your brief and contacts you within one business day.') }}</p>
+                <p class="mt-3 type-body-xs text-fg-tertiary">
+                    {{ __('Prefer a form?') }} <a href="{{ route('quote') }}" class="type-label-sm text-fg-brand hover:underline">{{ __('Request a Quote') }}</a>
                 </p>
             </aside>
         </div>

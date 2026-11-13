@@ -91,24 +91,34 @@
             <nav class="hidden flex-1 justify-center xl:flex" aria-label="{{ __('Main navigation') }}" data-main-nav>
                 <ul class="flex items-center gap-x-7 2xl:gap-x-8">
                     @foreach ($header as $link)
-                        <li @class(['relative' => $link['children'] !== []]) @if ($link['children'] !== []) data-dropdown @endif>
-                            <span class="flex items-center gap-0.5">
+                        @if ($link['children'] !== [])
+                            {{--
+                                One element (label + chevron) that links to the parent page. The panel opens on hover (pointer devices)
+                                and focus-within in plain CSS, with a 150ms close delay and a padding "bridge"; the nav module adds
+                                aria-expanded sync, ArrowDown/Esc and tap-to-open-then-navigate on touch screens.
+                            --}}
+                            <li class="relative" data-nav-item>
+                                <a href="{{ $link['url'] }}" {!! $newTab($link) !!} aria-haspopup="true" aria-expanded="false" aria-controls="nav-submenu-{{ $loop->index }}" data-nav-trigger
+                                   @if ($isCurrent($link['url'])) aria-current="page" @endif
+                                   class="inline-flex items-center gap-1 rounded-sm py-2 type-label-md whitespace-nowrap text-fg transition-colors hover:text-fg-brand aria-expanded:text-fg-brand">
+                                    {{ $link['label'] }}
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0 transition-transform" data-nav-chevron><path d="m6 9 6 6 6-6"/></svg>
+                                </a>
+                                <div class="absolute start-0 top-full z-40 pt-3" data-nav-dropdown>
+                                    <ul id="nav-submenu-{{ $loop->index }}" class="w-64 rounded-lg border border-line bg-surface-raised p-2 shadow-lg">
+                                        <li><a href="{{ $link['url'] }}" class="block rounded-md px-3 py-2 type-label-md text-fg hover:bg-subtle hover:text-fg-brand focus-visible:bg-subtle">{{ __('All :item', ['item' => mb_strtolower($link['label'])]) }}</a></li>
+                                        @foreach ($link['children'] as $child)
+                                            <li><a href="{{ $child['url'] }}" {!! $newTab($child) !!} class="block rounded-md px-3 py-2 type-body-sm text-fg hover:bg-subtle hover:text-fg-brand focus-visible:bg-subtle">{{ $child['label'] }}</a></li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </li>
+                        @else
+                            <li>
                                 <a href="{{ $link['url'] }}" {!! $newTab($link) !!} @if ($isCurrent($link['url'])) aria-current="page" @endif
                                    class="rounded-sm py-2 type-label-md whitespace-nowrap text-fg-secondary transition-colors hover:text-fg aria-[current=page]:text-fg">{{ $link['label'] }}</a>
-                                @if ($link['children'] !== [])
-                                    <button type="button" data-dropdown-trigger class="rounded-sm p-0.5 text-fg-secondary hover:text-fg aria-expanded:rotate-180" aria-label="{{ __('Show :item links', ['item' => $link['label']]) }}">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-                                    </button>
-                                @endif
-                            </span>
-                            @if ($link['children'] !== [])
-                                <ul data-dropdown-menu hidden class="absolute start-0 top-full z-40 mt-3 w-64 rounded-lg border border-line bg-surface-raised p-2 shadow-lg">
-                                    @foreach ($link['children'] as $child)
-                                        <li><a href="{{ $child['url'] }}" {!! $newTab($child) !!} class="block rounded-md px-3 py-2 type-body-sm text-fg hover:bg-subtle hover:text-fg-brand">{{ $child['label'] }}</a></li>
-                                    @endforeach
-                                </ul>
-                            @endif
-                        </li>
+                            </li>
+                        @endif
                     @endforeach
                 </ul>
             </nav>
@@ -131,13 +141,23 @@
             <ul class="container-page flex flex-col py-4">
                 @foreach ($header as $link)
                     <li class="border-b border-line-subtle last:border-b-0">
-                        <a href="{{ $link['url'] }}" {!! $newTab($link) !!} @if ($isCurrent($link['url'])) aria-current="page" @endif class="flex items-center justify-between rounded-md py-3.5 type-label-lg text-fg hover:text-fg-brand aria-[current=page]:text-fg-brand">{{ $link['label'] }}</a>
                         @if ($link['children'] !== [])
-                            <ul class="mb-3 flex flex-col border-s-2 border-line-subtle ps-4">
+                            {{-- One row: the label navigates, the chevron (shown by the nav module) expands the sub-list, which stays open without JavaScript. --}}
+                            <div class="flex items-center justify-between gap-2">
+                                <a href="{{ $link['url'] }}" {!! $newTab($link) !!} @if ($isCurrent($link['url'])) aria-current="page" @endif class="flex-1 rounded-md py-3.5 type-label-lg text-fg hover:text-fg-brand aria-[current=page]:text-fg-brand">{{ $link['label'] }}</a>
+                                <button type="button" hidden data-nav-sub-toggle aria-expanded="true" aria-controls="mobile-submenu-{{ $loop->index }}" aria-label="{{ __('Show :item', ['item' => mb_strtolower($link['label'])]) }}"
+                                        class="group/toggle flex size-11 shrink-0 items-center justify-center rounded-md text-icon-secondary hover:bg-subtle hover:text-fg-brand aria-expanded:text-fg-brand">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="transition-transform group-aria-expanded/toggle:rotate-180"><path d="m6 9 6 6 6-6"/></svg>
+                                </button>
+                            </div>
+                            <ul id="mobile-submenu-{{ $loop->index }}" class="mb-3 flex flex-col border-s-2 border-line-subtle ps-4">
+                                <li><a href="{{ $link['url'] }}" class="block rounded-md py-2 type-label-md text-fg hover:text-fg-brand">{{ __('All :item', ['item' => mb_strtolower($link['label'])]) }}</a></li>
                                 @foreach ($link['children'] as $child)
                                     <li><a href="{{ $child['url'] }}" {!! $newTab($child) !!} class="block rounded-md py-2 type-body-md text-fg-secondary hover:text-fg-brand">{{ $child['label'] }}</a></li>
                                 @endforeach
                             </ul>
+                        @else
+                            <a href="{{ $link['url'] }}" {!! $newTab($link) !!} @if ($isCurrent($link['url'])) aria-current="page" @endif class="flex items-center justify-between rounded-md py-3.5 type-label-lg text-fg hover:text-fg-brand aria-[current=page]:text-fg-brand">{{ $link['label'] }}</a>
                         @endif
                     </li>
                 @endforeach
@@ -219,4 +239,8 @@
     @if ($consent->isNeeded())
         <x-site.consent-banner :measurement-id="$consent->measurementId()" :decided="$consent->hasDecided(request())" />
     @endif
+
+    @unless (request()->routeIs('assistant'))
+        <x-site.assistant-launcher />
+    @endunless
 </x-layouts.base>

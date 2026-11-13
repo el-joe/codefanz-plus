@@ -1,3 +1,5 @@
+@props(['title' => null, 'entry' => null, 'themeable' => false])
+
 @php
     $locale = app()->getLocale();
     $direction = \App\Models\Language::active()[$locale]['direction'] ?? 'ltr';
@@ -10,9 +12,13 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ isset($title) ? $title.' · ' : '' }}CodeFanz</title>
     @isset($meta) {{ $meta }} @endisset
-    <script>
-        try { if ((localStorage.getItem('codefanz-theme') ?? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark') document.documentElement.classList.add('dark'); } catch (e) {}
-    </script>
+    @if ($themeable)
+        {{-- Light is the designed default; dark only when the user chose it with the theme toggle (admin, portal). --}}
+        <meta name="codefanz-themeable" content="1">
+        <script>
+            try { if (localStorage.getItem('codefanz-theme') === 'dark') document.documentElement.classList.add('dark'); } catch (e) {}
+        </script>
+    @endif
     @fonts
     @vite(['resources/css/app.css', $entry ?? 'resources/js/app.js'])
 </head>

@@ -40,7 +40,7 @@
     $moreActive = collect($nav)->reject(fn ($item) => in_array($item['key'], $tabs, true))->contains(fn ($item) => $isActive($item));
 @endphp
 
-<x-layouts.base :title="$title">
+<x-layouts.base :themeable="true" :title="$title">
     <div class="flex min-h-screen">
         {{-- Portal Sidebar --}}
         <aside class="sticky top-0 hidden h-screen w-68 shrink-0 flex-col border-e border-line bg-surface lg:flex" data-portal-sidebar>

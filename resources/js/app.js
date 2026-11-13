@@ -13,6 +13,8 @@ import { init as initCopy } from './modules/copy';
 import { init as initPrint } from './modules/print';
 import { init as initConsent } from './modules/consent';
 import { init as initTabs } from './modules/tabs';
+import { init as initToc } from './modules/toc';
+import { init as initCharCount } from './modules/char-count';
 
 applyStoredTheme();
 
@@ -32,4 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initPrint();
     initConsent();
     initTabs();
+    initToc();
+    initCharCount();
 });

@@ -92,7 +92,7 @@ export function init() {
 
         if (time) {
             const stamp = document.createElement('span');
-            stamp.className = 'mt-1 block text-xs opacity-75';
+            stamp.className = 'mt-1 block type-body-xs opacity-75';
             stamp.setAttribute('dir', 'ltr');
             stamp.textContent = time;
             bubble.append(stamp);
@@ -100,12 +100,12 @@ export function init() {
 
         if (role === 'user') {
             item.className = 'flex justify-end';
-            bubble.className = 'max-w-[85%] rounded-2xl rounded-ee-sm bg-brand px-4 py-3 text-sm text-fg-on-brand sm:max-w-[70%]';
+            bubble.className = 'max-w-[85%] rounded-xl rounded-ee-sm bg-brand px-3 py-2.5 type-body-sm text-fg-on-brand sm:max-w-[60%] sm:type-body-md';
             item.append(bubble);
         } else {
             item.className = 'flex items-end gap-2';
             const avatar = root.querySelector('[data-assistant-intro] > span').cloneNode(true);
-            bubble.className = 'max-w-[85%] rounded-2xl rounded-es-sm bg-subtle px-4 py-3 text-sm text-fg sm:max-w-[70%]';
+            bubble.className = 'max-w-[85%] rounded-xl rounded-es-sm bg-subtle px-3 py-2.5 type-body-sm text-fg sm:max-w-[60%] sm:type-body-md';
             item.append(avatar, bubble);
         }
 
@@ -120,7 +120,7 @@ export function init() {
         (options ?? []).forEach((option) => {
             const button = document.createElement('button');
             button.type = 'button';
-            button.className = 'rounded-full border border-line-brand bg-surface px-3 py-1.5 text-sm font-semibold text-fg-brand hover:bg-brand-subtle';
+            button.className = 'rounded-full border border-line-brand bg-surface px-3 py-1.5 type-label-md text-fg-brand hover:bg-brand-subtle';
             button.textContent = option;
             button.addEventListener('click', () => send(option));
             quick.append(button);
@@ -135,7 +135,7 @@ export function init() {
         root.querySelectorAll('[data-progress-list]').forEach((list) => {
             list.replaceChildren(...items.map((item) => {
                 const li = document.createElement('li');
-                li.className = `flex items-center gap-2.5 ${item.done ? 'text-fg' : 'text-fg-secondary'}`;
+                li.className = `flex items-center gap-2.5 ${item.done ? 'text-fg' : 'text-fg-tertiary'}`;
                 const label = document.createElement('span');
                 label.textContent = item.label;
                 li.append(icon(item.done), label);
