@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\LeadAssignmentController;
 use App\Http\Controllers\Admin\LeadAttachmentController;
 use App\Http\Controllers\Admin\LeadController;
 use App\Http\Controllers\Admin\LeadStatusController;
+use App\Http\Controllers\Admin\McpClientController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\MenuItemController;
@@ -86,6 +87,18 @@ Route::middleware('two-factor')->group(function (): void {
     Route::put('emergency/{key}', [KillSwitchController::class, 'update'])->middleware('can:automation.manage')->name('emergency.update');
 
     Route::get('ai-governance', AiGovernanceController::class)->middleware('can:automation.manage')->name('ai-governance');
+
+    // MCP Management (B08, M9): clients, tokens (shown once), scopes, limits, IP allow-lists and the tool-call log.
+    Route::middleware('can:mcp.manage')->prefix('mcp')->name('mcp.')->group(function (): void {
+        Route::get('/', [McpClientController::class, 'index'])->name('index');
+        Route::get('clients/create', [McpClientController::class, 'create'])->name('clients.create');
+        Route::post('clients', [McpClientController::class, 'store'])->name('clients.store');
+        Route::get('clients/{client}/edit', [McpClientController::class, 'edit'])->name('clients.edit');
+        Route::put('clients/{client}', [McpClientController::class, 'update'])->name('clients.update');
+        Route::delete('clients/{client}', [McpClientController::class, 'destroy'])->name('clients.destroy');
+        Route::post('clients/{client}/token', [McpClientController::class, 'issueToken'])->middleware('throttle:10,1')->name('clients.token.store');
+        Route::delete('clients/{client}/token', [McpClientController::class, 'revokeToken'])->name('clients.token.destroy');
+    });
 
     Route::middleware('can:ai.use')->prefix('ai-studio')->name('ai-studio.')->group(function (): void {
         Route::get('/', [ContentStudioController::class, 'index'])->name('index');

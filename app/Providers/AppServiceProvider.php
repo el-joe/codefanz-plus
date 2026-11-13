@@ -25,6 +25,7 @@ use App\Models\Industry;
 use App\Models\Invoice;
 use App\Models\KillSwitch;
 use App\Models\Lead;
+use App\Models\McpClient;
 use App\Models\Media;
 use App\Models\Menu;
 use App\Models\MenuItem;
@@ -159,6 +160,7 @@ class AppServiceProvider extends ServiceProvider
             'social_account' => SocialAccount::class,
             'social_post' => SocialPost::class,
             'social_post_variant' => SocialPostVariant::class,
+            'mcp_client' => McpClient::class,
         ]);
 
         // Payment gateway webhooks: generous per gateway and IP; bad signatures are rejected before any work.

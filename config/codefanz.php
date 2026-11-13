@@ -256,6 +256,18 @@ return [
     ],
 
     /*
+    | MCP server (M9): tool-call log retention (model:prune), per-client rate
+    | limit bounds and list page sizes for /api/v1/mcp.
+    */
+
+    'mcp' => [
+        'tool_call_retention_days' => (int) env('MCP_TOOL_CALL_RETENTION_DAYS', 90),
+        'max_rate_limit_per_minute' => 600,
+        'default_per_page' => 20,
+        'max_per_page' => 50,
+    ],
+
+    /*
     | Project delivery (M6): documents reuse the lead attachment allow-list
     | (detected MIME type and extension must both match) and the private disk.
     | Conversations are polled by the browser; support tickets marked resolved

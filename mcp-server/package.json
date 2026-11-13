@@ -1,0 +1,33 @@
+{
+  "name": "@codefanz/mcp-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CodeFanz MCP server: a thin, scoped client of the Laravel /api/v1/mcp API for Claude Code and Claude Desktop.",
+  "type": "module",
+  "bin": {
+    "codefanz-mcp": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/index.js",
+    "start:http": "node dist/index.js --http",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "zod": "4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "20.19.43",
+    "typescript": "5.9.3",
+    "vitest": "4.1.12"
+  }
+}

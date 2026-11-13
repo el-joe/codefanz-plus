@@ -112,7 +112,7 @@ class Post extends Model implements Approvable
 
     public function isAiOrigin(): bool
     {
-        return $this->origin === PostOrigin::Ai;
+        return $this->origin?->isMachine() ?? false;
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SocialMediaController;
 use App\Http\Middleware\AddRobotsHeader;
 use App\Http\Middleware\AssignRequestId;
+use App\Http\Middleware\AuthorizeMcpCall;
 use App\Http\Middleware\EnsurePortalAccess;
 use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\HandleRedirects;
@@ -13,6 +14,7 @@ use App\Http\Middleware\RequireTwoFactor;
 use App\Http\Middleware\SetLocaleFromPreference;
 use App\Http\Middleware\SetLocaleFromRoute;
 use App\Services\Analytics\AnalyticsConsent;
+use App\Services\Mcp\McpErrors;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -22,6 +24,7 @@ use Illuminate\Support\Facades\Route;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function (): void {
@@ -65,10 +68,16 @@ return Application::configure(basePath: dirname(__DIR__))
             'portal' => EnsurePortalAccess::class,
             'locale.route' => SetLocaleFromRoute::class,
             'locale.preference' => SetLocaleFromPreference::class,
+            'mcp' => AuthorizeMcpCall::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        // MCP API: one error envelope for every failure (validation, auth, governance, not found, server errors).
+        $exceptions->render(fn (Throwable $exception, Request $request) => $request->is('api/v1/mcp', 'api/v1/mcp/*')
+            ? McpErrors::fromThrowable($exception)
+            : null);
     })->create();

@@ -11,7 +11,7 @@ Baseline: OWASP ASVS L2 / OWASP Top 10.
 ## 2. Authorization
 - Policies on every model; Form Request `authorize()`; route middleware by permission.
 - Client portal: all queries scoped to the authenticated customer; ULID references; isolation tests per resource.
-- Sanctum token abilities for API/MCP; AI/MCP actors can never hold finance, user-management or security abilities.
+- Sanctum token abilities for API/MCP (one hashed token per MCP client, abilities = scopes, owner permission re-checked per call, optional IP allow-list and expiry); AI/MCP actors can never hold finance, user-management or security abilities.
 
 ## 3. Input & output
 - Validation via Form Requests; Eloquent/bindings only (no raw SQL with interpolation).

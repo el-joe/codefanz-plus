@@ -25,3 +25,10 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+/mcp-server/node_modules
+/mcp-server/dist
+
+# Stray Yarn PnP artifacts (project uses npm + package-lock.json)
+/.yarn
+/.pnp.*
+/yarn.lock

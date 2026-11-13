@@ -88,6 +88,15 @@ AI-origin requests with guardrail flags, the reviewer's own proposals and reques
   get "ready for manual export"; a post only counts as published when the platform returns an id, or when a
   person pastes the live URL ("mark as posted manually", audited). Nothing is ever simulated.
 
+## 4d. MCP (M9)
+
+- MCP clients (Admin → MCP, `mcp.manage`) act for an owner: every proposal is a `ProposeChange` with origin `mcp`
+  and `requested_by` = the owner (so the owner cannot approve it), blog/social drafts get origin `mcp` and follow
+  their editorial workflows (the owner counts as the author/generator), leads get source `mcp`.
+- MCP has no approve / reject tools. `apply_approved_change` only applies MCP-origin requests a human approved,
+  through `ApplyApprovedChange`; the owner must hold the request's `required_permission`. Details:
+  `docs/MCP_DOCUMENTATION.md`.
+
 ## 5. Audit record (every operation)
 
 actor identity (user / AI agent / MCP client) · operation · target resource · before state · proposed state ·
@@ -98,6 +107,7 @@ approver identity · execution result · timestamp · IP/user agent where applic
 - Pause all AI automation (`ai_automation` kill switch)
 - Disable social publishing (`social_publishing`)
 - Disable MCP write operations (`mcp_writes`) — draft/execute tools return a clear error
+- Disable all MCP access (`mcp_access`) — every MCP call, including reads, is refused
 - Revoke an individual integration or MCP token
 - Cancel all scheduled content (bulk action, audited)
 - View all pending change requests
