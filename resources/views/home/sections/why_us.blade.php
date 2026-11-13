@@ -7,11 +7,11 @@
         '<path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/>',
     ];
 @endphp
-<x-site.section :tone="$tone" inner="grid gap-10 lg:grid-cols-[1fr_27.5rem] lg:items-start lg:gap-16" aria-labelledby="{{ $headingId }}" data-section="why_us">
+<x-site.section :tone="$tone" inner="grid gap-10 lg:grid-cols-[minmax(0,1fr)_27.5rem] lg:items-start lg:gap-16" aria-labelledby="{{ $headingId }}" data-section="why_us">
     <div class="flex flex-col gap-8">
         <x-site.section-heading :id="$headingId" align="start" :eyebrow="$copy['eyebrow']" :heading="$copy['heading']" :subheading="$copy['subheading']" />
         @if ($copy['items'] !== [])
-            <ul class="grid gap-6 sm:grid-cols-2">
+            <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 @foreach ($copy['items'] as $reason)
                     <li class="flex flex-col items-start gap-3">
                         <span class="flex size-11 items-center justify-center rounded-lg bg-brand-subtle text-icon-brand" aria-hidden="true">

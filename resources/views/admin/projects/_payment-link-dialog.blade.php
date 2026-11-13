@@ -33,7 +33,7 @@
 
         <div class="flex flex-col gap-1.5">
             <label for="link-milestone" class="text-sm font-semibold">{{ __('Milestone') }}</label>
-            <select id="link-milestone" name="milestone" data-link-milestone class="w-full rounded-md border border-line bg-surface px-3 py-2.5 text-base text-fg">
+            <select id="link-milestone" name="milestone" data-link-milestone class="w-full rounded-md border border-line-strong bg-surface px-3 py-2.5 text-base text-fg">
                 <option value="" data-currency="{{ $project->currency }}">{{ __('Custom amount (no milestone)') }}</option>
                 @foreach ($milestoneOptions as $milestone)
                     @php($remaining = $linkDialog['remaining'][$milestone->ulid])
@@ -44,7 +44,7 @@
             </select>
         </div>
 
-        <div class="grid grid-cols-[1fr_8rem] gap-3">
+        <div class="grid grid-cols-[minmax(0,1fr)_8rem] gap-3">
             <x-ui.input name="amount" id="link-amount" type="number" step="0.01" min="0.01" :label="__('Amount')" bag="paymentLink" required dir="ltr" data-link-amount />
             <x-ui.select name="currency" id="link-currency" :label="__('Currency')" bag="paymentLink" :options="array_combine(config('codefanz.payments.currencies'), config('codefanz.payments.currencies'))" :value="in_array($project->currency, config('codefanz.payments.currencies'), true) ? $project->currency : 'USD'" data-link-currency />
         </div>
@@ -52,7 +52,7 @@
 
         <x-ui.input name="description" id="link-description" :label="__('Description (shown to client)')" bag="paymentLink" maxlength="255" dir="auto" :placeholder="__('e.g. Second installment (50%)')" />
 
-        <div class="grid gap-3 sm:grid-cols-2">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <x-ui.input name="expires_on" id="link-expires" type="date" :label="__('Expires on')" bag="paymentLink" :value="$defaultExpiry" :min="now()->toDateString()" />
             <x-ui.select name="usage" id="link-usage" :label="__('Usage')" bag="paymentLink" :options="['single' => __('Single use'), 'reusable' => __('Reusable')]" value="single" data-link-usage />
         </div>

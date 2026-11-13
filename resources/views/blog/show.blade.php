@@ -150,7 +150,7 @@
             </div>
         </header>
 
-        <div class="container-page grid gap-10 pt-10 pb-14 lg:grid-cols-[17.5rem_minmax(0,47.5rem)] lg:gap-20 lg:pt-12 lg:pb-24">
+        <div class="container-page grid grid-cols-1 gap-10 pt-10 pb-14 lg:grid-cols-[17.5rem_minmax(0,47.5rem)] lg:gap-20 lg:pt-12 lg:pb-24">
             <aside class="lg:sticky lg:top-24 lg:self-start" aria-labelledby="toc-heading">
                 @if ($toc->isNotEmpty())
                     <nav class="rounded-xl bg-subtle p-4" aria-labelledby="toc-heading" data-toc>
@@ -201,7 +201,7 @@
     @if ($related->isNotEmpty())
         <x-site.section tone="surface" inner="flex flex-col gap-8" aria-labelledby="related-heading">
             <h2 id="related-heading" class="type-h3 text-fg">{{ __('Keep reading') }}</h2>
-            <ul class="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            <ul class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($related as $relatedPost)
                     @include('blog._card', ['post' => $relatedPost])
                 @endforeach

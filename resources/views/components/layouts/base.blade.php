@@ -30,7 +30,7 @@
 
     {{ $slot }}
 
-    <div data-toast-region aria-live="polite" class="pointer-events-none fixed bottom-4 end-4 z-50 flex w-full max-w-sm flex-col gap-2"></div>
+    <div data-toast-region aria-live="polite" class="pointer-events-none fixed bottom-4 end-4 z-50 flex w-[calc(100%-2rem)] max-w-sm flex-col gap-2"></div>
     @if (session('toast'))
         <span hidden data-flash="{{ session('toast') }}"></span>
     @endif

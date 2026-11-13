@@ -9,7 +9,7 @@
         <x-ui.alert tone="danger" :title="__('Please fix the highlighted fields')">{{ $errors->first() }}</x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <form method="POST" action="{{ $template->exists ? route('admin.prompts.update', $template) : route('admin.prompts.store') }}" class="flex flex-col gap-6">
             @csrf
             @if ($template->exists)
@@ -18,7 +18,7 @@
             @endif
 
             <x-ui.card>
-                <div class="grid gap-4 md:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <x-ui.input name="name" :label="__('Name')" :value="$template->name" required maxlength="120" dir="auto" />
                     <x-ui.input name="key" :label="__('Key')" :value="$template->key" required maxlength="60" dir="ltr" :helper="__('Lowercase letters, digits and dashes, e.g. blog-article.')" />
                     <x-ui.select name="purpose" :label="__('Purpose')" :options="$purposes" :value="$template->purpose?->value" required />
@@ -53,10 +53,10 @@
                         <tbody>
                             @for ($i = 0; $i < $rows; $i++)
                                 <tr>
-                                    <td class="py-1 pe-2"><input name="variables[{{ $i }}][name]" value="{{ $variables[$i]['name'] ?? '' }}" aria-label="{{ __('Name') }}" maxlength="40" dir="ltr" class="w-full rounded-md border {{ $errors->has("variables.{$i}.name") ? 'border-line-danger' : 'border-line' }} bg-surface px-2 py-1.5 font-mono text-sm text-fg">
+                                    <td class="py-1 pe-2"><input name="variables[{{ $i }}][name]" value="{{ $variables[$i]['name'] ?? '' }}" aria-label="{{ __('Name') }}" maxlength="40" dir="ltr" class="w-full rounded-md border {{ $errors->has("variables.{$i}.name") ? 'border-line-danger' : 'border-line-strong' }} bg-surface px-2 py-1.5 font-mono text-sm text-fg">
                                         @error("variables.{$i}.name")<p class="text-xs text-fg-danger">{{ $message }}</p>@enderror</td>
-                                    <td class="py-1 pe-2"><input name="variables[{{ $i }}][label]" value="{{ $variables[$i]['label'] ?? '' }}" aria-label="{{ __('Label') }}" maxlength="120" dir="auto" class="w-full rounded-md border border-line bg-surface px-2 py-1.5 text-sm text-fg"></td>
-                                    <td class="py-1 pe-2"><input type="number" name="variables[{{ $i }}][max]" value="{{ $variables[$i]['max'] ?? 2000 }}" min="1" max="20000" aria-label="{{ __('Max length') }}" class="w-28 rounded-md border border-line bg-surface px-2 py-1.5 text-sm text-fg"></td>
+                                    <td class="py-1 pe-2"><input name="variables[{{ $i }}][label]" value="{{ $variables[$i]['label'] ?? '' }}" aria-label="{{ __('Label') }}" maxlength="120" dir="auto" class="w-full rounded-md border border-line-strong bg-surface px-2 py-1.5 text-sm text-fg"></td>
+                                    <td class="py-1 pe-2"><input type="number" name="variables[{{ $i }}][max]" value="{{ $variables[$i]['max'] ?? 2000 }}" min="1" max="20000" aria-label="{{ __('Max length') }}" class="w-28 rounded-md border border-line-strong bg-surface px-2 py-1.5 text-sm text-fg"></td>
                                     <td class="py-1"><input type="checkbox" name="variables[{{ $i }}][required]" value="1" @checked($variables[$i]['required'] ?? false) aria-label="{{ __('Required') }}" class="size-4 rounded border-line-strong"></td>
                                 </tr>
                             @endfor

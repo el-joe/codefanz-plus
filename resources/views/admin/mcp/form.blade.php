@@ -21,7 +21,7 @@
         </x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_340px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <form id="mcp-client-form" method="POST" action="{{ $client->exists ? route('admin.mcp.clients.update', $client) : route('admin.mcp.clients.store') }}" class="flex flex-col gap-6">
             @csrf
             @if ($client->exists)
@@ -29,7 +29,7 @@
             @endif
 
             <x-ui.card :title="__('Client')">
-                <div class="grid gap-4 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <x-ui.input name="name" :label="__('Name')" :value="$client->name" required maxlength="80" dir="ltr" placeholder="claude-desktop" :helper="__('Letters, numbers, spaces, dots, hyphens and underscores.')" />
                     <x-ui.select name="owner_id" :label="__('Owner')" :options="$owners->all()" :value="$client->owner_id" :helper="__('The client can never do more than this person.')" />
                     <x-ui.select name="status" :label="__('Status')" :options="$statuses" :value="$client->status?->value ?? 'active'" />
@@ -43,7 +43,7 @@
             <x-ui.card :title="__('Scopes')">
                 <fieldset>
                     <legend class="mb-3 text-sm text-fg-secondary">{{ __('Least privilege: choose only what this client needs. Write scopes create drafts or pending proposals that a human must approve.') }}</legend>
-                    <div class="grid gap-2 sm:grid-cols-2">
+                    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                         @foreach ($scopes as $scope)
                             <label class="flex items-start gap-3 rounded-md border border-line p-3 has-checked:border-line-brand has-checked:bg-brand-subtle">
                                 <input type="checkbox" name="scopes[]" value="{{ $scope->value }}" @checked(in_array($scope->value, $chosenScopes, true)) class="mt-0.5 size-4 accent-brand">
@@ -62,7 +62,7 @@
             </x-ui.card>
 
             <x-ui.card :title="__('Limits & privacy')">
-                <div class="grid gap-4 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <x-ui.input name="rate_limit_per_minute" type="number" min="1" :max="config('codefanz.mcp.max_rate_limit_per_minute')" :label="__('Rate limit (calls per minute)')" :value="$client->rate_limit_per_minute ?? 60" required />
                     @include('admin._textarea', ['name' => 'allowed_ips', 'id' => 'allowed_ips', 'label' => __('IP allow-list'), 'value' => $allowedIps, 'rows' => 3, 'mono' => true, 'help' => __('One IP address or CIDR range per line (e.g. 203.0.113.10 or 10.0.0.0/8). Leave empty to allow any address.')])
                     <label class="flex items-start gap-3 sm:col-span-2">
@@ -77,7 +77,7 @@
             </x-ui.card>
         </form>
 
-        <aside class="flex flex-col gap-6">
+        <div class="flex flex-col gap-6">
             <x-ui.card :title="__('Save')">
                 <div class="flex flex-col gap-3">
                     @unless ($client->exists)
@@ -120,7 +120,7 @@
 
                 @include('admin._trash-card', ['action' => route('admin.mcp.clients.destroy', $client), 'confirm' => __('Delete :name and revoke its token?', ['name' => $client->name]), 'label' => __('Delete client')])
             @endif
-        </aside>
+        </div>
     </div>
 
     @if ($client->exists)

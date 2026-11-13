@@ -5,13 +5,18 @@
     $categoryName = $category?->exactTranslation($locale)?->name;
     $tagName = $tag?->exactTranslation($locale)?->name;
     $heading = $categoryName ?? ($tagName ? __('Articles tagged “:tag”', ['tag' => $tagName]) : __('Insights on building digital products'));
-    $lead = $category?->exactTranslation($locale)?->description ?: __('Engineering, design, SEO and AI — practical guides from our team.');
+    // Archives get their own description (unique per page for search results) when the category has none.
+    $lead = $category?->exactTranslation($locale)?->description ?: match (true) {
+        $categoryName !== null => __('Articles about :category from the CodeFanz team: practical engineering, design, SEO and AI guides.', ['category' => $categoryName]),
+        $tagName !== null => __('Articles tagged “:tag” from the CodeFanz team: practical engineering, design, SEO and AI guides.', ['tag' => $tagName]),
+        default => __('Engineering, design, SEO and AI — practical guides from our team.'),
+    };
     $featuredTranslation = $featured?->exactTranslation($locale);
     $crumbs = $category || $tag ? [__('Blog') => route('blog.index'), ($categoryName ?? $tagName) => null] : [__('Blog') => null];
     $action = $category ? route('blog.category', ['slug' => $category->exactTranslation($locale)->slug]) : ($tag ? route('blog.tag', ['slug' => $tag->exactTranslation($locale)->slug]) : route('blog.index'));
 @endphp
 
-<x-layouts.public :title="$categoryName ?? $tagName ?? __('Blog')" :description="$lead" :alternates="$alternates" :robots="$search !== '' ? 'noindex, follow' : null">
+<x-layouts.public :title="$categoryName ?? ($tagName ? __('Articles tagged “:tag”', ['tag' => $tagName]) : __('Blog'))" :description="$lead" :alternates="$alternates" :robots="$search !== '' ? 'noindex, follow' : null">
     <x-slot:head>
         <link rel="alternate" type="application/rss+xml" title="{{ __('CodeFanz blog') }}" href="{{ route('blog.feed') }}">
     </x-slot:head>
@@ -22,7 +27,7 @@
             <div class="relative">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-icon-secondary"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
                 <input id="blog-search" type="search" name="q" value="{{ $search }}" maxlength="100" placeholder="{{ __('Search articles…') }}"
-                       class="h-12 w-full rounded-md border border-line bg-surface ps-10 pe-24 type-body-md text-fg shadow-xs placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20">
+                       class="h-12 w-full rounded-md border border-line-strong bg-surface ps-10 pe-24 type-body-md text-fg shadow-xs placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20">
                 <button type="submit" class="absolute end-1.5 top-1/2 -translate-y-1/2 rounded-md px-3 py-1.5 type-label-md text-fg-brand hover:bg-brand-subtle">{{ __('Search') }}</button>
             </div>
         </form>
@@ -54,7 +59,7 @@
         @if ($featured && $featuredTranslation)
             @php($featuredCover = $featured->coverImage())
             @php($featuredCategory = $featured->category?->exactTranslation($locale))
-            <article class="group relative grid items-center gap-6 lg:grid-cols-2 lg:gap-12" aria-labelledby="featured-article" data-featured-post>
+            <article class="group relative grid grid-cols-1 items-center gap-6 lg:grid-cols-2 lg:gap-12" aria-labelledby="featured-article" data-featured-post>
                 <div class="relative aspect-[16/10] overflow-hidden rounded-[24px] bg-[linear-gradient(137deg,var(--color-ink-900)_12.5%,var(--color-brand-600)_75%)] transition-shadow group-hover:shadow-lg">
                     @if ($featuredCover)
                         <x-media.picture :media="$featuredCover" sizes="(min-width: 1024px) 640px, 100vw" :eager="true" class="size-full object-cover" />
@@ -88,7 +93,7 @@
             <x-ui.empty-state :title="$isFiltered ? __('No articles match your search') : __('No articles yet')"
                               :description="$isFiltered ? __('Try another category or search term.') : __('Our first articles are on the way. Please check back soon.')" />
         @elseif ($posts->isNotEmpty())
-            <ul class="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            <ul class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($posts as $post)
                     @include('blog._card', ['post' => $post])
                 @endforeach

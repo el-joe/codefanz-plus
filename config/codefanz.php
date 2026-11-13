@@ -509,4 +509,12 @@ return [
         'allow_private_outbound' => (bool) env('ALLOW_PRIVATE_OUTBOUND', false),
     ],
 
+    // Local-only sign-in accounts for manual QA (Database\Seeders\LocalDevAccountsSeeder, refuses outside APP_ENV=local).
+    'local_dev_accounts' => [
+        'admin_password' => env('DEV_ADMIN_PASSWORD'),
+        'admin_two_factor_secret' => env('DEV_ADMIN_2FA_SECRET'),
+        'editor_password' => env('DEV_EDITOR_PASSWORD'),
+        'client_password' => env('DEV_CLIENT_PASSWORD'),
+    ],
+
 ];

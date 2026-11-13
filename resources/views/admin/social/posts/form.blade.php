@@ -30,7 +30,7 @@
     @endif
 
     <form id="social-form" method="POST" action="{{ $post->exists ? route('admin.social.posts.update', $post) : route('admin.social.posts.store') }}"
-          class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]" data-social-composer>
+          class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_380px]" data-social-composer>
         @csrf
         @if ($post->exists)
             @method('PUT')
@@ -39,7 +39,7 @@
 
         <div class="flex min-w-0 flex-col gap-6">
             <x-ui.card :title="__('Post')">
-                <div class="grid gap-5 md:grid-cols-2">
+                <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
                     <div class="md:col-span-2">
                         <x-ui.input name="title" :label="__('Internal title')" :value="$post->title" required maxlength="150" :helper="__('Only shown inside the admin and on the calendar.')" />
                     </div>
@@ -60,7 +60,7 @@
                 <fieldset class="mt-6 rounded-lg border border-line p-4">
                     <legend class="px-1 text-sm font-semibold text-fg">{{ __('UTM builder') }}</legend>
                     <p class="mb-3 text-xs text-fg-tertiary">{{ __('utm_source is set to each platform automatically. Letters, numbers, dots, dashes and underscores only.') }}</p>
-                    <div class="grid gap-4 md:grid-cols-3">
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
                         <x-ui.input name="utm[medium]" id="utm_medium" :label="__('Medium')" :value="$utm['medium'] ?? ''" maxlength="80" dir="ltr" data-social-utm="medium" />
                         <x-ui.input name="utm[campaign]" id="utm_campaign" :label="__('Campaign tag')" :value="$utm['campaign'] ?? ''" maxlength="80" dir="ltr" data-social-utm="campaign" />
                         <x-ui.input name="utm[content]" id="utm_content" :label="__('Content tag')" :value="$utm['content'] ?? ''" maxlength="80" dir="ltr" data-social-utm="content" />
@@ -102,14 +102,14 @@
                                         <textarea id="variant-{{ $account->id }}-text" name="variants[{{ $account->id }}][text]" rows="5" dir="auto" data-social-text
                                                   aria-describedby="variant-{{ $account->id }}-count"
                                                   @error($key.'.text') aria-invalid="true" @enderror
-                                                  class="w-full rounded-md border bg-surface px-3 py-2.5 text-base text-fg focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 {{ $errors->has($key.'.text') ? 'border-line-danger' : 'border-line' }}">{{ $text }}</textarea>
+                                                  class="w-full rounded-md border bg-surface px-3 py-2.5 text-base text-fg focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 {{ $errors->has($key.'.text') ? 'border-line-danger' : 'border-line-strong' }}">{{ $text }}</textarea>
                                         <p class="flex justify-between gap-3 text-xs text-fg-tertiary">
                                             <span>{{ __('Counted with hashtags and link, as :platform counts them.', ['platform' => $platform->shortLabel()]) }}</span>
                                             <span id="variant-{{ $account->id }}-count" data-social-count aria-live="polite">{{ number_format($platform->maxLength()) }}</span>
                                         </p>
                                         @error($key.'.text')<p class="text-sm text-fg-danger">{{ $message }}</p>@enderror
                                     </div>
-                                    <div class="grid gap-4 md:grid-cols-2">
+                                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                                         <x-ui.input name="variants[{{ $account->id }}][hashtags]" id="variant-{{ $account->id }}-hashtags" :label="__('Hashtags')" :value="$hashtags" maxlength="1000" dir="auto" data-social-hashtags
                                                     :helper="$platform->maxHashtags() ? __('Space separated, up to :max.', ['max' => $platform->maxHashtags()]) : __('Space separated.')" />
                                         @if ($platform->supportsFirstComment())
@@ -141,7 +141,7 @@
                     <p class="text-sm text-fg-secondary">{{ __('No optimized images yet. Upload images in the media library first.') }}</p>
                 @else
                     <p class="mb-4 text-xs text-fg-tertiary">{{ __('Selected images go out in this order with every variant that attaches images. Alt text is sent where the platform supports it.') }}</p>
-                    <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    <ul class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                         @foreach ($images as $image)
                             @php
                                 $thumb = $image->variantsFor('webp')->first()?->url();
@@ -161,7 +161,7 @@
                                 <label class="hidden flex-col gap-1 text-xs group-has-checked:flex">
                                     <span class="font-semibold text-fg">{{ __('Alt text') }}</span>
                                     <input type="text" name="media_alt[{{ $image->id }}]" value="{{ $mediaAlt[$image->id] ?? $mediaAlt[(string) $image->id] ?? $image->altText($post->locale) }}" maxlength="1000" dir="auto"
-                                           class="rounded-md border border-line bg-surface px-2 py-1.5 text-sm text-fg">
+                                           class="rounded-md border border-line-strong bg-surface px-2 py-1.5 text-sm text-fg">
                                 </label>
                             </li>
                         @endforeach
@@ -179,7 +179,7 @@
                         <div class="flex flex-col gap-1.5">
                             <label for="topic" class="text-sm font-semibold text-fg">{{ __('What is the post about?') }}</label>
                             <textarea id="topic" name="topic" rows="3" maxlength="1000" dir="auto"
-                                      class="w-full rounded-md border bg-surface px-3 py-2.5 text-base text-fg {{ $errors->has('topic') ? 'border-line-danger' : 'border-line' }}">{{ old('topic') }}</textarea>
+                                      class="w-full rounded-md border bg-surface px-3 py-2.5 text-base text-fg {{ $errors->has('topic') ? 'border-line-danger' : 'border-line-strong' }}">{{ old('topic') }}</textarea>
                             @error('topic')<p class="text-sm text-fg-danger">{{ $message }}</p>@enderror
                             @error('ai')<p class="text-sm text-fg-danger">{{ $message }}</p>@enderror
                         </div>

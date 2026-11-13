@@ -17,7 +17,7 @@
         <noscript><x-ui.button variant="secondary" size="sm">{{ __('Apply') }}</x-ui.button></noscript>
     </form>
 
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         @foreach ([[__('New projects'), $summary['total']], [__('Applied on platform'), $summary['applied']], [__('Converted to leads'), $summary['converted']], [__('Won'), $summary['won'].' · '.__(':count via CRM', ['count' => $summary['converted_won']])]] as [$label, $value])
             <x-ui.card>
                 <p class="text-sm text-fg-secondary">{{ $label }}</p>
@@ -46,7 +46,7 @@
         @endif
     </x-ui.card>
 
-    <div class="grid gap-6 lg:grid-cols-2">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <x-ui.card :title="__('By platform')">@include('admin.radar._bars', ['rows' => $summary['by_platform']])</x-ui.card>
         <x-ui.card :title="__('By score band')">@include('admin.radar._bars', ['rows' => $bandRows])</x-ui.card>
         <x-ui.card :title="__('By status')">@include('admin.radar._bars', ['rows' => $statusRows])</x-ui.card>

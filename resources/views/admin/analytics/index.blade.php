@@ -35,7 +35,7 @@
     @endif
 
     {{-- Lead submissions come from the CRM itself and are always available. --}}
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         @foreach ([...$ga4['kpis'], 'leads' => $leads['kpi']] as $key => $kpi)
             @php($available = $key === 'leads' || $ga4['hasData'])
             <x-ui.card data-kpi="{{ $key }}">
@@ -64,7 +64,7 @@
                 @include('admin.analytics._state', ['source' => $ga4, 'name' => 'GA4'])
             </div>
 
-            <div class="grid gap-4 xl:grid-cols-[1fr_360px]">
+            <div class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
                 <x-ui.card :title="__('Sessions per day')">
                     @if ($ga4['chart']['series'] !== [])
                         <div class="h-64"><canvas data-analytics-chart="sessions-chart-data" role="img" aria-label="{{ __('Sessions per day, last :days days', ['days' => $days]) }}"></canvas></div>
@@ -97,7 +97,7 @@
                 </x-ui.card>
             </div>
 
-            <div class="grid gap-4 xl:grid-cols-2">
+            <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
                 <x-ui.card :title="__('Conversion events')">
                     <p class="mb-3 text-xs text-fg-tertiary">{{ __('Lead submissions recorded in the CRM, last :days days.', ['days' => $days]) }}</p>
                     @foreach ($bars($leads['bySource']) as $row)
@@ -132,7 +132,7 @@
                 @include('admin.analytics._state', ['source' => $gsc, 'name' => 'Search Console'])
             </div>
 
-            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 @foreach ($gsc['kpis'] as $key => $kpi)
                     <x-ui.card data-kpi="gsc-{{ $key }}">
                         <p class="text-sm text-fg-secondary">{{ $kpi['label'] }}</p>
@@ -144,7 +144,7 @@
                 @endforeach
             </div>
 
-            <div class="grid gap-4 xl:grid-cols-2">
+            <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
                 @foreach (['queries' => __('Top queries'), 'pages' => __('Top pages'), 'countries' => __('Countries'), 'devices' => __('Devices')] as $report => $heading)
                     <x-ui.card :title="$heading.' · '.__('clicks, last 28 days')">
                         @forelse ($gsc[$report] as $row)

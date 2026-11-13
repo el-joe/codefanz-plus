@@ -8,7 +8,7 @@
         </div>
     </div>
 
-    <div class="mt-8 grid gap-6 sm:grid-cols-2">
+    <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
         @include('billing._bill-to', ['billTo' => $receipt->customer_snapshot, 'heading' => __('Received from')])
         <dl class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm sm:justify-self-end">
             <dt class="text-ink-500">{{ __('Date') }}</dt><dd class="font-semibold">{{ ($payment->paid_at ?? $receipt->issued_at)->translatedFormat('j M Y') }}</dd>

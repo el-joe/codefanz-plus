@@ -6,7 +6,7 @@
     @else
         <x-ui.card padding="p-0" class="overflow-hidden">
             <div class="flex flex-col lg:flex-row">
-                <aside class="border-b border-line lg:w-80 lg:shrink-0 lg:border-e lg:border-b-0 {{ $active ? 'hidden lg:block' : '' }}">
+                <div class="border-b border-line lg:w-80 lg:shrink-0 lg:border-e lg:border-b-0 {{ $active ? 'hidden lg:block' : '' }}">
                     <ul class="flex flex-col" data-conversation-list>
                         @foreach ($conversations as $conversation)
                             @php($isActive = $active && $conversation->is($active))
@@ -43,12 +43,12 @@
                             <x-ui.input name="subject" :label="__('Subject')" maxlength="160" required dir="auto" />
                             <div class="flex flex-col gap-1.5">
                                 <label for="new-conversation-body" class="text-sm font-semibold text-fg">{{ __('Message') }}</label>
-                                <textarea id="new-conversation-body" name="body" rows="3" required maxlength="{{ config('codefanz.projects.message_max_length') }}" dir="auto" class="rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg"></textarea>
+                                <textarea id="new-conversation-body" name="body" rows="3" required maxlength="{{ config('codefanz.projects.message_max_length') }}" dir="auto" class="rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg"></textarea>
                             </div>
                             <x-ui.button size="sm" class="w-fit">{{ __('Send') }}</x-ui.button>
                         </form>
                     </details>
-                </aside>
+                </div>
 
                 @if ($active)
                     <div class="flex min-w-0 flex-1 flex-col">

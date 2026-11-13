@@ -3,7 +3,7 @@
 @endphp
 
 <x-layouts.admin :title="__('MCP server · clients & activity')" :crumb="__('AI & Automation')">
-    <div class="grid gap-6 xl:grid-cols-[1fr_360px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <x-ui.card padding="p-0" class="overflow-x-auto">
             <div class="flex items-center justify-between gap-3 px-5 pt-5 pb-4">
                 <h2 class="text-base font-semibold text-fg">{{ __('MCP clients') }}</h2>

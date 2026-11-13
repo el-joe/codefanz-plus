@@ -45,7 +45,7 @@
 
 <x-layouts.base :themeable="true" :title="$title" entry="resources/js/admin.js">
     <div class="flex min-h-screen">
-        <aside class="sticky top-0 hidden h-screen w-68 shrink-0 flex-col border-e border-line bg-surface lg:flex">
+        <aside aria-label="{{ __('Sidebar') }}" class="sticky top-0 hidden h-screen w-68 shrink-0 flex-col border-e border-line bg-surface lg:flex">
             <div class="px-5 py-5"><x-ui.logo /></div>
             <nav class="flex flex-1 flex-col gap-0.5 px-3" aria-label="{{ __('Admin navigation') }}">
                 @foreach ($nav as $item)
@@ -73,7 +73,7 @@
                     <h1 class="truncate text-xl font-semibold text-fg">{{ $title }}</h1>
                 </div>
                 <x-language-switch />
-                <button type="button" data-theme-toggle class="rounded-md border border-line px-3 py-2 text-sm font-semibold text-fg hover:bg-subtle">{{ __('Theme') }}</button>
+                <button type="button" data-theme-toggle aria-pressed="false" class="rounded-md border border-line px-3 py-2 text-sm font-semibold text-fg hover:bg-subtle">{{ __('Dark theme') }}</button>
                 <div data-dropdown class="relative" data-notification-bell>
                     <button type="button" data-dropdown-trigger class="relative flex size-10 items-center justify-center rounded-md border border-line text-fg hover:bg-subtle"
                             aria-label="{{ $unreadNotificationCount ? __('Notifications (:count unread)', ['count' => $unreadNotificationCount]) : __('Notifications') }}">

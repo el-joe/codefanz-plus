@@ -1,4 +1,4 @@
-<div class="grid gap-6 xl:grid-cols-[1fr_360px]">
+<div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
     <x-ui.card :title="__('Documents')">
         @if ($documents->isEmpty())
             <x-ui.empty-state :title="__('No documents yet')" :description="__('Upload contracts, designs and reports. Choose whether the client can see each file.')" />

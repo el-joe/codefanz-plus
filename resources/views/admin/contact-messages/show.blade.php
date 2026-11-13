@@ -1,5 +1,5 @@
 <x-layouts.admin :title="__('Message from :name', ['name' => $message->name])" :crumb="__('Contact inbox')">
-    <div class="grid gap-6 xl:grid-cols-[1fr_340px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <x-ui.card :title="$message->topic->label()">
             <p class="whitespace-pre-line text-base leading-relaxed text-fg" dir="auto">{{ $message->message }}</p>
         </x-ui.card>

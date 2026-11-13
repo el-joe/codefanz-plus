@@ -5,7 +5,7 @@
         <x-ui.alert tone="danger" :title="__('Please fix the highlighted fields')">{{ $errors->first('status') ?: __('Some fields need attention.') }}</x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_340px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <form id="testimonial-form" method="POST" action="{{ $testimonial->exists ? route('admin.testimonials.update', $testimonial) : route('admin.testimonials.store') }}" class="flex min-w-0 flex-col gap-6">
             @csrf
             @if ($testimonial->exists)
@@ -13,7 +13,7 @@
             @endif
 
             <x-ui.card :title="__('Client')">
-                <div class="grid gap-4 md:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <x-ui.input name="author_name" :label="__('Author name')" :value="$testimonial->author_name" maxlength="120" required />
                     <x-ui.input name="company" :label="__('Company')" :value="$testimonial->company" maxlength="150" />
                 </div>

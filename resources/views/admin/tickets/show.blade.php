@@ -1,5 +1,5 @@
 <x-layouts.admin :title="$ticket->reference" :crumb="__('Support tickets')">
-    <div class="grid gap-6 xl:grid-cols-[1fr_340px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div class="flex min-w-0 flex-col gap-6">
             <x-ui.card>
                 <div class="flex flex-wrap items-center gap-2">
@@ -47,7 +47,7 @@
             @endif
         </div>
 
-        <aside class="flex flex-col gap-6">
+        <div class="flex flex-col gap-6">
             <x-ui.card :title="__('Manage')">
                 <form method="POST" action="{{ route('admin.tickets.update', $ticket) }}" class="flex flex-col gap-4">
                     @csrf
@@ -80,6 +80,6 @@
                     <p class="mt-2 text-sm text-fg-secondary"><span dir="auto">{{ $ticket->opener->name }}</span> · <span dir="ltr">{{ $ticket->opener->email }}</span></p>
                 @endif
             </x-ui.card>
-        </aside>
+        </div>
     </div>
 </x-layouts.admin>

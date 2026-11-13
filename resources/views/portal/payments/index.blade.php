@@ -1,5 +1,5 @@
 <x-layouts.portal :title="__('Payment history')" :crumb="__('Payments')">
-    <div class="grid gap-4 sm:grid-cols-3" data-payment-totals>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3" data-payment-totals>
         <x-ui.card padding="p-5">
             <p class="text-xs text-fg-tertiary">{{ __('Total paid') }}</p>
             <p class="mt-1 text-2xl font-semibold text-fg-success" dir="ltr">{{ $totals->isEmpty() ? '—' : $totals->map(fn ($minor, $currency) => \App\Services\Money::plain($minor, $currency))->implode(' · ') }}</p>

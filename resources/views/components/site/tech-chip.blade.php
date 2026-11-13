@@ -13,10 +13,10 @@
     ][$level->value];
 @endphp
 
-<li {{ $attributes->merge(['class' => 'relative inline-flex items-center gap-2 rounded-full border bg-surface px-4 py-2 type-label-md text-fg transition-colors hover:border-line-brand '.$styles['chip']]) }} title="{{ $level->description() }}" data-level="{{ $level->value }}">
+<li {{ $attributes->merge(['class' => 'relative inline-flex items-center gap-2 rounded-full border bg-surface px-4 py-1.5 type-label-md text-fg transition-colors hover:border-line-brand '.$styles['chip']]) }} title="{{ $level->description() }}" data-level="{{ $level->value }}">
     <span class="size-2 shrink-0 rounded-full {{ $styles['dot'] }}" aria-hidden="true"></span>
     @if ($href)
-        <a href="{{ $href }}" dir="auto" class="after:absolute after:inset-0 after:rounded-full hover:text-fg-brand">{{ $technology->translation()?->name ?? $technology->key }}</a>
+        <a href="{{ $href }}" dir="auto" class="inline-flex min-h-6 items-center after:absolute after:inset-0 after:rounded-full hover:text-fg-brand">{{ $technology->translation()?->name ?? $technology->key }}</a>
     @else
         <span dir="auto">{{ $technology->translation()?->name ?? $technology->key }}</span>
     @endif

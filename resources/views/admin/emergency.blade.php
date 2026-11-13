@@ -3,7 +3,7 @@
         {{ __('Every switch is enforced inside jobs, schedulers and MCP tools — not only in this screen. Each change is audited.') }}
     </x-ui.alert>
 
-    <div class="grid gap-4 md:grid-cols-3">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
         @foreach ($switches as $switch)
             @include('admin._kill-switch-toggle', ['key' => $switch['key'], 'active' => $switch['active']])
         @endforeach

@@ -10,7 +10,7 @@
 @endphp
 
 <x-layouts.admin :title="__('AI usage')" :crumb="__('AI & Automation')">
-    <div class="grid gap-4 md:grid-cols-3">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
         <x-ui.card>
             <p class="text-sm text-fg-tertiary">{{ __('Budget this month') }}</p>
             <p class="mt-1 text-2xl font-bold text-fg" dir="ltr" data-ai-budget>{{ $usd($spentMinor) }} / {{ '$'.number_format($limitMinor / 100, 2) }}</p>
@@ -49,7 +49,7 @@
     <form method="GET" data-auto-submit class="flex items-end gap-3">
         <div class="flex flex-col gap-1.5">
             <label for="month" class="text-sm font-semibold text-fg">{{ __('Month') }}</label>
-            <select id="month" name="month" class="rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg">
+            <select id="month" name="month" class="rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg">
                 @foreach ($months as $option)
                     <option value="{{ $option->format('Y-m') }}" @selected($option->isSameMonth($month))>{{ $option->translatedFormat('F Y') }}</option>
                 @endforeach

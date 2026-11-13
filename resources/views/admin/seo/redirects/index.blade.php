@@ -15,7 +15,7 @@
         </x-ui.alert>
     @endif
 
-    <div class="grid gap-4 lg:grid-cols-[1fr_360px]">
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
         <form method="GET" action="{{ route('admin.redirects.index') }}" role="search" class="flex items-end gap-3">
             <div class="flex-1"><x-ui.input name="q" type="search" :label="__('Search paths')" :value="$search" maxlength="100" dir="ltr" /></div>
             <x-ui.button variant="secondary">{{ __('Search') }}</x-ui.button>

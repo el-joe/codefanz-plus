@@ -6,7 +6,7 @@
 <x-layouts.admin :title="$project->title" :crumb="__('Freelance Radar')">
     @include('admin.radar._nav')
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_380px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
         <div class="flex flex-col gap-6">
             <x-ui.card>
                 <div class="flex items-start gap-4">
@@ -19,7 +19,7 @@
                             <x-ui.badge :dot="false">{{ $project->language === 'ar' ? __('Arabic') : __('English') }}</x-ui.badge>
                         </div>
                         <h2 class="text-lg font-semibold text-fg" dir="auto">{{ $project->title }}</h2>
-                        <dl class="grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
+                        <dl class="grid grid-cols-1 gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
                             <div class="flex gap-2"><dt class="text-fg-tertiary">{{ __('Budget') }}</dt><dd class="text-fg">{{ $project->budgetLabel() ?? __('Not stated') }}</dd></div>
                             <div class="flex gap-2"><dt class="text-fg-tertiary">{{ __('Posted') }}</dt><dd class="text-fg">{{ ($project->posted_at ?? $project->collected_at)?->diffForHumans() }}</dd></div>
                             <div class="flex gap-2"><dt class="text-fg-tertiary">{{ __('Proposals') }}</dt><dd class="text-fg">{{ $project->proposals_count ?? '—' }}</dd></div>
@@ -66,7 +66,7 @@
                                 @csrf
                                 @method('PUT')
                                 <label for="proposal-body-{{ $proposal->id }}" class="sr-only">{{ __('Proposal text') }}</label>
-                                <textarea id="proposal-body-{{ $proposal->id }}" name="body" rows="10" maxlength="10000" dir="{{ $proposal->locale === 'ar' ? 'rtl' : 'ltr' }}" class="rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg">{{ $proposal->body }}</textarea>
+                                <textarea id="proposal-body-{{ $proposal->id }}" name="body" rows="10" maxlength="10000" dir="{{ $proposal->locale === 'ar' ? 'rtl' : 'ltr' }}" class="rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg">{{ $proposal->body }}</textarea>
                                 <div><x-ui.button variant="secondary" size="sm">{{ __('Save draft') }}</x-ui.button></div>
                             </form>
                         @else
@@ -85,7 +85,7 @@
                         @if ($aiReason)
                             <x-ui.alert tone="warning">{{ __('AI is unavailable: :reason', ['reason' => $aiReason->label()]) }}</x-ui.alert>
                         @endif
-                        <div class="grid gap-4 sm:grid-cols-2">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <x-ui.select name="locale" :label="__('Language')" :options="$locales" :value="$project->language" />
                             <x-ui.input name="price" :label="__('Price or rate to quote')" maxlength="100" :helper="__('Leave empty: the draft will not mention any price.')" />
                         </div>
@@ -96,7 +96,7 @@
             </x-ui.card>
         </div>
 
-        <aside class="flex flex-col gap-6">
+        <div class="flex flex-col gap-6">
             <x-ui.card :title="__('Rule score: :score / 100', ['score' => $project->score ?? '—'])">
                 @include('admin.radar._breakdown', ['evaluation' => $project->ruleEvaluation])
                 <p class="mt-4 text-xs text-fg-tertiary">{{ __('Weighted average of transparent rules. Weights and thresholds are set on Radar → Settings.') }}</p>
@@ -164,6 +164,6 @@
                     </ul>
                 </x-ui.card>
             @endif
-        </aside>
+        </div>
     </div>
 </x-layouts.admin>

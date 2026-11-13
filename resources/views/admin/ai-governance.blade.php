@@ -5,7 +5,7 @@
         {{ __('Pausing a feature stops new AI calls inside the gateway, jobs and MCP tools — not only in the screens. Every change is audited. Pending approvals are never applied while AI automation is paused.') }}
     </x-ui.alert>
 
-    <div class="grid gap-4 md:grid-cols-3">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
         <x-ui.card>
             <p class="text-sm text-fg-tertiary">{{ __('Provider') }}</p>
             <p class="mt-1 text-lg font-bold text-fg" dir="ltr">{{ $provider->isConfigured() ? $provider->name().' · '.$provider->model() : __('Not configured') }}</p>
@@ -21,7 +21,7 @@
     </div>
 
     <x-ui.card :title="__('Master controls')">
-        <div class="grid gap-4 md:grid-cols-3">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
             @foreach ($global as $switch)
                 @include('admin._kill-switch-toggle', ['key' => $switch['key'], 'active' => $switch['active']])
             @endforeach
@@ -73,7 +73,7 @@
     </x-ui.card>
 
     <x-ui.card :title="__('Usage limits')">
-        <dl class="grid gap-3 text-sm md:grid-cols-2">
+        <dl class="grid grid-cols-1 gap-3 text-sm md:grid-cols-2">
             <div class="flex justify-between gap-4"><dt class="text-fg-secondary">{{ __('Requests per staff member per day') }}</dt><dd class="text-fg" dir="ltr">{{ $userDailyRequests === null ? __('No cap') : number_format($userDailyRequests) }}</dd></div>
             <div class="flex justify-between gap-4"><dt class="text-fg-secondary">{{ __('Tokens per staff member per month') }}</dt><dd class="text-fg" dir="ltr">{{ $userMonthlyTokens === null ? __('No cap') : number_format($userMonthlyTokens) }}</dd></div>
         </dl>

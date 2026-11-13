@@ -15,7 +15,7 @@
     :description="__('Describe your idea to our free AI project assistant and get a structured project brief to our team — no payment needed.')"
     :alternates="$languages->keys()->mapWithKeys(fn ($code) => [$code => route('assistant', ['locale' => $code])])->all()">
     <div class="bg-canvas">
-        <div class="container-page grid gap-6 py-4 max-sm:px-3 sm:py-6 lg:grid-cols-[minmax(0,1fr)_20.625rem] lg:py-8"
+        <div class="container-page grid grid-cols-1 gap-6 py-4 max-sm:px-3 sm:py-6 lg:grid-cols-[minmax(0,1fr)_20.625rem] lg:py-8"
              data-assistant
              data-mode="{{ $aiAvailable ? 'ai' : 'guided' }}"
              data-start-url="{{ route('assistant.start') }}"
@@ -56,20 +56,22 @@
                      @unless ($aiAvailable) data-initial-notice="{{ \App\Services\Assistant\ProjectAssistant::fallbackNotice(null) }}" @endunless></div>
 
                 <div class="flex h-[calc(100dvh-20rem)] min-h-96 flex-col gap-4 overflow-y-auto bg-surface px-4 py-5 sm:px-6 lg:h-[36rem]" data-assistant-scroll>
-                    <ol class="flex flex-col gap-4" role="log" aria-live="polite" aria-label="{{ __('Conversation') }}" data-assistant-log>
-                        <li class="flex items-end gap-2" data-assistant-intro>
-                            <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand text-fg-on-brand">{!! $botIcon !!}</span>
-                            <div class="max-w-[85%] rounded-xl rounded-es-sm bg-subtle px-3 py-2.5 type-body-sm text-fg sm:max-w-[60%] sm:type-body-md">
-                                {{ __("Hi! I'm the CodeFanz project assistant. I'll ask a few questions about your idea and prepare a project brief for our team. It's free — no payment needed.") }}
-                            </div>
-                        </li>
-                        <li class="flex items-end gap-2" data-assistant-intro>
-                            <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand text-fg-on-brand">{!! $botIcon !!}</span>
-                            <div class="max-w-[85%] rounded-xl rounded-es-sm bg-subtle px-3 py-2.5 type-body-sm text-fg sm:max-w-[60%] sm:type-body-md">
-                                {{ $aiAvailable ? __('What would you like to build?') : __('What would you like to build? Give it a short name and tell us about your business.') }}
-                            </div>
-                        </li>
-                    </ol>
+                    <div role="log" aria-live="polite" aria-label="{{ __('Conversation') }}">
+                        <ol class="flex flex-col gap-4" data-assistant-log>
+                            <li class="flex items-end gap-2" data-assistant-intro>
+                                <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand text-fg-on-brand">{!! $botIcon !!}</span>
+                                <div class="max-w-[85%] rounded-xl rounded-es-sm bg-subtle px-3 py-2.5 type-body-sm text-fg sm:max-w-[60%] sm:type-body-md">
+                                    {{ __("Hi! I'm the CodeFanz project assistant. I'll ask a few questions about your idea and prepare a project brief for our team. It's free — no payment needed.") }}
+                                </div>
+                            </li>
+                            <li class="flex items-end gap-2" data-assistant-intro>
+                                <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand text-fg-on-brand">{!! $botIcon !!}</span>
+                                <div class="max-w-[85%] rounded-xl rounded-es-sm bg-subtle px-3 py-2.5 type-body-sm text-fg sm:max-w-[60%] sm:type-body-md">
+                                    {{ $aiAvailable ? __('What would you like to build?') : __('What would you like to build? Give it a short name and tell us about your business.') }}
+                                </div>
+                            </li>
+                        </ol>
+                    </div>
 
                     <p class="hidden text-xs text-fg-tertiary" data-assistant-typing aria-hidden="true">{{ __('The assistant is typing…') }}</p>
 
@@ -80,7 +82,7 @@
 
                         <form class="mt-4 flex flex-col gap-3 border-t border-line-subtle pt-4" data-assistant-confirm novalidate>
                             <p class="text-sm font-semibold text-fg">{{ __('Your contact details') }}</p>
-                            <div class="grid gap-3 sm:grid-cols-2">
+                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                 <label class="flex flex-col gap-1 text-sm text-fg">{{ __('Full name') }} *
                                     <input name="name" required maxlength="120" autocomplete="name" class="{{ $field }}">
                                 </label>
@@ -129,7 +131,7 @@
                     </x-ui.alert>
                 </div>
 
-                <div class="flex flex-wrap gap-2 px-4 pb-2 sm:px-5" data-assistant-quick aria-label="{{ __('Suggested replies') }}"></div>
+                <div class="flex flex-wrap gap-2 px-4 pb-2 sm:px-5" data-assistant-quick role="group" aria-label="{{ __('Suggested replies') }}"></div>
 
                 {{-- Guided questionnaire (fallback when AI is unavailable): one step at a time. --}}
                 <div class="hidden border-t border-line bg-subtle px-4 py-4 sm:px-5" data-assistant-guided>
@@ -203,7 +205,7 @@
                         <label for="assistant-website">{{ __('Leave this field empty') }}</label>
                         <input type="text" id="assistant-website" name="{{ StartAssistantRequest::HONEYPOT }}" tabindex="-1" autocomplete="off">
                     </div>
-                    <div class="flex items-end gap-2 rounded-xl border border-line bg-subtle p-2 focus-within:border-line-focus focus-within:ring-4 focus-within:ring-brand/20">
+                    <div class="flex items-end gap-2 rounded-xl border border-line-strong bg-subtle p-2 focus-within:border-line-focus focus-within:ring-4 focus-within:ring-brand/20">
                         <label for="assistant-message" class="sr-only">{{ __('Your message') }}</label>
                         <textarea id="assistant-message" name="message" rows="1" maxlength="{{ config('codefanz.assistant.max_message_length') }}" required dir="auto"
                                   placeholder="{{ __('Type your message…') }}"

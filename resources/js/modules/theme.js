@@ -23,11 +23,20 @@ export function applyStoredTheme() {
     document.documentElement.classList.toggle('dark', stored === 'dark');
 }
 
+// Toggle buttons expose the current state to assistive technology: pressed = dark theme on (WCAG 4.1.2).
+const syncPressed = () => {
+    const dark = document.documentElement.classList.contains('dark');
+    document.querySelectorAll('[data-theme-toggle]').forEach((button) => button.setAttribute('aria-pressed', String(dark)));
+};
+
 export function init() {
+    syncPressed();
+
     document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
         button.addEventListener('click', () => {
             const dark = !document.documentElement.classList.contains('dark');
             document.documentElement.classList.toggle('dark', dark);
+            syncPressed();
 
             try {
                 localStorage.setItem(KEY, dark ? 'dark' : 'light');

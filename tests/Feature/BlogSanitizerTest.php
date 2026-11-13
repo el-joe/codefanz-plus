@@ -96,7 +96,7 @@ test('safe article markup survives', function () {
         ->toContain('<a href="https://laravel.com/docs" rel="noopener noreferrer nofollow">the docs</a>')
         ->toContain('<ol start="3">')
         ->toContain('<code class="language-php">$a = 1 &lt; 2;</code>')
-        ->toContain('<aside data-callout="tip">')
+        ->toContain('<aside data-callout="tip" role="note">')
         ->toContain('<th scope="col">A</th>')
         ->toContain('<td colspan="2">B</td>')
         ->toContain('<img src="/storage/media/a.webp" alt="Chart" width="800" height="450" data-media-id="12">');
@@ -112,7 +112,7 @@ test('unknown elements are unwrapped and headings normalised', function () {
         ->and(sanitize('<a href="http://insecure.example">x</a>'))->toBe('x')
         ->and(sanitize('<a href="mailto:a@b.c">mail</a>'))->toBe('mail')
         ->and(sanitize('<code class="evil onload">x</code>'))->toBe('<code>x</code>')
-        ->and(sanitize('<aside data-callout="script">x</aside>'))->toBe('<aside data-callout="info">x</aside>');
+        ->and(sanitize('<aside data-callout="script">x</aside>'))->toBe('<aside data-callout="info" role="note">x</aside>');
 });
 
 test('video embeds are rebuilt as privacy-enhanced iframes', function () {

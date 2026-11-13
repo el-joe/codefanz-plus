@@ -70,7 +70,7 @@
                 @endif
             </div>
             @if ($features !== [])
-                <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+                <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
                     @foreach ($features as $feature)
                         <li class="flex flex-col items-start gap-3 rounded-[18px] border border-line bg-surface p-6">
                             <span class="flex size-11 items-center justify-center rounded-lg bg-brand-subtle text-icon-brand" aria-hidden="true"><x-ui.icon :name="$featureIcons[$loop->index % count($featureIcons)]" :size="22" /></span>
@@ -89,7 +89,7 @@
         <x-site.section tone="canvas" id="licensing-models" aria-labelledby="licensing">
             <x-site.section-heading id="licensing" :eyebrow="__('Licensing')" :heading="__('Choose how you license :product', ['product' => $translation->name])"
                                     :subheading="__('Final pricing depends on users, branches and customization. All quotes are preliminary until scope is confirmed.')" />
-            <ul class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:items-start" data-licensing-models>
+            <ul class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 lg:items-start" data-licensing-models>
                 @foreach ($models as $model)
                     @php($highlighted = $loop->first && $models->count() > 1)
                     <li class="flex flex-col items-start gap-4 rounded-xl px-7 py-8 {{ $highlighted ? 'border-2 border-line-brand bg-brand-subtle' : 'border border-line bg-surface' }}">

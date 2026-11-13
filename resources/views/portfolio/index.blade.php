@@ -72,7 +72,7 @@
 
         @if ($featured && $featuredTranslation)
             @php($featuredCover = $featured->coverImage())
-            <article class="group relative grid overflow-hidden rounded-[24px] border border-line bg-surface shadow-sm transition hover:border-line-brand hover:shadow-lg lg:grid-cols-[720fr_558fr]" aria-labelledby="featured-project">
+            <article class="group relative grid grid-cols-1 overflow-hidden rounded-[24px] border border-line bg-surface shadow-sm transition hover:border-line-brand hover:shadow-lg lg:grid-cols-[720fr_558fr]" aria-labelledby="featured-project">
                 @if ($featuredCover)
                     <div class="aspect-[12/7] overflow-hidden bg-subtle lg:aspect-auto lg:min-h-105">
                         <x-media.picture :media="$featuredCover" sizes="(min-width: 1024px) 720px, 100vw" :eager="true" class="size-full object-cover" />
@@ -110,7 +110,7 @@
             <x-ui.empty-state :title="$isFiltered ? __('No projects match your filters') : __('Our portfolio is being updated')"
                               :description="$isFiltered ? __('Try another category or search term.') : __('Please check back soon or contact us to discuss your project.')" />
         @elseif ($projects->isNotEmpty())
-            <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($projects as $project)
                     @include('portfolio._card', ['project' => $project])
                 @endforeach

@@ -14,7 +14,7 @@
         @if ($templates->isEmpty())
             <x-ui.card><x-ui.empty-state :title="__('No prompt templates yet')" :description="__('Add templates in the prompt library first.')" /></x-ui.card>
         @else
-            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" data-template-gallery>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" data-template-gallery>
                 @foreach ($templates as $template)
                     <a href="{{ route('admin.ai-studio.create', ['template' => $template->key]) }}" class="flex flex-col gap-3 rounded-xl border border-line bg-surface p-5 hover:border-line-strong hover:bg-subtle">
                         <span class="flex size-9 items-center justify-center rounded-lg bg-brand-subtle text-fg-brand"><x-ui.icon :name="$template->purpose->icon()" size="18" /></span>

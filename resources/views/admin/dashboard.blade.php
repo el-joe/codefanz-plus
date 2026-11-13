@@ -12,7 +12,7 @@
         </x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-2">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
         @can('viewAny', \App\Models\ChangeRequest::class)
         <x-ui.card :title="__('Approval queue')">
             <x-slot:action><a href="{{ route('admin.approvals.index') }}" class="text-sm font-semibold text-fg-brand hover:underline">{{ __('Review queue') }}</a></x-slot:action>

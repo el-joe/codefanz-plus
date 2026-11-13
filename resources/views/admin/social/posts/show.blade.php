@@ -29,7 +29,7 @@
         <x-ui.alert tone="warning" :title="__('AI draft')">{{ __('This copy was written with AI. Check every fact, number and link. Someone other than the person who generated it must approve it.') }}</x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div class="flex min-w-0 flex-col gap-6">
             <x-ui.card>
                 <div class="flex flex-wrap items-center gap-2">
@@ -38,7 +38,7 @@
                     <x-ui.badge :dot="false">{{ strtoupper($post->locale) }}</x-ui.badge>
                     @if ($post->campaign)<x-ui.badge tone="accent" :dot="false"><span dir="auto">{{ $post->campaign }}</span></x-ui.badge>@endif
                 </div>
-                <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+                <dl class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
                     <div><dt class="text-fg-tertiary">{{ __('Author') }}</dt><dd class="text-fg">{{ $post->author?->name ?? '—' }}</dd></div>
                     <div><dt class="text-fg-tertiary">{{ __('Approved by') }}</dt><dd class="text-fg">{{ $post->isApproved() ? $post->reviewer?->name.' · '.$post->approved_at->timezone($timezone)->translatedFormat('j M Y H:i') : __('Not approved yet') }}</dd></div>
                     <div><dt class="text-fg-tertiary">{{ __('Scheduled for') }}</dt><dd class="text-fg">{{ $post->scheduled_at ? $post->scheduled_at->timezone($timezone)->translatedFormat('j M Y · H:i').' ('.$timezone.')' : ($post->planned_at ? __('Planned: :date', ['date' => $post->planned_at->timezone($timezone)->translatedFormat('j M Y · H:i')]) : '—') }}</dd></div>
@@ -51,7 +51,7 @@
 
             @if ($media->isNotEmpty())
                 <x-ui.card :title="__('Images')">
-                    <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    <ul class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                         @foreach ($media as $image)
                             @php
                                 $optimized = ($image->largestVariant('webp') ?? $image->largestVariant('gif'))?->url();
@@ -97,7 +97,7 @@
                         <p class="mt-2 text-sm text-fg-secondary"><span class="font-semibold">{{ __('First comment') }}:</span> <span dir="auto">{{ $variant->first_comment }}</span></p>
                     @endif
 
-                    <dl class="mt-4 grid gap-2 text-xs sm:grid-cols-3">
+                    <dl class="mt-4 grid grid-cols-1 gap-2 text-xs sm:grid-cols-3">
                         <div><dt class="text-fg-tertiary">{{ __('Attempts') }}</dt><dd class="text-fg">{{ $variant->attempts }}</dd></div>
                         <div><dt class="text-fg-tertiary">{{ __('Images') }}</dt><dd class="text-fg">{{ $variant->include_media ? $media->count() : 0 }}</dd></div>
                         <div><dt class="text-fg-tertiary">{{ __('Published') }}</dt><dd class="text-fg">{{ ($variant->published_at ?? $variant->exported_at)?->timezone($timezone)->translatedFormat('j M Y · H:i') ?? '—' }}</dd></div>
@@ -173,7 +173,7 @@
             @endforelse
         </div>
 
-        <aside class="flex flex-col gap-4">
+        <div class="flex flex-col gap-4">
             <x-ui.card :title="__('Workflow')">
                 <ol class="mb-4 flex flex-wrap gap-1 text-xs" aria-label="{{ __('Workflow steps') }}">
                     @foreach ([SocialPostStatus::Draft, SocialPostStatus::InReview, SocialPostStatus::Approved, SocialPostStatus::Scheduled, SocialPostStatus::Published] as $step)
@@ -230,7 +230,7 @@
                                 @csrf
                                 <label for="note" class="sr-only">{{ __('Note for the author') }}</label>
                                 <textarea id="note" name="note" rows="3" required minlength="3" maxlength="2000" dir="auto" placeholder="{{ __('What should change?') }}"
-                                          class="w-full rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg"></textarea>
+                                          class="w-full rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg"></textarea>
                                 <x-ui.button variant="secondary">{{ __('Send back to the author') }}</x-ui.button>
                             </form>
                         </details>
@@ -259,6 +259,6 @@
                     </ol>
                 @endif
             </x-ui.card>
-        </aside>
+        </div>
     </div>
 </x-layouts.admin>

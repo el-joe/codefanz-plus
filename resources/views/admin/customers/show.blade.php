@@ -16,7 +16,7 @@
         @endif
     </div>
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_360px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div class="flex min-w-0 flex-col gap-6">
             <x-ui.card :title="__('Portal users')">
                 <p class="mb-4 text-sm text-fg-secondary">{{ __('People who can sign in to the client portal for this customer. They only ever see this customer’s records.') }}</p>
@@ -72,7 +72,7 @@
                     <form method="POST" action="{{ route('admin.customers.portal-users.store', $customer) }}" class="mt-6 flex flex-col gap-4 rounded-lg border border-line p-4" data-invite-portal-user>
                         @csrf
                         <h3 class="text-base font-semibold text-fg">{{ __('Invite a portal user') }}</h3>
-                        <div class="grid gap-4 sm:grid-cols-2">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <x-ui.input name="name" bag="invitePortalUser" id="invite-name" :label="__('Full name')" :value="$customer->users->isEmpty() ? $customer->contact_name : null" required maxlength="120" dir="auto" />
                             <x-ui.input name="email" bag="invitePortalUser" id="invite-email" type="email" :label="__('Email')" :value="$customer->users->isEmpty() ? $customer->email : null" required maxlength="255" dir="ltr" />
                             <x-ui.select name="locale" bag="invitePortalUser" id="invite-locale" :label="__('Language')" :options="$languages->map(fn ($language) => $language['native_name'])" :value="$customer->preferred_locale" :helper="__('The invitation email is sent in this language.')" />
@@ -111,7 +111,7 @@
             @endif
         </div>
 
-        <aside class="flex flex-col gap-6">
+        <div class="flex flex-col gap-6">
             <x-ui.card :title="__('Contact')">
                 <dl class="flex flex-col divide-y divide-line-subtle text-sm">
                     @foreach (array_filter([
@@ -165,6 +165,6 @@
                     </form>
                 </x-ui.card>
             @endcan
-        </aside>
+        </div>
     </div>
 </x-layouts.admin>

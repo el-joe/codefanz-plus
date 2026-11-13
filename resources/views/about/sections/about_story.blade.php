@@ -9,7 +9,7 @@
     ];
     $statPositions = ['start-[7.7%] top-[12%]', 'start-[40%] top-[44.5%]'];
 @endphp
-<x-site.section :tone="$tone" inner="grid gap-12 lg:grid-cols-[1fr_32.5rem] lg:items-center lg:gap-20" aria-labelledby="{{ $headingId }}" data-section="about_story">
+<x-site.section :tone="$tone" inner="grid gap-12 lg:grid-cols-[minmax(0,1fr)_32.5rem] lg:items-center lg:gap-20" aria-labelledby="{{ $headingId }}" data-section="about_story">
     <div @class(['flex flex-col gap-5', 'lg:col-span-2 lg:max-w-3xl' => $statistics->isEmpty()])>
         <x-site.section-heading :id="$headingId" align="start" :eyebrow="$copy['eyebrow']" :heading="$copy['heading']" :subheading="$copy['subheading']" />
     </div>

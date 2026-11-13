@@ -13,7 +13,7 @@
         <x-ui.alert tone="success" :title="__('Indexing is allowed')">{{ __('Search engines may crawl the public site. Private areas and site search stay disallowed.') }}</x-ui.alert>
     @endif
 
-    <div class="grid gap-6 lg:grid-cols-2">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <x-ui.card :title="__('XML sitemaps')">
             <p class="text-sm text-fg-secondary">{{ trans_choice('{0} No URLs are listed yet.|{1} 1 published, indexable URL is listed.|[2,*] :count published, indexable URLs are listed.', $urlCount, ['count' => $urlCount]) }}
                 {{ __('Drafts, closed positions, unlisted projects, noindex and canonicalised pages are left out. Sitemaps rebuild automatically when content changes.') }}</p>

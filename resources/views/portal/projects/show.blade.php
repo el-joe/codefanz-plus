@@ -30,7 +30,7 @@
         </nav>
     </x-ui.card>
 
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         @if ($project->show_budget_to_client && $project->budget_minor !== null)
             <x-ui.card padding="p-4"><p class="text-xs text-fg-tertiary">{{ __('Total value') }}</p><p class="mt-1 text-xl font-semibold text-fg" dir="ltr">{{ $project->formattedBudget() }}</p></x-ui.card>
         @endif

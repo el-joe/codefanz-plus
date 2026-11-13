@@ -1,6 +1,6 @@
 <x-ui.card padding="p-0" class="overflow-hidden">
     <div class="flex flex-col lg:flex-row">
-        <aside class="border-b border-line lg:w-72 lg:shrink-0 lg:border-e lg:border-b-0">
+        <div class="border-b border-line lg:w-72 lg:shrink-0 lg:border-e lg:border-b-0">
             <ul class="flex flex-col" data-conversation-list>
                 @foreach ($conversations as $conversation)
                     @php($isActive = $activeConversation && $conversation->is($activeConversation))
@@ -26,7 +26,7 @@
                     </form>
                 </details>
             @endif
-        </aside>
+        </div>
 
         @if ($activeConversation)
             <x-conversation.thread

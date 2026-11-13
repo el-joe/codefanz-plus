@@ -19,7 +19,7 @@
         <x-ui.alert tone="danger" :title="__('Could not restore')">{{ $errors->first() }}</x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
         <x-ui.card :title="__('Revisions')" padding="p-0" class="[&>div]:px-6 [&>div]:pt-5">
             @if ($history->isEmpty())
                 <x-ui.empty-state :title="__('No revisions yet')" :description="__('A revision is saved every time the content changes.')" />

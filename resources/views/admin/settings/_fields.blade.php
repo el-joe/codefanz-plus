@@ -3,7 +3,7 @@
     @if ($field['type'] === 'translatable')
         <fieldset class="flex flex-col gap-3">
             <legend class="mb-1 text-sm font-semibold text-fg">{{ __($field['label']) }}</legend>
-            <div class="grid gap-3 sm:grid-cols-2">
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 @foreach ($languages as $code => $language)
                     <div lang="{{ $code }}" dir="{{ $language['direction'] }}">
                         <x-ui.input :name="'settings['.$key.']['.$code.']'" :id="$key.'-'.$code" :label="$language['native_name']" :value="$values[$key][$code] ?? null" />

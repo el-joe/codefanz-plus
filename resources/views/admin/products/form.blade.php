@@ -22,7 +22,7 @@
         </x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_340px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <form id="product-form" method="POST" action="{{ $product->exists ? route('admin.products.update', $product) : route('admin.products.store') }}" class="flex min-w-0 flex-col gap-6">
             @csrf
             @if ($product->exists)
@@ -39,13 +39,13 @@
                         <x-ui.input :name="'translations['.$code.'][tagline]'" :id="'tagline-'.$code" :label="__('Tagline')" :value="$translation?->tagline" maxlength="200" />
                         <div class="flex flex-col gap-1.5">
                             <label for="description-{{ $code }}" class="text-sm font-semibold text-fg">{{ __('Description (Markdown)') }}</label>
-                            <textarea id="description-{{ $code }}" name="translations[{{ $code }}][description]" rows="8" class="rounded-md border border-line bg-surface px-3 py-2 font-mono text-sm text-fg">{{ old("translations.{$code}.description", $translation?->description) }}</textarea>
+                            <textarea id="description-{{ $code }}" name="translations[{{ $code }}][description]" rows="8" class="rounded-md border border-line-strong bg-surface px-3 py-2 font-mono text-sm text-fg">{{ old("translations.{$code}.description", $translation?->description) }}</textarea>
                             <p class="text-xs text-fg-tertiary">{{ __('Headings, lists and links are supported. Raw HTML is removed for security.') }}</p>
                             @error("translations.{$code}.description")<p class="text-sm text-fg-danger">{{ $message }}</p>@enderror
                         </div>
                         <div class="flex flex-col gap-1.5">
                             <label for="licensing-{{ $code }}" class="text-sm font-semibold text-fg">{{ __('Licensing notes') }}</label>
-                            <textarea id="licensing-{{ $code }}" name="translations[{{ $code }}][licensing_notes]" rows="3" maxlength="2000" class="rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg">{{ old("translations.{$code}.licensing_notes", $translation?->licensing_notes) }}</textarea>
+                            <textarea id="licensing-{{ $code }}" name="translations[{{ $code }}][licensing_notes]" rows="3" maxlength="2000" class="rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg">{{ old("translations.{$code}.licensing_notes", $translation?->licensing_notes) }}</textarea>
                             <p class="text-xs text-fg-tertiary">{{ __('Plain text. Do not include prices: quotes are always preliminary.') }}</p>
                         </div>
                         <x-ui.input :name="'translations['.$code.'][seo_title]'" :id="'seo-title-'.$code" :label="__('SEO title')" :value="$translation?->seo_title" maxlength="70" :helper="__('Up to 70 characters.')" />

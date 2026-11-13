@@ -11,7 +11,7 @@
         @method('PUT')
         <input type="hidden" name="active" value="{{ $active ? 0 : 1 }}">
         <label class="sr-only" for="reason-{{ $key->value }}">{{ __('Reason') }}</label>
-        <input id="reason-{{ $key->value }}" name="reason" maxlength="255" placeholder="{{ __('Reason (optional)') }}" class="rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg">
+        <input id="reason-{{ $key->value }}" name="reason" maxlength="255" placeholder="{{ __('Reason (optional)') }}" class="rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg">
         <x-ui.button :variant="$active ? 'secondary' : 'danger'" size="sm">{{ $active ? __('Resume') : __('Pause now') }}</x-ui.button>
     </form>
 </div>

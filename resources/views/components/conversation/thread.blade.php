@@ -38,7 +38,7 @@
                     <input type="file" name="attachment" class="sr-only" data-conversation-file accept="{{ collect(config('codefanz.leads.attachments.extensions'))->map(fn ($extension) => '.'.$extension)->implode(',') }}">
                 </label>
                 <textarea id="conversation-body" name="body" rows="2" required maxlength="{{ $maxLength }}" dir="auto" placeholder="{{ __('Write a message…') }}"
-                          class="min-h-10 flex-1 rounded-md border border-line bg-subtle px-3 py-2 text-sm text-fg focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20">{{ old('body') }}</textarea>
+                          class="min-h-10 flex-1 rounded-md border border-line-strong bg-subtle px-3 py-2 text-sm text-fg focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20">{{ old('body') }}</textarea>
                 <x-ui.button class="shrink-0" aria-label="{{ __('Send') }}">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="rtl:-scale-x-100"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
                     <span class="hidden sm:inline">{{ __('Send') }}</span>

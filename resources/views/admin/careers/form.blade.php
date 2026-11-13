@@ -5,7 +5,7 @@
         <x-ui.alert tone="danger" :title="__('Please fix the highlighted fields')">{{ $errors->first('status') ?: __('Some fields need attention.') }}</x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_340px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <form id="career-form" method="POST" action="{{ $career->exists ? route('admin.careers.update', $career) : route('admin.careers.store') }}" class="flex min-w-0 flex-col gap-6">
             @csrf
             @if ($career->exists)
@@ -18,7 +18,7 @@
                     <div class="flex flex-col gap-4">
                         <x-ui.input :name="'translations['.$code.'][title]'" :id="'title-'.$code" :label="__('Job title')" :value="$translation?->title" maxlength="150" />
                         <x-ui.input :name="'translations['.$code.'][slug]'" :id="'slug-'.$code" :label="__('URL slug')" :value="$translation?->slug" :helper="url($code.'/careers').'/…'" />
-                        <div class="grid gap-4 md:grid-cols-2">
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <x-ui.input :name="'translations['.$code.'][department]'" :id="'department-'.$code" :label="__('Department')" :value="$translation?->department" maxlength="100" />
                             <x-ui.input :name="'translations['.$code.'][location]'" :id="'location-'.$code" :label="__('Location')" :value="$translation?->location" maxlength="150" :helper="__('E.g. Cairo · Hybrid.')" />
                         </div>

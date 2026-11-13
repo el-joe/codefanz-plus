@@ -19,7 +19,7 @@
                       :lead="__('Choose the channel that suits you. We reply within one business day — in Arabic or English.')"
                       :crumbs="[__('Contact') => null]" />
 
-    <x-site.section tone="surface" inner="grid items-start gap-8 lg:grid-cols-[24rem_minmax(0,1fr)] lg:gap-10">
+    <x-site.section tone="surface" inner="grid grid-cols-[minmax(0,1fr)] items-start gap-8 lg:grid-cols-[24rem_minmax(0,1fr)] lg:gap-10">
         <section aria-labelledby="contact-channels">
             <h2 id="contact-channels" class="sr-only">{{ __('Contact channels') }}</h2>
             <ul class="flex flex-col gap-4" data-contact-channels>
@@ -84,7 +84,7 @@
                         <input type="text" id="contact-website" name="{{ \App\Http\Requests\ContactMessageRequest::HONEYPOT }}" tabindex="-1" autocomplete="off">
                     </div>
 
-                    <div class="grid gap-5 sm:grid-cols-2">
+                    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                         <x-ui.input name="name" size="lg" icon="user" :label="__('Full name').' *'" required maxlength="120" autocomplete="name" :placeholder="__('Your name')" />
                         <x-ui.input name="email" size="lg" icon="mail" type="email" :label="__('Email').' *'" required maxlength="255" autocomplete="email" dir="ltr" placeholder="you@company.com" />
                         <x-ui.input name="phone" size="lg" icon="phone" type="tel" :label="__('Phone')" maxlength="30" autocomplete="tel" dir="ltr" placeholder="+20 …" />
@@ -95,7 +95,7 @@
                         <label for="message" class="type-label-md text-fg">{{ __('Message') }} *</label>
                         <textarea id="message" name="message" rows="5" required minlength="10" maxlength="2000" aria-describedby="@error('message') message-error @enderror message-help"
                                   data-char-count="2000" @error('message') aria-invalid="true" @enderror placeholder="{{ __('How can we help?') }}"
-                                  class="w-full rounded-md border bg-surface px-3 py-2.5 type-body-md text-fg placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 {{ $errors->has('message') ? 'border-line-danger' : 'border-line' }}">{{ old('message', $prefill) }}</textarea>
+                                  class="w-full rounded-md border bg-surface px-3 py-2.5 type-body-md text-fg placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 {{ $errors->has('message') ? 'border-line-danger' : 'border-line-strong' }}">{{ old('message', $prefill) }}</textarea>
                         @error('message')
                             <p id="message-error" class="text-sm text-fg-danger">{{ $message }}</p>
                         @enderror

@@ -241,6 +241,8 @@
     @endif
 
     @unless (request()->routeIs('assistant'))
-        <x-site.assistant-launcher />
+        <aside aria-label="{{ __('AI Project Assistant') }}">
+            <x-site.assistant-launcher />
+        </aside>
     @endunless
 </x-layouts.base>

@@ -23,7 +23,7 @@
         </x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_340px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <form id="project-form" method="POST" action="{{ $project->exists ? route('admin.portfolio.update', $project) : route('admin.portfolio.store') }}" class="flex min-w-0 flex-col gap-6">
             @csrf
             @if ($project->exists)
@@ -39,13 +39,13 @@
                         <x-ui.input :name="'translations['.$code.'][slug]'" :id="'slug-'.$code" :label="__('URL slug')" :value="$translation?->slug" :helper="url($code.'/portfolio').'/…'" />
                         <div class="flex flex-col gap-1.5">
                             <label for="summary-{{ $code }}" class="text-sm font-semibold text-fg">{{ __('Summary') }}</label>
-                            <textarea id="summary-{{ $code }}" name="translations[{{ $code }}][summary]" rows="2" maxlength="300" class="rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg">{{ old("translations.{$code}.summary", $translation?->summary) }}</textarea>
+                            <textarea id="summary-{{ $code }}" name="translations[{{ $code }}][summary]" rows="2" maxlength="300" class="rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg">{{ old("translations.{$code}.summary", $translation?->summary) }}</textarea>
                             @error("translations.{$code}.summary")<p class="text-sm text-fg-danger">{{ $message }}</p>@enderror
                         </div>
                         @foreach (['challenge' => [__('The challenge (Markdown)'), 5], 'solution' => [__('Our solution (Markdown)'), 6], 'results' => [__('Results (Markdown)'), 6]] as $field => [$fieldLabel, $rows])
                             <div class="flex flex-col gap-1.5">
                                 <label for="{{ $field }}-{{ $code }}" class="text-sm font-semibold text-fg">{{ $fieldLabel }}</label>
-                                <textarea id="{{ $field }}-{{ $code }}" name="translations[{{ $code }}][{{ $field }}]" rows="{{ $rows }}" class="rounded-md border border-line bg-surface px-3 py-2 font-mono text-sm text-fg">{{ old("translations.{$code}.{$field}", $translation?->{$field}) }}</textarea>
+                                <textarea id="{{ $field }}-{{ $code }}" name="translations[{{ $code }}][{{ $field }}]" rows="{{ $rows }}" class="rounded-md border border-line-strong bg-surface px-3 py-2 font-mono text-sm text-fg">{{ old("translations.{$code}.{$field}", $translation?->{$field}) }}</textarea>
                                 @error("translations.{$code}.{$field}")<p class="text-sm text-fg-danger">{{ $message }}</p>@enderror
                             </div>
                         @endforeach

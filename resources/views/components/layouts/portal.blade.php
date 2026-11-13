@@ -43,7 +43,7 @@
 <x-layouts.base :themeable="true" :title="$title">
     <div class="flex min-h-screen">
         {{-- Portal Sidebar --}}
-        <aside class="sticky top-0 hidden h-screen w-68 shrink-0 flex-col border-e border-line bg-surface lg:flex" data-portal-sidebar>
+        <aside aria-label="{{ __('Sidebar') }}" class="sticky top-0 hidden h-screen w-68 shrink-0 flex-col border-e border-line bg-surface lg:flex" data-portal-sidebar>
             <div class="flex flex-col gap-2 px-5 pt-5 pb-4">
                 <a href="{{ route('portal.dashboard') }}" class="w-fit"><x-ui.logo /></a>
                 <span class="w-fit rounded-full bg-accent-subtle px-2.5 py-0.5 text-xs font-semibold text-fg-accent">{{ __('Client Portal') }}</span>
@@ -53,7 +53,7 @@
                 <form method="POST" action="{{ route('portal.account.switch') }}" class="px-4 pb-3" data-auto-submit>
                     @csrf
                     <label for="sidebar-customer" class="mb-1 block text-xs font-semibold text-fg-tertiary">{{ __('Account') }}</label>
-                    <select id="sidebar-customer" name="customer" class="w-full rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg">
+                    <select id="sidebar-customer" name="customer" class="w-full rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg">
                         @foreach ($switchableCustomers as $option)
                             <option value="{{ $option->ulid }}" @selected($option->is($customer))>{{ $option->company_name }}</option>
                         @endforeach
@@ -108,7 +108,7 @@
                     <h1 class="truncate text-lg font-semibold text-fg lg:text-xl">{{ $title }}</h1>
                 </div>
                 <div class="hidden sm:block"><x-language-switch /></div>
-                <button type="button" data-theme-toggle class="hidden size-10 items-center justify-center rounded-md border border-line text-fg hover:bg-subtle sm:flex" aria-label="{{ __('Switch light or dark theme') }}">
+                <button type="button" data-theme-toggle class="hidden size-10 items-center justify-center rounded-md border border-line text-fg hover:bg-subtle sm:flex" aria-pressed="false" aria-label="{{ __('Dark theme') }}">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
                 </button>
                 <a href="{{ route('portal.notifications.index') }}" class="relative flex size-10 items-center justify-center rounded-md border border-line text-fg hover:bg-subtle"
@@ -142,7 +142,7 @@
                         <a href="{{ route('portal.security') }}" class="block rounded-md px-3 py-2 text-sm text-fg hover:bg-subtle">{{ __('Security') }}</a>
                         <div class="flex items-center justify-between gap-2 border-t border-line-subtle px-1 py-1 sm:hidden">
                             <x-language-switch />
-                            <button type="button" data-theme-toggle class="rounded-md px-2.5 py-1.5 text-sm font-semibold text-fg hover:bg-subtle">{{ __('Theme') }}</button>
+                            <button type="button" data-theme-toggle aria-pressed="false" class="rounded-md px-2.5 py-1.5 text-sm font-semibold text-fg hover:bg-subtle">{{ __('Dark theme') }}</button>
                         </div>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

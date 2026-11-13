@@ -89,7 +89,7 @@
                                         <label for="out-{{ $locale }}-{{ $field }}" class="text-sm font-semibold {{ $live !== null ? 'text-fg-success' : 'text-fg' }}">{{ $fieldLabel($field) }} · {{ __('AI suggestion') }}</label>
                                         <textarea id="out-{{ $locale }}-{{ $field }}" name="outputs[{{ $locale }}][{{ $field }}]" dir="{{ $direction }}" lang="{{ $locale }}"
                                                   rows="{{ mb_strlen($value) > 400 ? 12 : (mb_strlen($value) > 120 ? 4 : 2) }}" @readonly(! $editable)
-                                                  class="rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg read-only:bg-subtle">{{ old("outputs.{$locale}.{$field}", $value) }}</textarea>
+                                                  class="rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg read-only:bg-subtle">{{ old("outputs.{$locale}.{$field}", $value) }}</textarea>
                                     </div>
                                 </div>
                                 @if (isset($diffs[$locale][$field]) && collect($diffs[$locale][$field])->contains(fn ($row) => $row['type'] !== 'same'))

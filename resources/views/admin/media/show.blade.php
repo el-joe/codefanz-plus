@@ -3,7 +3,7 @@
         <x-ui.alert tone="danger">{{ $errors->first() }}</x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_380px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
         <x-ui.card>
             @if ($media->status === \App\Enums\MediaStatus::Ready)
                 <x-media.picture :media="$media" sizes="(min-width: 1280px) 800px, 100vw" class="rounded-lg" eager />

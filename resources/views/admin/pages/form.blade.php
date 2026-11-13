@@ -12,7 +12,7 @@
         </x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_340px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <form id="page-form" method="POST" action="{{ $page->exists ? route('admin.pages.update', $page) : route('admin.pages.store') }}" class="flex flex-col gap-6">
             @csrf
             @if ($page->exists)
@@ -28,7 +28,7 @@
                         <x-ui.input :name="'translations['.$code.'][slug]'" :id="'slug-'.$code" :label="__('URL slug')" :value="$translation?->slug" :helper="url($code).'/…'" />
                         <div class="flex flex-col gap-1.5">
                             <label for="body-{{ $code }}" class="text-sm font-semibold text-fg">{{ __('Content (Markdown)') }}</label>
-                            <textarea id="body-{{ $code }}" name="translations[{{ $code }}][body]" rows="12" class="rounded-md border border-line bg-surface px-3 py-2 font-mono text-sm text-fg">{{ old("translations.{$code}.body", $translation?->body) }}</textarea>
+                            <textarea id="body-{{ $code }}" name="translations[{{ $code }}][body]" rows="12" class="rounded-md border border-line-strong bg-surface px-3 py-2 font-mono text-sm text-fg">{{ old("translations.{$code}.body", $translation?->body) }}</textarea>
                             <p class="text-xs text-fg-tertiary">{{ __('Headings, lists and links are supported. Raw HTML is removed for security.') }}</p>
                         </div>
                         <x-ui.input :name="'translations['.$code.'][seo_title]'" :id="'seo-title-'.$code" :label="__('SEO title')" :value="$translation?->seo_title" maxlength="70" :helper="__('Up to 70 characters.')" />
@@ -43,7 +43,7 @@
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-col gap-1.5">
                         <label for="template" class="text-sm font-semibold text-fg">{{ __('Template') }}</label>
-                        <select id="template" name="template" form="page-form" class="rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg">
+                        <select id="template" name="template" form="page-form" class="rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg">
                             @foreach (['default' => __('Standard page'), 'legal' => __('Legal page')] as $value => $label)
                                 <option value="{{ $value }}" @selected(old('template', $page->template) === $value)>{{ $label }}</option>
                             @endforeach

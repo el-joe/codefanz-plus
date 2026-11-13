@@ -34,7 +34,7 @@
         </div>
     </x-site.page-hero>
 
-    <x-site.section inner="grid gap-12 lg:grid-cols-[1fr_23.75rem] lg:items-start lg:gap-16">
+    <x-site.section inner="grid gap-12 lg:grid-cols-[minmax(0,1fr)_23.75rem] lg:items-start lg:gap-16">
         <div class="flex min-w-0 flex-col gap-12">
             @if ($cover)
                 <x-media.picture :media="$cover" sizes="(min-width: 1024px) 836px, 100vw" :eager="true" class="w-full rounded-xl border border-line" />
@@ -49,7 +49,7 @@
             @if ($service->features->isNotEmpty())
                 <section aria-labelledby="deliverables" class="flex flex-col gap-6">
                     <h2 id="deliverables" class="type-h3 text-fg">{{ __('What you get') }}</h2>
-                    <ul class="grid gap-6 sm:grid-cols-2">
+                    <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         @foreach ($service->features as $feature)
                             @continue(! ($featureTranslation = $feature->exactTranslation($locale)))
                             <li class="flex items-start gap-3">
@@ -84,7 +84,7 @@
             @if ($service->children->isNotEmpty())
                 <section aria-labelledby="sub-services" class="flex flex-col gap-4">
                     <h2 id="sub-services" class="type-h4 text-fg">{{ __('Related services') }}</h2>
-                    <ul class="grid gap-4 sm:grid-cols-2">
+                    <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         @foreach ($service->children as $child)
                             @php($childTranslation = $child->exactTranslation($locale))
                             <x-site.tile-card :icon="$child->icon ?? 'code'" :title="$childTranslation->title" :text="$childTranslation->summary"

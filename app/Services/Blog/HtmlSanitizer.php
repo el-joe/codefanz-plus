@@ -201,6 +201,11 @@ class HtmlSanitizer
         if ($tag === 'img' && ! $element->hasAttribute('alt')) {
             $element->setAttribute('alt', '');
         }
+
+        // Callouts sit inside the article's <main>: a note, not a nested complementary landmark (WCAG 1.3.1).
+        if ($tag === 'aside') {
+            $element->setAttribute('role', 'note');
+        }
     }
 
     private function cleanAttributeValue(string $tag, string $name, string $value): ?string

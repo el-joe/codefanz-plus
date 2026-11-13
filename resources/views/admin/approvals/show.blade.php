@@ -14,7 +14,7 @@
         <x-ui.alert tone="danger" :title="__('Action blocked')" data-action-blocked>{{ $errors->first() }}</x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[340px_minmax(0,1fr)]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[340px_minmax(0,1fr)]">
         <x-ui.card padding="p-0" class="hidden self-start overflow-hidden xl:block">
             <h2 class="border-b border-line px-4 py-3 text-sm font-semibold text-fg">{{ __('Pending') }}</h2>
             @forelse ($queue as $item)
@@ -60,7 +60,7 @@
                 @foreach ($fields as $field => $change)
                     <section data-diff-field="{{ $field }}">
                         <h3 class="mb-2 text-sm font-semibold text-fg">{{ $fieldLabel($field) }}</h3>
-                        <div class="grid gap-3 md:grid-cols-2">
+                        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                             <div>
                                 <p class="mb-1 text-xs font-semibold text-fg-danger">{{ __('Before (live · v:version)', ['version' => $changeRequest->target_version]) }}</p>
                                 <div class="whitespace-pre-wrap break-words rounded-lg bg-danger-subtle p-3 text-sm text-fg" dir="{{ $direction }}">{{ $change['before'] !== '' ? strip_tags($change['before']) : '—' }}</div>
@@ -115,7 +115,7 @@
                     <form method="POST" action="{{ route('admin.approvals.decide', $changeRequest) }}" class="mt-6 flex flex-col gap-2" data-decision-form>
                         @csrf
                         <label for="note" class="text-sm font-semibold text-fg">{{ __('Review note') }}</label>
-                        <textarea id="note" name="note" rows="4" maxlength="1000" placeholder="{{ __('Optional for approval, required when requesting changes…') }}" class="rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg">{{ old('note') }}</textarea>
+                        <textarea id="note" name="note" rows="4" maxlength="1000" placeholder="{{ __('Optional for approval, required when requesting changes…') }}" class="rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg">{{ old('note') }}</textarea>
                         <p class="text-xs text-fg-tertiary">{{ __('Stored in the audit log · up to 1,000 characters') }}</p>
                         <div class="mt-2 flex flex-wrap items-center gap-3">
                             <x-ui.button name="decision" value="reject" variant="ghost" class="text-fg-danger">{{ __('Reject') }}</x-ui.button>

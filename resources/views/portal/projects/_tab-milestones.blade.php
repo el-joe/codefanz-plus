@@ -46,7 +46,7 @@
                                 <input type="hidden" name="decision" value="changes">
                                 <label for="feedback-{{ $milestone->ulid }}" class="text-sm font-semibold text-fg">{{ __('What should change?') }}</label>
                                 <textarea id="feedback-{{ $milestone->ulid }}" name="feedback" rows="3" maxlength="2000" required dir="auto"
-                                          class="w-full rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20">{{ old('feedback') }}</textarea>
+                                          class="w-full rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20">{{ old('feedback') }}</textarea>
                                 @error('feedback')<p class="text-sm text-fg-danger">{{ $message }}</p>@enderror
                                 <x-ui.button size="sm" variant="secondary" class="w-fit">{{ __('Send change request') }}</x-ui.button>
                             </form>

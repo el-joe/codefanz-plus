@@ -18,7 +18,7 @@
             <x-ui.input name="name" :label="__('Brand name')" :value="$profile->name" required maxlength="120" />
         </x-ui.card>
 
-        <div class="grid gap-6 lg:grid-cols-2">
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
             @foreach (['en' => 'English', 'ar' => 'العربية'] as $code => $languageName)
                 <x-ui.card :title="$languageName" :lang="$code" :dir="$code === 'ar' ? 'rtl' : 'ltr'">
                     <div class="flex flex-col gap-4">

@@ -5,7 +5,7 @@
         <x-ui.alert tone="danger" :title="__('Please fix the highlighted fields')">{{ $errors->first('status') ?: __('Some fields need attention.') }}</x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_340px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <form id="industry-form" method="POST" action="{{ $industry->exists ? route('admin.industries.update', $industry) : route('admin.industries.store') }}" class="flex min-w-0 flex-col gap-6">
             @csrf
             @if ($industry->exists)
@@ -20,11 +20,11 @@
                         <x-ui.input :name="'translations['.$code.'][slug]'" :id="'slug-'.$code" :label="__('URL slug')" :value="$translation?->slug" />
                         <div class="flex flex-col gap-1.5">
                             <label for="summary-{{ $code }}" class="text-sm font-semibold text-fg">{{ __('Summary') }}</label>
-                            <textarea id="summary-{{ $code }}" name="translations[{{ $code }}][summary]" rows="3" maxlength="500" class="rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg">{{ old("translations.{$code}.summary", $translation?->summary) }}</textarea>
+                            <textarea id="summary-{{ $code }}" name="translations[{{ $code }}][summary]" rows="3" maxlength="500" class="rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg">{{ old("translations.{$code}.summary", $translation?->summary) }}</textarea>
                         </div>
                         <div class="flex flex-col gap-1.5">
                             <label for="solutions-{{ $code }}" class="text-sm font-semibold text-fg">{{ __('Typical solutions') }}</label>
-                            <textarea id="solutions-{{ $code }}" name="translations[{{ $code }}][typical_solutions]" rows="4" maxlength="1000" aria-describedby="solutions-{{ $code }}-help" class="rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg">{{ old("translations.{$code}.typical_solutions", implode("\n", $translation?->typical_solutions ?? [])) }}</textarea>
+                            <textarea id="solutions-{{ $code }}" name="translations[{{ $code }}][typical_solutions]" rows="4" maxlength="1000" aria-describedby="solutions-{{ $code }}-help" class="rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg">{{ old("translations.{$code}.typical_solutions", implode("\n", $translation?->typical_solutions ?? [])) }}</textarea>
                             <p id="solutions-{{ $code }}-help" class="text-xs text-fg-tertiary">{{ __('One per line, up to 12 short labels.') }}</p>
                             @error("translations.{$code}.typical_solutions")<p class="text-sm text-fg-danger">{{ $message }}</p>@enderror
                         </div>

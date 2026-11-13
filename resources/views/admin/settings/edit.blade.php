@@ -16,7 +16,7 @@
     @endif
 
     @if ($integrations !== [])
-        <div class="grid gap-4 md:grid-cols-2">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
             @foreach ($integrations as $integration)
                 <x-ui.card>
                     <div class="flex items-center justify-between gap-3">

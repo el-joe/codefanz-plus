@@ -10,7 +10,7 @@
         <form method="GET" action="{{ route('portal.invoices.index') }}" role="search">
             @if (! empty($filters['status']))<input type="hidden" name="status" value="{{ $filters['status'] }}">@endif
             <label for="invoice-search" class="sr-only">{{ __('Search invoices') }}</label>
-            <input id="invoice-search" type="search" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="{{ __('Search invoices…') }}" dir="auto" class="w-56 rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg">
+            <input id="invoice-search" type="search" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="{{ __('Search invoices…') }}" dir="auto" class="w-56 rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg">
         </form>
     </div>
 

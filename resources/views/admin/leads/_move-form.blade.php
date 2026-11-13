@@ -11,7 +11,7 @@
         <div class="flex min-w-0 flex-1 flex-col gap-1">
             <label for="move-{{ $lead->ulid }}-{{ $compact ? 'card' : 'detail' }}" class="{{ $compact ? 'sr-only' : 'text-sm font-semibold text-fg' }}">{{ __('Move :reference to', ['reference' => $lead->reference]) }}</label>
             <select id="move-{{ $lead->ulid }}-{{ $compact ? 'card' : 'detail' }}" name="status" data-lead-move-status
-                    class="w-full rounded-md border border-line bg-surface px-2 py-1.5 text-sm text-fg focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20">
+                    class="w-full rounded-md border border-line-strong bg-surface px-2 py-1.5 text-sm text-fg focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20">
                 @foreach ($allowed as $status)
                     <option value="{{ $status->value }}">{{ $status->label() }}</option>
                 @endforeach
@@ -20,7 +20,7 @@
         <div class="flex min-w-0 flex-1 flex-col gap-1" data-lost-reason-field>
             <label for="lost-{{ $lead->ulid }}-{{ $compact ? 'card' : 'detail' }}" class="{{ $compact ? 'sr-only' : 'text-sm font-semibold text-fg' }}">{{ __('Reason if lost') }}</label>
             <input type="text" id="lost-{{ $lead->ulid }}-{{ $compact ? 'card' : 'detail' }}" name="lost_reason" maxlength="500" placeholder="{{ __('Reason if lost') }}" data-lead-move-reason
-                   class="w-full rounded-md border border-line bg-surface px-2 py-1.5 text-sm text-fg placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20">
+                   class="w-full rounded-md border border-line-strong bg-surface px-2 py-1.5 text-sm text-fg placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20">
         </div>
         <x-ui.button size="sm" variant="secondary">{{ __('Move') }}</x-ui.button>
     </form>

@@ -98,7 +98,7 @@ test('an article page shows byline, table of contents, rich body, author bio and
         ->assertSee('href="#when-laravel-wins"', false)
         ->assertSee('<h2 id="when-laravel-wins">', false)
         ->assertSee('href="#queues"', false)
-        ->assertSee('<aside data-callout="tip">', false)
+        ->assertSee('<aside data-callout="tip" role="note">', false)
         ->assertSee('<pre><code>php artisan queue:work</code></pre>', false)
         ->assertSee('data-share-link="linkedin"', false)
         ->assertSee('Keep reading')

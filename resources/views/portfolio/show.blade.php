@@ -142,7 +142,7 @@
         <x-site.section tone="canvas" inner="flex flex-col gap-8 lg:gap-12" aria-labelledby="what-we-built">
             @if ($project->services->isNotEmpty())
                 <x-site.section-heading id="what-we-built" align="start" :eyebrow="__('What we built')" :heading="__('Services delivered')" />
-                <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach ($project->services as $service)
                         @php($serviceTranslation = $service->exactTranslation($locale))
                         <li class="relative flex items-center gap-3 rounded-lg border border-line bg-surface px-5 py-4 transition hover:border-line-brand hover:shadow-md">

@@ -8,7 +8,7 @@
         <x-ui.alert tone="danger" :title="__('Please fix the highlighted fields')">{{ $errors->first('lock_version') ?: $errors->first('dependencies') ?: __('Some fields need attention.') }}</x-ui.alert>
     @endif
 
-    <form method="POST" action="{{ $milestone->exists ? route('admin.projects.milestones.update', [$project, $milestone]) : route('admin.projects.milestones.store', $project) }}" class="grid gap-6 xl:grid-cols-[1fr_340px]">
+    <form method="POST" action="{{ $milestone->exists ? route('admin.projects.milestones.update', [$project, $milestone]) : route('admin.projects.milestones.store', $project) }}" class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         @csrf
         @if ($milestone->exists)
             @method('PUT')
@@ -17,7 +17,7 @@
 
         <div class="flex min-w-0 flex-col gap-6">
             <x-ui.card :title="__('Milestone')">
-                <div class="grid gap-4 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div class="sm:col-span-2"><x-ui.input name="title" :label="__('Title')" :value="$milestone->title" required maxlength="160" dir="auto" /></div>
                     <x-ui.input name="due_date" type="date" :label="__('Due date')" :value="$milestone->due_date?->toDateString()" />
                 </div>
@@ -41,7 +41,7 @@
             </x-ui.card>
         </div>
 
-        <aside class="flex flex-col gap-6">
+        <div class="flex flex-col gap-6">
             <x-ui.card :title="__('Amount')">
                 <div class="flex flex-col gap-4">
                     <x-ui.input name="amount" type="number" step="0.01" min="0" :label="__('Amount')" :value="\App\Services\Money::toDecimal($milestone->amount_minor)" dir="ltr" />
@@ -55,6 +55,6 @@
                     <a href="{{ route('admin.projects.show', ['project' => $project, 'tab' => 'milestones']) }}" class="text-center text-sm font-semibold text-fg-brand hover:underline">{{ __('Cancel') }}</a>
                 </div>
             </x-ui.card>
-        </aside>
+        </div>
     </form>
 </x-layouts.admin>

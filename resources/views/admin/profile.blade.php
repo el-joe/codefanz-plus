@@ -10,7 +10,7 @@
         <x-ui.alert tone="success">{{ __('Password changed. Other devices have been signed out.') }}</x-ui.alert>
     @endif
 
-    <div class="grid max-w-5xl gap-6 lg:grid-cols-2">
+    <div class="grid grid-cols-1 max-w-5xl gap-6 lg:grid-cols-2">
         <x-ui.card :title="__('Personal details')">
             <form method="POST" action="{{ route('user-profile-information.update') }}" class="flex flex-col gap-4">
                 @csrf
@@ -41,7 +41,7 @@
                     @csrf
                     @method('PUT')
                     <p class="text-sm text-fg-secondary">{{ __('Shown under the blog articles you write. Leave empty to show only your name.') }}</p>
-                    <div class="grid gap-6 md:grid-cols-2">
+                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                         @foreach (\App\Models\Language::active() as $code => $language)
                             <div class="flex flex-col gap-4" lang="{{ $code }}" dir="{{ $language['direction'] }}">
                                 <p class="text-sm font-semibold text-fg-tertiary">{{ $language['native_name'] }}</p>

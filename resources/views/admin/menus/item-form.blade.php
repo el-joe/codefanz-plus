@@ -10,7 +10,7 @@
         <x-ui.alert tone="danger" :title="__('Please fix the highlighted fields')">{{ __('Some fields need attention.') }}</x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_340px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <form id="item-form" method="POST" action="{{ $action }}" class="flex min-w-0 flex-col gap-6">
             @csrf
             @if ($item->exists)
@@ -37,7 +37,7 @@
                         @error('link_type')<p class="text-sm text-fg-danger">{{ $message }}</p>@enderror
                     </fieldset>
 
-                    <div class="grid gap-4 md:grid-cols-2">
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <x-ui.select name="route_name" :label="__('Site section')" :value="$item->route_name" :placeholder="__('Choose a section')"
                                      :options="collect(\App\Models\MenuItem::ROUTES)->map(fn ($label) => __($label))->all()" />
                         <x-ui.input name="route_query" :label="__('Filter (optional)')" :value="$routeQuery" dir="ltr" placeholder="category=saas" :helper="__('Query parameters, e.g. category=saas.')" />
@@ -45,7 +45,7 @@
 
                     <div class="flex flex-col gap-1.5">
                         <label for="linkable" class="text-sm font-semibold text-fg">{{ __('Content item') }}</label>
-                        <select id="linkable" name="linkable" @error('linkable') aria-invalid="true" @enderror class="w-full rounded-md border border-line bg-surface px-3 py-2.5 text-base text-fg">
+                        <select id="linkable" name="linkable" @error('linkable') aria-invalid="true" @enderror class="w-full rounded-md border border-line-strong bg-surface px-3 py-2.5 text-base text-fg">
                             <option value="">{{ __('Choose content') }}</option>
                             @foreach ($linkables as $group => $options)
                                 <optgroup label="{{ $group }}">

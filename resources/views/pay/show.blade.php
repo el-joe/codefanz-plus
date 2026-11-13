@@ -8,7 +8,7 @@
 @endphp
 
 <x-layouts.checkout :title="__('Payment :reference', ['reference' => $link->reference])">
-    <div class="grid items-start gap-6 lg:grid-cols-2" data-pay-page data-link-status="{{ $status->value }}">
+    <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-2" data-pay-page data-link-status="{{ $status->value }}">
         <x-ui.card class="shadow-sm">
             @if ($link->expires_at && $status === \App\Enums\PaymentLinkStatus::Active)
                 <x-ui.badge tone="warning">{{ __('Expires :date', ['date' => $link->expires_at->translatedFormat('j M Y')]) }}</x-ui.badge>

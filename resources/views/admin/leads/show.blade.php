@@ -35,10 +35,10 @@
         </x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_360px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div class="flex min-w-0 flex-col gap-6">
             <x-ui.card :title="__('Project requirements')">
-                <dl class="grid gap-x-6 gap-y-4 text-sm sm:grid-cols-2">
+                <dl class="grid grid-cols-1 gap-x-6 gap-y-4 text-sm sm:grid-cols-2">
                     @if ($lead->services->isNotEmpty())
                         <div class="sm:col-span-2">
                             <dt class="text-fg-tertiary">{{ __('Services') }}</dt>
@@ -144,12 +144,12 @@
                 @if ($canManage)
                     <form method="POST" action="{{ route('admin.leads.activities.store', $lead) }}" class="mb-6 flex flex-col gap-3 rounded-lg border border-line p-4">
                         @csrf
-                        <div class="grid gap-3 sm:grid-cols-[200px_1fr]">
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-[200px_1fr]">
                             <x-ui.select name="type" :label="__('Type')" :options="\App\Enums\LeadActivityType::manualOptions()" />
                             <div class="flex flex-col gap-1.5">
                                 <label for="activity-body" class="text-sm font-semibold text-fg">{{ __('Details') }}</label>
                                 <textarea id="activity-body" name="body" rows="3" required maxlength="5000" dir="auto"
-                                          class="w-full rounded-md border bg-surface px-3 py-2.5 text-base text-fg focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 {{ $errors->has('body') ? 'border-line-danger' : 'border-line' }}">{{ old('body') }}</textarea>
+                                          class="w-full rounded-md border bg-surface px-3 py-2.5 text-base text-fg focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 {{ $errors->has('body') ? 'border-line-danger' : 'border-line-strong' }}">{{ old('body') }}</textarea>
                                 @error('body')<p class="text-sm text-fg-danger">{{ $message }}</p>@enderror
                             </div>
                         </div>
@@ -197,7 +197,7 @@
             </x-ui.card>
         </div>
 
-        <aside class="flex flex-col gap-6">
+        <div class="flex flex-col gap-6">
             <x-ui.card :title="__('Contact')">
                 <dl class="flex flex-col divide-y divide-line-subtle text-sm">
                     @foreach (array_filter([
@@ -283,6 +283,6 @@
                     </dl>
                 </x-ui.card>
             @endif
-        </aside>
+        </div>
     </div>
 </x-layouts.admin>

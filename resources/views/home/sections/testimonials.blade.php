@@ -1,6 +1,6 @@
 <x-site.section :tone="$tone" aria-labelledby="{{ $headingId }}" data-section="testimonials">
     <x-site.section-heading :id="$headingId" :eyebrow="$copy['eyebrow']" :heading="$copy['heading']" :subheading="$copy['subheading']" />
-    <ul class="grid items-start gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <ul class="grid grid-cols-1 items-start gap-6 md:grid-cols-2 lg:grid-cols-3">
         @foreach ($data as $testimonial)
             <x-site.testimonial-card :testimonial="$testimonial" heading-tag="h3" />
         @endforeach

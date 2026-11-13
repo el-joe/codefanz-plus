@@ -14,7 +14,7 @@
         </x-ui.alert>
     @endif
 
-    <form method="POST" action="{{ $project->exists ? route('admin.projects.update', $project) : route('admin.projects.store') }}" class="grid gap-6 xl:grid-cols-[1fr_340px]">
+    <form method="POST" action="{{ $project->exists ? route('admin.projects.update', $project) : route('admin.projects.store') }}" class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         @csrf
         @if ($project->exists)
             @method('PUT')
@@ -26,7 +26,7 @@
 
         <div class="flex min-w-0 flex-col gap-6">
             <x-ui.card :title="__('Project')">
-                <div class="grid gap-4 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     @if ($project->exists)
                         <div class="flex flex-col gap-1.5">
                             <span class="text-sm font-semibold text-fg">{{ __('Customer') }}</span>
@@ -58,13 +58,13 @@
                 </div>
                 <fieldset>
                     <legend class="mb-2 text-sm font-semibold text-fg">{{ __('Team members') }}</legend>
-                    <ul class="grid gap-2 sm:grid-cols-2" data-project-members>
+                    <ul class="grid grid-cols-1 gap-2 sm:grid-cols-2" data-project-members>
                         @foreach ($staff as $member)
                             <li class="flex items-center gap-3 rounded-md border border-line px-3 py-2">
                                 <input type="checkbox" id="member-{{ $member->id }}" name="members[]" value="{{ $member->id }}" @checked(in_array($member->id, array_map('intval', (array) $memberIds), true)) class="size-4 accent-brand">
                                 <label for="member-{{ $member->id }}" class="min-w-0 flex-1 truncate text-sm text-fg" dir="auto">{{ $member->name }}</label>
                                 <input type="text" name="member_roles[{{ $member->id }}]" value="{{ $memberRoles[$member->id] ?? '' }}" maxlength="80" placeholder="{{ __('Role') }}" aria-label="{{ __('Role of :name', ['name' => $member->name]) }}" dir="auto"
-                                       class="w-32 rounded-md border border-line bg-surface px-2 py-1 text-xs text-fg">
+                                       class="w-32 rounded-md border border-line-strong bg-surface px-2 py-1 text-xs text-fg">
                             </li>
                         @endforeach
                     </ul>
@@ -73,7 +73,7 @@
             </x-ui.card>
         </div>
 
-        <aside class="flex flex-col gap-6">
+        <div class="flex flex-col gap-6">
             <x-ui.card :title="__('Budget')">
                 <div class="flex flex-col gap-4">
                     <x-ui.input name="budget" type="number" step="0.01" min="0" :label="__('Total project value')" :value="\App\Services\Money::toDecimal($project->budget_minor)" dir="ltr" />
@@ -97,6 +97,6 @@
                     <a href="{{ $project->exists ? route('admin.projects.show', $project) : route('admin.projects.index') }}" class="text-center text-sm font-semibold text-fg-brand hover:underline">{{ __('Cancel') }}</a>
                 </div>
             </x-ui.card>
-        </aside>
+        </div>
     </form>
 </x-layouts.admin>

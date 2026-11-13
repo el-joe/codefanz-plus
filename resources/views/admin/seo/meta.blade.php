@@ -43,7 +43,7 @@
                                 <x-ui.badge tone="brand" :dot="false">{{ strtoupper($row['locale']) }}</x-ui.badge>
                             </p>
                             <a href="{{ $row['url'] }}" target="_blank" rel="noopener" class="mt-1 block break-all font-mono text-xs text-fg-brand hover:underline" dir="ltr">{{ rawurldecode((string) parse_url($row['url'], PHP_URL_PATH)) }}</a>
-                            <dl class="mt-3 grid gap-x-6 gap-y-1 text-xs text-fg-secondary sm:grid-cols-2 lg:grid-cols-4">
+                            <dl class="mt-3 grid grid-cols-1 gap-x-6 gap-y-1 text-xs text-fg-secondary sm:grid-cols-2 lg:grid-cols-4">
                                 <div><dt class="inline">{{ __('Title') }}:</dt> <dd class="inline">{{ trans_choice('{0} empty|{1} 1 character|[2,*] :count characters', mb_strlen((string) $row['effective_title']), ['count' => mb_strlen((string) $row['effective_title'])]) }}</dd></div>
                                 <div><dt class="inline">{{ __('Description') }}:</dt> <dd class="inline">{{ trans_choice('{0} empty|{1} 1 character|[2,*] :count characters', mb_strlen((string) $row['effective_description']), ['count' => mb_strlen((string) $row['effective_description'])]) }}</dd></div>
                                 <div><dt class="inline">{{ __('Focus keyword') }}:</dt> <dd class="inline" dir="auto">{{ $row['focus_keyword'] ?: '—' }}</dd></div>
@@ -62,7 +62,7 @@
 
                     <details class="border-t border-line-subtle" @if ($isOld) open @endif>
                         <summary class="cursor-pointer px-4 py-2.5 text-sm font-semibold text-fg-brand hover:bg-subtle">{{ __('Edit SEO') }}</summary>
-                        <div class="grid gap-6 p-4 lg:grid-cols-[1fr_280px]">
+                        <div class="grid grid-cols-1 gap-6 p-4 lg:grid-cols-[minmax(0,1fr)_280px]">
                             <form method="POST" action="{{ route('admin.seo.meta.update') }}" class="flex flex-col gap-4" lang="{{ $row['locale'] }}">
                                 @csrf
                                 @method('PUT')
@@ -86,7 +86,7 @@
                                     <textarea id="{{ $row['key'] }}-description" name="seo_description" maxlength="170" rows="2" dir="{{ $direction }}" placeholder="{{ $row['effective_description'] }}" data-char-count="160" class="{{ $field }}">{{ $value('seo_description', $row['seo_description']) }}</textarea>
                                     <p class="text-xs text-fg-tertiary" data-char-count-output>{{ __('Recommended 70–160 characters.') }}</p>
                                 </div>
-                                <div class="grid gap-4 sm:grid-cols-2">
+                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <div class="flex flex-col gap-1.5">
                                         <label for="{{ $row['key'] }}-keyword" class="text-sm font-semibold text-fg">{{ __('Focus keyword') }}</label>
                                         <input id="{{ $row['key'] }}-keyword" name="focus_keyword" maxlength="100" dir="{{ $direction }}" value="{{ $value('focus_keyword', $row['focus_keyword']) }}" class="{{ $field }}">

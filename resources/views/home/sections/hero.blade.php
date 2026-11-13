@@ -1,6 +1,6 @@
 {{-- Figma "Hero": copy column + product visual (chart card, KPI card and assistant bubble drawn in HTML/CSS). --}}
 <section class="bg-canvas bg-[radial-gradient(50rem_16.7rem_at_5rem_71%,rgb(110_86_255/0.18),transparent)] rtl:bg-[radial-gradient(50rem_16.7rem_at_calc(100%-5rem)_71%,rgb(110_86_255/0.18),transparent)]" aria-labelledby="{{ $headingId }}" data-section="hero">
-    <div class="container-page grid items-center gap-10 pt-10 pb-14 lg:pt-24 lg:pb-28 xl:grid-cols-[1fr_0.85fr] xl:gap-16">
+    <div class="container-page grid grid-cols-1 items-center gap-10 pt-10 pb-14 lg:pt-24 lg:pb-28 xl:grid-cols-[minmax(0,1fr)_0.85fr] xl:gap-16">
         <div class="flex flex-col items-start gap-5 lg:gap-7">
             @if ($copy['eyebrow'])
                 <x-ui.badge tone="accent" class="w-fit">{{ $copy['eyebrow'] }}</x-ui.badge>

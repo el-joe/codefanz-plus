@@ -19,7 +19,7 @@
     $oldServices = array_map('intval', (array) old('services', $selectedServices));
     $oldPlatforms = (array) old('platforms', []);
     $oldTechnologies = array_map('intval', (array) old('technologies', []));
-    $textareaClass = fn (string $field) => 'w-full rounded-md border bg-surface px-3 py-2.5 type-body-md text-fg placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 '.($errors->has($field) ? 'border-line-danger' : 'border-line');
+    $textareaClass = fn (string $field) => 'w-full rounded-md border bg-surface px-3 py-2.5 type-body-md text-fg placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 '.($errors->has($field) ? 'border-line-danger' : 'border-line-strong');
     $checkboxCard = 'flex items-center gap-2 rounded-md border border-line bg-surface px-3 py-2 type-body-sm text-fg transition-colors hover:border-line-strong has-checked:border-line-brand has-checked:bg-brand-subtle';
     $checkboxInline = 'flex items-center gap-2 type-body-md text-fg';
     $stepCard = 'flex flex-col gap-5 rounded-2xl border border-line bg-surface p-5 shadow-xs sm:p-8';
@@ -77,7 +77,7 @@
                         @foreach ($steps as $number => $label)
                             <li class="group/step flex items-center gap-2 rounded-full border border-line bg-surface py-1 ps-1 pe-3 type-label-md text-fg-secondary data-[state=current]:border-line-brand data-[state=current]:bg-brand-subtle data-[state=current]:text-fg-brand data-[state=done]:text-fg"
                                 data-stepper-indicator="{{ $number }}">
-                                <span class="flex size-6 items-center justify-center rounded-full bg-muted type-label-sm text-fg-secondary group-data-[state=current]/step:bg-brand group-data-[state=current]/step:text-fg-on-brand group-data-[state=done]/step:bg-accent group-data-[state=done]/step:text-fg-on-brand">{{ $number }}</span>
+                                <span class="flex size-6 items-center justify-center rounded-full bg-muted type-label-sm text-fg-secondary group-data-[state=current]/step:bg-brand group-data-[state=current]/step:text-fg-on-brand group-data-[state=done]/step:bg-accent group-data-[state=done]/step:text-ink-900">{{ $number }}</span>
                                 <span class="max-sm:sr-only">{{ $label }}</span>
                             </li>
                         @endforeach
@@ -92,7 +92,7 @@
                                 {{ $steps[1] }}
                             </span>
                         </legend>
-                        <div class="grid gap-5 sm:grid-cols-2">
+                        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                             <x-ui.input name="name" size="lg" icon="user" :label="__('Full name').' *'" required maxlength="120" autocomplete="name" :placeholder="__('Your name')" />
                             <x-ui.input name="email" size="lg" icon="mail" type="email" :label="__('Email').' *'" required maxlength="255" autocomplete="email" dir="ltr" placeholder="you@company.com" />
                             <x-ui.input name="phone" size="lg" icon="phone" type="tel" :label="__('Phone').' *'" required maxlength="30" autocomplete="tel" dir="ltr" placeholder="+20 …" pattern="\+?[0-9 ()\-]{6,30}" />
@@ -113,7 +113,7 @@
                         @if ($services->isNotEmpty())
                             <fieldset class="flex flex-col gap-2" data-required-group data-required-message="{{ __('Choose at least one option.') }}">
                                 <legend class="mb-2 {{ $fieldLabel }}">{{ __('What do you need?') }} *</legend>
-                                <div class="grid gap-2 sm:grid-cols-2">
+                                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                                     @foreach ($services as $service)
                                         <label class="{{ $checkboxCard }}">
                                             <input type="checkbox" name="services[]" value="{{ $service->id }}" @checked(in_array($service->id, $oldServices, true)) class="size-4 accent-brand">
@@ -180,7 +180,7 @@
                             </details>
                         @endif
 
-                        <x-ui.input name="existing_url" size="lg" icon="globe" type="url" :label="__('Existing website')" maxlength="500" dir="ltr" placeholder="https://" :helper="__('Optional')" />
+                        <x-ui.input name="existing_url" size="lg" icon="globe" type="url" autocomplete="url" :label="__('Existing website')" maxlength="500" dir="ltr" placeholder="https://" :helper="__('Optional')" />
                     </fieldset>
 
                     {{-- Step 3 --}}
@@ -191,7 +191,7 @@
                                 {{ $steps[3] }}
                             </span>
                         </legend>
-                        <div class="grid gap-5 sm:grid-cols-2">
+                        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                             <x-ui.select name="budget_range" size="lg" :label="__('Estimated budget')" :options="\App\Enums\BudgetRange::options()" :placeholder="__('Optional')" />
                             <x-ui.select name="timeline" size="lg" :label="__('Timeline')" :options="\App\Enums\ProjectTimeline::options()" :placeholder="__('Optional')" />
                             <x-ui.input name="deadline" size="lg" icon="calendar" type="date" :label="__('Expected deadline')" :min="now()->addDay()->toDateString()" :helper="__('Optional')" />
@@ -227,7 +227,7 @@
                             </div>
                         </div>
 
-                        <div class="grid gap-5 sm:grid-cols-2">
+                        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                             <fieldset class="flex flex-col gap-2">
                                 <legend class="mb-2 {{ $fieldLabel }}">{{ __('Preferred contact method') }} *</legend>
                                 @foreach (\App\Enums\ContactMethod::options() as $value => $label)

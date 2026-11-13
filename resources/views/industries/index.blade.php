@@ -11,7 +11,7 @@
             <x-ui.empty-state :title="__('Our industry list is being updated')" />
         @else
             {{-- Figma "Industry List": two-column cards with icon tile, summary, typical solutions and the related-projects link. --}}
-            <ul class="grid gap-6 md:grid-cols-2 md:items-start">
+            <ul class="grid grid-cols-1 gap-6 md:grid-cols-2 md:items-start">
                 @foreach ($industries as $industry)
                     @php($translation = $industry->exactTranslation(app()->getLocale()))
                     <li id="{{ $translation->slug }}" class="flex scroll-mt-24 flex-col items-start gap-4 rounded-xl border border-line bg-surface p-6 sm:p-7">

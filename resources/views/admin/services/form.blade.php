@@ -33,7 +33,7 @@
         </x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_340px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <form id="service-form" method="POST" action="{{ $service->exists ? route('admin.services.update', $service) : route('admin.services.store') }}" class="flex min-w-0 flex-col gap-6">
             @csrf
             @if ($service->exists)
@@ -49,12 +49,12 @@
                         <x-ui.input :name="'translations['.$code.'][slug]'" :id="'slug-'.$code" :label="__('URL slug')" :value="$translation?->slug" :helper="url($code.'/services').'/…'" />
                         <div class="flex flex-col gap-1.5">
                             <label for="summary-{{ $code }}" class="text-sm font-semibold text-fg">{{ __('Summary') }}</label>
-                            <textarea id="summary-{{ $code }}" name="translations[{{ $code }}][summary]" rows="2" maxlength="300" class="rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg">{{ old("translations.{$code}.summary", $translation?->summary) }}</textarea>
+                            <textarea id="summary-{{ $code }}" name="translations[{{ $code }}][summary]" rows="2" maxlength="300" class="rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg">{{ old("translations.{$code}.summary", $translation?->summary) }}</textarea>
                             @error("translations.{$code}.summary")<p class="text-sm text-fg-danger">{{ $message }}</p>@enderror
                         </div>
                         <div class="flex flex-col gap-1.5">
                             <label for="body-{{ $code }}" class="text-sm font-semibold text-fg">{{ __('Description (Markdown)') }}</label>
-                            <textarea id="body-{{ $code }}" name="translations[{{ $code }}][body]" rows="10" class="rounded-md border border-line bg-surface px-3 py-2 font-mono text-sm text-fg">{{ old("translations.{$code}.body", $translation?->body) }}</textarea>
+                            <textarea id="body-{{ $code }}" name="translations[{{ $code }}][body]" rows="10" class="rounded-md border border-line-strong bg-surface px-3 py-2 font-mono text-sm text-fg">{{ old("translations.{$code}.body", $translation?->body) }}</textarea>
                             <p class="text-xs text-fg-tertiary">{{ __('Headings, lists and links are supported. Raw HTML is removed for security.') }}</p>
                         </div>
                         <x-ui.input :name="'translations['.$code.'][seo_title]'" :id="'seo-title-'.$code" :label="__('SEO title')" :value="$translation?->seo_title" maxlength="70" :helper="__('Up to 70 characters.')" />

@@ -23,7 +23,7 @@
         </form>
     </div>
 
-    <div class="grid gap-4 sm:grid-cols-3">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
         @foreach (['impressions' => __('Impressions'), 'engagements' => __('Engagements'), 'clicks' => __('Clicks')] as $key => $label)
             <x-ui.card data-kpi="{{ $key }}">
                 <p class="text-sm text-fg-secondary">{{ $label }}</p>
@@ -33,7 +33,7 @@
         @endforeach
     </div>
 
-    <div class="grid gap-4 xl:grid-cols-[1fr_360px]">
+    <div class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
         <x-ui.card :title="__('Impressions by platform')">
             @if ($chart->isNotEmpty())
                 <div class="h-64"><canvas data-analytics-chart="social-chart-data" role="img" aria-label="{{ __('Impressions by platform') }}"></canvas></div>

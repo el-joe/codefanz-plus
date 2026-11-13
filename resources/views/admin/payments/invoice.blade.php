@@ -19,7 +19,7 @@
             <x-ui.button size="sm" variant="secondary" :href="route('admin.invoices.print', ['invoice' => $invoice, 'lang' => app()->getLocale() === 'ar' ? 'en' : 'ar'])">{{ app()->getLocale() === 'ar' ? __('Print in English') : __('Print in Arabic') }}</x-ui.button>
         </div>
 
-        <dl class="mt-6 grid gap-x-6 gap-y-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
+        <dl class="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
             <div><dt class="text-fg-tertiary">{{ __('Total') }}</dt><dd class="mt-0.5 text-lg font-semibold text-fg" dir="ltr">{{ \App\Services\Money::plain($invoice->total_minor, $invoice->currency) }}</dd></div>
             <div><dt class="text-fg-tertiary">{{ __('Issued') }}</dt><dd class="mt-0.5 font-semibold text-fg">{{ $invoice->issued_at?->translatedFormat('j M Y') ?? '—' }}</dd></div>
             <div><dt class="text-fg-tertiary">{{ __('Due') }}</dt><dd class="mt-0.5 font-semibold text-fg">{{ $invoice->due_at?->translatedFormat('j M Y') ?? '—' }}</dd></div>
@@ -33,7 +33,7 @@
     @if ($invoice->status === \App\Enums\InvoiceStatus::Draft)
         @can('update', $invoice)
             <x-ui.card :title="__('Draft')">
-                <form method="POST" action="{{ route('admin.invoices.update', $invoice) }}" class="grid gap-4 md:grid-cols-2">
+                <form method="POST" action="{{ route('admin.invoices.update', $invoice) }}" class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     @csrf
                     @method('PUT')
                     <div class="md:col-span-2"><x-ui.input name="description" :label="__('Line description')" :value="$invoice->items->first()?->description" maxlength="255" required dir="auto" /></div>
@@ -41,7 +41,7 @@
                     <x-ui.input name="due_at" type="date" :label="__('Due date')" :value="$invoice->due_at?->toDateString()" />
                     <div class="flex flex-col gap-1.5 md:col-span-2">
                         <label for="notes" class="text-sm font-semibold text-fg">{{ __('Notes (printed on the invoice)') }}</label>
-                        <textarea id="notes" name="notes" rows="3" maxlength="2000" dir="auto" class="w-full rounded-md border border-line bg-surface px-3 py-2.5 text-base text-fg">{{ old('notes', $invoice->notes) }}</textarea>
+                        <textarea id="notes" name="notes" rows="3" maxlength="2000" dir="auto" class="w-full rounded-md border border-line-strong bg-surface px-3 py-2.5 text-base text-fg">{{ old('notes', $invoice->notes) }}</textarea>
                     </div>
                     <div class="flex flex-wrap gap-3 md:col-span-2">
                         <x-ui.button variant="secondary">{{ __('Save draft') }}</x-ui.button>

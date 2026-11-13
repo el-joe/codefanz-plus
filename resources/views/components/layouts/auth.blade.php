@@ -1,5 +1,5 @@
 <x-layouts.base :title="$title ?? null">
-    <div class="grid min-h-screen lg:grid-cols-[minmax(0,560px)_1fr]">
+    <div class="grid grid-cols-1 min-h-screen lg:grid-cols-[minmax(0,560px)_1fr]">
         <aside class="dark hidden flex-col justify-between bg-[linear-gradient(135deg,#3B26AB,#0A0D17)] p-14 text-fg lg:flex">
             <x-ui.logo />
             <div class="flex flex-col gap-5">

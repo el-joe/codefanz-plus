@@ -58,7 +58,7 @@
         </x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <form id="post-form" method="POST" action="{{ $post->exists ? route('admin.posts.update', $post) : route('admin.posts.store') }}"
               class="flex min-w-0 flex-col gap-6" data-post-form data-checklist-url="{{ route('admin.posts.checklist') }}">
             @csrf
@@ -90,7 +90,7 @@
                         <div class="flex flex-col gap-1.5">
                             <label for="title-{{ $code }}" class="text-sm font-semibold text-fg">{{ __('Title') }}</label>
                             <input id="title-{{ $code }}" name="translations[{{ $code }}][title]" value="{{ old("translations.{$code}.title", $translation?->title) }}" maxlength="200" data-field="title"
-                                   class="w-full rounded-md border bg-surface px-3 py-2 text-2xl font-bold text-fg focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 lg:text-3xl {{ $errors->has("translations.{$code}.title") ? 'border-line-danger' : 'border-line' }}"
+                                   class="w-full rounded-md border bg-surface px-3 py-2 text-2xl font-bold text-fg focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 lg:text-3xl {{ $errors->has("translations.{$code}.title") ? 'border-line-danger' : 'border-line-strong' }}"
                                    placeholder="{{ __('Article title') }}">
                             @error("translations.{$code}.title")<p class="text-sm text-fg-danger">{{ $message }}</p>@enderror
                         </div>
@@ -108,7 +108,7 @@
                                           'linkPrompt' => __('Link address (https://… or /page). Leave empty to remove the link.'), 'linkInvalid' => __('Use an https:// address or a site path starting with /.'),
                                           'words' => __(':count words · :minutes min read'),
                                       ], JSON_UNESCAPED_UNICODE) }}"
-                                      class="min-h-80 rounded-md border border-line bg-surface px-3 py-2 font-mono text-sm text-fg">{{ old("translations.{$code}.body", $translation?->body) }}</textarea>
+                                      class="min-h-80 rounded-md border border-line-strong bg-surface px-3 py-2 font-mono text-sm text-fg">{{ old("translations.{$code}.body", $translation?->body) }}</textarea>
                             @error("translations.{$code}.body")<p class="text-sm text-fg-danger">{{ $message }}</p>@enderror
                             <p class="text-xs text-fg-tertiary" data-editor-stats>
                                 @if ($translation)
@@ -328,7 +328,7 @@
                 <ul class="grid max-h-80 grid-cols-3 gap-3 overflow-y-auto sm:grid-cols-4" data-media-picker-list></ul>
                 <div class="flex flex-col gap-1.5">
                     <label for="media-picker-alt" class="text-sm font-semibold text-fg">{{ __('Alt text') }}</label>
-                    <input id="media-picker-alt" type="text" maxlength="300" data-media-picker-alt class="rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg">
+                    <input id="media-picker-alt" type="text" maxlength="300" data-media-picker-alt class="rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg">
                     <p class="text-xs text-fg-tertiary">{{ __('Describe the image for people who cannot see it.') }}</p>
                 </div>
             @endif

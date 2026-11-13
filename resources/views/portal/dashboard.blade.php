@@ -13,7 +13,7 @@
         <p class="mt-1 text-base text-fg-secondary">{{ __('Here’s what’s happening with your projects.') }}</p>
     </div>
 
-    <div class="grid gap-4 sm:grid-cols-3" data-dashboard-kpis>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3" data-dashboard-kpis>
         @foreach ([
             ['projects', __('Active projects'), $activeProjectCount, route('portal.projects.index')],
             ['tickets', __('Open tickets'), $openTicketCount, route('portal.support.index')],
@@ -26,7 +26,7 @@
         @endforeach
     </div>
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_360px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div class="flex min-w-0 flex-col gap-6">
             <x-ui.card :title="__('Active project')">
                 <x-slot:action><a href="{{ route('portal.projects.index') }}" class="text-sm font-semibold text-fg-brand hover:underline">{{ __('My Projects') }}</a></x-slot:action>
@@ -70,7 +70,7 @@
             </x-ui.card>
 
             <x-ui.card :title="__('Your account')">
-                <dl class="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+                <dl class="grid grid-cols-1 gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
                     <div>
                         <dt class="text-fg-tertiary">{{ __('Customer') }}</dt>
                         <dd class="mt-0.5 font-semibold text-fg" dir="auto">{{ $customer->company_name }}</dd>
@@ -91,7 +91,7 @@
             </x-ui.card>
         </div>
 
-        <aside class="flex flex-col gap-6">
+        <div class="flex flex-col gap-6">
             <x-ui.card :title="__('Recent invoices')">
                 <x-slot:action><a href="{{ route('portal.invoices.index') }}" class="text-sm font-semibold text-fg-brand hover:underline">{{ __('View all') }}</a></x-slot:action>
                 @if ($recentInvoices->isEmpty())
@@ -147,6 +147,6 @@
                     </ul>
                 @endif
             </x-ui.card>
-        </aside>
+        </div>
     </div>
 </x-layouts.portal>

@@ -13,7 +13,7 @@
         <x-ui.alert tone="success">{{ __('Password changed. Other devices have been signed out.') }}</x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_380px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
         <x-ui.card>
             <div class="mb-5 flex items-center gap-4">
                 <span class="flex size-14 shrink-0 items-center justify-center rounded-full bg-brand-subtle text-lg font-semibold text-fg-brand" aria-hidden="true">{{ $user->initials() }}</span>
@@ -26,7 +26,7 @@
             <form method="POST" action="{{ route('user-profile-information.update') }}" class="flex flex-col gap-4">
                 @csrf
                 @method('PUT')
-                <div class="grid gap-4 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <x-ui.input name="name" bag="updateProfileInformation" :label="__('Full name')" :value="$user->name" required autocomplete="name" dir="auto" />
                     <x-ui.input name="email" bag="updateProfileInformation" type="email" :label="__('Email')" :value="$user->email" required autocomplete="email" dir="ltr" />
                 </div>
@@ -50,7 +50,7 @@
             </form>
         </x-ui.card>
 
-        <aside class="flex flex-col gap-6">
+        <div class="flex flex-col gap-6">
             <x-ui.card :title="__('Password')">
                 <form method="POST" action="{{ route('user-password.update') }}" class="flex flex-col gap-4">
                     @csrf
@@ -80,6 +80,6 @@
                 </dl>
                 <p class="mt-3 text-xs text-fg-tertiary">{{ __('To change company or billing details, contact your CodeFanz team.') }}</p>
             </x-ui.card>
-        </aside>
+        </div>
     </div>
 </x-layouts.portal>

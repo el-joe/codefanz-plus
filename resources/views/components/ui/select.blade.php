@@ -18,7 +18,7 @@
         name="{{ $name }}"
         @if ($hasError || $helper) aria-describedby="{{ $id }}-help" @endif
         @if ($hasError) aria-invalid="true" @endif
-        {{ $attributes->except('id')->merge(['class' => 'w-full rounded-md border bg-surface '.($large ? 'h-12 appearance-none ps-3 pe-10 type-body-md' : 'px-3 py-2.5 text-base').' text-fg focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 '.($hasError ? 'border-line-danger' : 'border-line')]) }}
+        {{ $attributes->except('id')->merge(['class' => 'w-full rounded-md border bg-surface '.($large ? 'h-12 appearance-none ps-3 pe-10 type-body-md' : 'px-3 py-2.5 text-base').' text-fg focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 '.($hasError ? 'border-line-danger' : 'border-line-strong')]) }}
     >
         @if ($placeholder !== null)
             <option value="">{{ $placeholder }}</option>

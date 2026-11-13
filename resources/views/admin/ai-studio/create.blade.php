@@ -10,7 +10,7 @@
         <x-ui.alert tone="danger" :title="__('Nothing was generated')" data-generation-error>{{ $errors->first('ai') }}</x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <x-ui.card :title="__('Brief')">
             @if ($purpose->needsTarget())
                 <form method="GET" action="{{ route('admin.ai-studio.create') }}" data-auto-submit class="mb-5 flex flex-wrap items-end gap-3">

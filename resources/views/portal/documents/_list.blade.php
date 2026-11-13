@@ -1,5 +1,5 @@
 {{-- Client-visible documents grouped by title: latest version first, earlier versions in a disclosure. --}}
-<ul class="grid gap-4 md:grid-cols-2 xl:grid-cols-3" data-documents>
+<ul class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3" data-documents>
     @foreach ($groups as $versions)
         @php($document = $versions->first())
         <li class="flex flex-col gap-3 rounded-xl border border-line bg-surface p-4" data-document="{{ $document->uuid }}">

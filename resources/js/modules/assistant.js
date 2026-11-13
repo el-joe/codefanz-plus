@@ -92,7 +92,7 @@ export function init() {
 
         if (time) {
             const stamp = document.createElement('span');
-            stamp.className = 'mt-1 block type-body-xs opacity-75';
+            stamp.className = 'mt-1 block type-body-xs';
             stamp.setAttribute('dir', 'ltr');
             stamp.textContent = time;
             bubble.append(stamp);

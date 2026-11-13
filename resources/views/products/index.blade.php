@@ -19,7 +19,7 @@
         @if ($products->isEmpty())
             <x-ui.empty-state :title="__('Our products are being updated')" :description="__('Please check back soon or contact us to discuss your project.')" />
         @else
-            <ul class="grid gap-6 md:grid-cols-2">
+            <ul class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 @foreach ($products as $product)
                     <x-site.product-card :product="$product" heading-tag="h2" />
                 @endforeach
@@ -29,7 +29,7 @@
 
     <x-site.section tone="canvas" aria-labelledby="why-product">
         <x-site.section-heading id="why-product" :eyebrow="__('Why a product')" :heading="__('Faster than custom, more flexible than off-the-shelf')" />
-        <ul class="grid gap-8 sm:grid-cols-3">
+        <ul class="grid grid-cols-1 gap-8 sm:grid-cols-3">
             @foreach ($reasons as [$icon, $title, $text])
                 <li class="flex flex-col items-center gap-3 text-center">
                     <span class="flex size-12 items-center justify-center rounded-lg bg-brand-subtle text-icon-brand" aria-hidden="true"><x-ui.icon :name="$icon" :size="22" /></span>

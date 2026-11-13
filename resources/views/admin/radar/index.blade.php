@@ -11,7 +11,7 @@
 <x-layouts.admin :title="__('Freelance Projects Radar')" :crumb="__('AI & Automation')">
     @include('admin.radar._nav')
 
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         @foreach ($tileItems as $tile)
             <x-ui.card>
                 <p class="text-sm text-fg-secondary">{{ $tile['label'] }}</p>
@@ -46,7 +46,7 @@
         <x-ui.button variant="secondary" size="sm">{{ __('Filter') }}</x-ui.button>
     </form>
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_360px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div class="flex flex-col gap-4">
             @forelse ($projects as $project)
                 <x-ui.card class="{{ $loop->first ? 'ring-2 ring-brand/40' : '' }}" data-radar-project="{{ $project->id }}">
@@ -95,7 +95,7 @@
             {{ $projects->links() }}
         </div>
 
-        <aside class="flex flex-col gap-6">
+        <div class="flex flex-col gap-6">
             @if ($featured)
                 @php($featured->loadMissing('ruleEvaluation'))
                 <x-ui.card :title="__('Why :score? Score breakdown', ['score' => $featured->score ?? '—'])">
@@ -103,6 +103,6 @@
                     <p class="mt-4 text-xs text-fg-tertiary">{{ __('Alerts: ≥:immediate immediate · :normal–:normalMax normal · :digest–:digestMax daily digest · below :digest saved only. Thresholds are configurable. Proposals are drafts — never auto-submitted.', ['immediate' => $thresholds['immediate'], 'normal' => $thresholds['normal'], 'normalMax' => $thresholds['immediate'] - 1, 'digest' => $thresholds['digest'], 'digestMax' => $thresholds['normal'] - 1]) }}</p>
                 </x-ui.card>
             @endif
-        </aside>
+        </div>
     </div>
 </x-layouts.admin>

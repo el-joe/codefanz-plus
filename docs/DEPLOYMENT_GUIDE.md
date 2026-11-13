@@ -72,3 +72,19 @@ See Phase 20 of the master prompt; tracked in `IMPLEMENTATION_ROADMAP.md` at M12
 customer with one portal user, `client.demo@example.test`. Its password is random on purpose: to sign in locally,
 open `/forgot-password`, request a link for that address and open it from the local mail log
 (`MAIL_MAILER=log` → `storage/logs/laravel.log`) to choose a password, then sign in — you land on `/portal`.
+
+## 9. Local development
+
+**QA sign-in accounts.** `Database\Seeders\LocalDevAccountsSeeder` (not called by `DatabaseSeeder`; it throws unless
+`APP_ENV=local`) creates or updates a Super Admin `admin@codefanz.test` and a Content Manager `editor@codefanz.test` (both
+hold approval permissions, so both get confirmed 2FA with the same local secret), and sets a known password on the demo portal client `client.demo@example.test` (run
+`DemoContentSeeder` first). Passwords and the TOTP secret are read from your own `.env` only:
+
+1. Add `DEV_ADMIN_PASSWORD`, `DEV_EDITOR_PASSWORD`, `DEV_CLIENT_PASSWORD` (strong, random, 12+ characters) and
+   `DEV_ADMIN_2FA_SECRET` (base32, e.g. `php -r 'require "vendor/autoload.php"; echo (new PragmaRX\Google2FA\Google2FA)->generateSecretKey(32), PHP_EOL;'`).
+   `.env.example` lists the names with empty values — never commit real values or set them outside local.
+2. `php artisan config:clear && php artisan db:seed --class=LocalDevAccountsSeeder`.
+3. Sign in at `/login`; for the admin, add the secret to an authenticator app or compute the current code with
+   `php artisan tinker --execute 'echo (new PragmaRX\Google2FA\Google2FA)->getCurrentOtp(config("codefanz.local_dev_accounts.admin_two_factor_secret"));'`.
+
+Re-running the seeder resets the three passwords to the `.env` values and replaces the admin's recovery codes.

@@ -2,7 +2,7 @@
     <form method="GET" data-auto-submit class="flex items-end gap-3">
         <div class="flex flex-col gap-1.5">
             <label for="actor" class="text-sm font-semibold text-fg">{{ __('Actor type') }}</label>
-            <select id="actor" name="actor" class="rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg">
+            <select id="actor" name="actor" class="rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg">
                 <option value="">{{ __('All actors') }}</option>
                 @foreach (\App\Enums\ActorType::cases() as $type)
                     <option value="{{ $type->value }}" @selected($actorType === $type)>{{ __(\Illuminate\Support\Str::headline($type->value)) }}</option>

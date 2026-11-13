@@ -68,7 +68,7 @@
             <x-ui.empty-state :title="__('No audit yet')" :description="__('Run an audit to crawl the public pages listed in the sitemap and find SEO issues. Nothing outside this site is crawled.')" />
         </x-ui.card>
     @else
-        <div class="grid gap-4 lg:grid-cols-[260px_1fr]">
+        <div class="grid grid-cols-1 gap-4 lg:grid-cols-[260px_1fr]">
             <x-ui.card class="flex flex-col items-center gap-2 text-center">
                 <p class="text-sm font-semibold text-fg-secondary">{{ __('Site health') }}</p>
                 <p class="text-6xl font-extrabold {{ $scoreTone }}" data-health-score>{{ $score ?? '—' }}</p>

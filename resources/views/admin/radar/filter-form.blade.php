@@ -19,7 +19,7 @@
         @endif
 
         <x-ui.card :title="__('Profile')">
-            <div class="grid gap-4 sm:grid-cols-2">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <x-ui.input name="name" :label="__('Name')" :value="$filter->name" required maxlength="80" dir="auto" placeholder="Laravel & SaaS" />
                 <x-ui.input name="sort_order" type="number" min="0" max="1000" :label="__('Tab order')" :value="$filter->sort_order ?? 0" />
                 <label class="flex items-center gap-2 text-sm text-fg"><input type="hidden" name="is_active" value="0"><input type="checkbox" name="is_active" value="1" @checked(old('is_active', $filter->is_active ?? true)) class="size-4 accent-brand"> {{ __('Show as a tab') }}</label>
@@ -29,7 +29,7 @@
 
         <x-ui.card :title="__('Rules')">
             <p class="mb-4 text-sm text-fg-secondary">{{ __('Empty rules match everything. Lists take one entry per line or comma separated. Projects outside a profile are never deleted — they stay under “All projects”.') }}</p>
-            <div class="grid gap-4 sm:grid-cols-2">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 @include('admin._textarea', ['name' => 'include_keywords', 'id' => 'include_keywords', 'label' => __('Include keywords (any)'), 'value' => $list('include_keywords'), 'rows' => 3])
                 @include('admin._textarea', ['name' => 'exclude_keywords', 'id' => 'exclude_keywords', 'label' => __('Exclude keywords'), 'value' => $list('exclude_keywords'), 'rows' => 3])
                 @include('admin._textarea', ['name' => 'skills', 'id' => 'skills', 'label' => __('Skills (any)'), 'value' => $list('skills'), 'rows' => 3])
@@ -38,7 +38,7 @@
                 <x-ui.input name="min_score" type="number" min="0" max="100" :label="__('Minimum rule score')" :value="$rules['min_score'] ?? null" />
                 <x-ui.select name="budget_type" :label="__('Budget type')" :options="['fixed' => __('Fixed price'), 'hourly' => __('Hourly')]" :value="$rules['budget_type'] ?? null" :placeholder="__('Any')" />
             </div>
-            <div class="mt-4 grid gap-4 sm:grid-cols-2">
+            <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <fieldset>
                     <legend class="mb-2 text-sm font-semibold text-fg">{{ __('Platforms') }}</legend>
                     <div class="flex flex-wrap gap-3">

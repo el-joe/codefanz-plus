@@ -13,7 +13,7 @@
         </x-ui.alert>
     @endif
 
-    <form method="POST" action="{{ $customer->exists ? route('admin.customers.update', $customer) : route('admin.customers.store') }}" class="grid gap-6 xl:grid-cols-[1fr_340px]">
+    <form method="POST" action="{{ $customer->exists ? route('admin.customers.update', $customer) : route('admin.customers.store') }}" class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         @csrf
         @if ($customer->exists)
             @method('PUT')
@@ -24,7 +24,7 @@
 
         <div class="flex min-w-0 flex-col gap-6">
             <x-ui.card :title="__('Customer')">
-                <div class="grid gap-4 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <x-ui.select name="type" :label="__('Customer type')" :options="\App\Enums\CustomerType::options()" :value="$customer->type?->value" />
                     <x-ui.input name="company_name" :label="__('Company or customer name')" :value="$customer->company_name" required maxlength="160" dir="auto" />
                     <x-ui.input name="contact_name" :label="__('Primary contact')" :value="$customer->contact_name" maxlength="120" dir="auto" />
@@ -35,7 +35,7 @@
             </x-ui.card>
 
             <x-ui.card :title="__('Billing details')">
-                <div class="grid gap-4 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <x-ui.select name="country" :label="__('Country')" :options="$countries" :value="$customer->country" :placeholder="__('Unknown')" />
                     <x-ui.input name="tax_id" :label="__('Tax ID (optional)')" :value="$customer->tax_id" maxlength="50" dir="ltr" />
                     <x-ui.input name="billing_address_line1" :label="__('Address line 1')" :value="$customer->billing_address_line1" maxlength="200" dir="auto" />
@@ -51,7 +51,7 @@
             </x-ui.card>
         </div>
 
-        <aside class="flex flex-col gap-6">
+        <div class="flex flex-col gap-6">
             <x-ui.card :title="__('Status')">
                 <div class="flex flex-col gap-4">
                     <x-ui.select name="status" :label="__('Status')" :options="\App\Enums\CustomerStatus::options()" :value="$customer->status?->value" :helper="__('Portal users of an inactive customer cannot sign in to the portal.')" />
@@ -59,6 +59,6 @@
                     <a href="{{ $customer->exists ? route('admin.customers.show', $customer) : route('admin.customers.index') }}" class="text-center text-sm font-semibold text-fg-brand hover:underline">{{ __('Cancel') }}</a>
                 </div>
             </x-ui.card>
-        </aside>
+        </div>
     </form>
 </x-layouts.admin>

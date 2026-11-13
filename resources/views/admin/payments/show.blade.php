@@ -23,7 +23,7 @@
             @endif
         </div>
 
-        <dl class="mt-6 grid gap-x-6 gap-y-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
+        <dl class="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
             @foreach ([
                 [__('Client'), $payment->customer?->company_name],
                 [__('Project'), $payment->project ? $payment->project->name.' ('.$payment->project->reference.')' : null],
@@ -52,7 +52,7 @@
 
     @if ($payment->status->isCollected() || $payment->refunds->isNotEmpty())
         <x-ui.card :title="__('Refunds')" data-payment-refunds>
-            <dl class="grid gap-4 text-sm sm:grid-cols-3">
+            <dl class="grid grid-cols-1 gap-4 text-sm sm:grid-cols-3">
                 <div><dt class="text-fg-tertiary">{{ __('Refunded') }}</dt><dd class="mt-0.5 font-semibold text-fg" dir="ltr">{{ \App\Services\Money::plain($payment->refunded_minor, $payment->currency) }}</dd></div>
                 <div><dt class="text-fg-tertiary">{{ __('Still refundable') }}</dt><dd class="mt-0.5 font-semibold text-fg" dir="ltr" data-refundable>{{ \App\Services\Money::plain($refundable, $payment->currency) }}</dd></div>
             </dl>
@@ -72,7 +72,7 @@
                         @if ($refundErrors->any())
                             <x-ui.alert tone="danger">{{ $refundErrors->first() }}</x-ui.alert>
                         @endif
-                        <div class="grid gap-4 sm:grid-cols-[12rem_1fr]">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-[12rem_1fr]">
                             <x-ui.input name="amount" id="refund-amount" type="number" step="0.01" min="0.01" :max="\App\Services\Money::toDecimal($refundable)" :label="__('Amount (:currency)', ['currency' => $payment->currency])" :value="old('amount', \App\Services\Money::toDecimal($refundable))" bag="refund" required dir="ltr" />
                             <x-ui.input name="reason" id="refund-reason" :label="__('Reason')" :value="old('reason')" bag="refund" required maxlength="500" dir="auto" />
                         </div>

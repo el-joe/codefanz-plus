@@ -22,7 +22,7 @@
                         @unless ($mine)<p class="mb-1 text-xs font-semibold text-fg-brand" dir="auto">{{ $reply->author?->name ?? __('CodeFanz team') }}</p>@endunless
                         @if ($mine && $reply->user_id !== auth()->id())<p class="mb-1 text-xs font-semibold" dir="auto">{{ $reply->author?->name }}</p>@endif
                         <p class="whitespace-pre-line break-words" dir="auto">{{ $reply->body }}</p>
-                        <p class="mt-1 text-[11px] opacity-75">{{ $reply->created_at->translatedFormat('j M, H:i') }}</p>
+                        <p class="mt-1 text-[11px]">{{ $reply->created_at->translatedFormat('j M, H:i') }}</p>
                     </div>
                 </li>
             @endforeach
@@ -35,7 +35,7 @@
                 @csrf
                 <label for="reply-body" class="text-sm font-semibold text-fg">{{ __('Reply') }}</label>
                 <textarea id="reply-body" name="body" rows="4" required maxlength="{{ config('codefanz.support.reply_max_length') }}" dir="auto" placeholder="{{ __('Write your reply…') }}"
-                          class="rounded-md border bg-surface px-3 py-2 text-sm text-fg {{ $errors->has('body') ? 'border-line-danger' : 'border-line' }}">{{ old('body') }}</textarea>
+                          class="rounded-md border bg-surface px-3 py-2 text-sm text-fg {{ $errors->has('body') ? 'border-line-danger' : 'border-line-strong' }}">{{ old('body') }}</textarea>
                 @error('body')<p class="text-sm text-fg-danger">{{ $message }}</p>@enderror
                 <div class="flex flex-wrap items-center gap-4">
                     <x-ui.button size="sm">{{ __('Send reply') }}</x-ui.button>

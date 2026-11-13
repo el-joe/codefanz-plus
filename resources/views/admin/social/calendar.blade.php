@@ -105,7 +105,7 @@
                                             @csrf
                                             <label class="sr-only" for="move-{{ $post->ulid }}">{{ __('New date and time') }}</label>
                                             <input id="move-{{ $post->ulid }}" type="datetime-local" name="scheduled_for" required value="{{ $at->format('Y-m-d\TH:i') }}"
-                                                   class="rounded border border-line bg-surface px-1.5 py-1 text-xs text-fg">
+                                                   class="rounded border border-line-strong bg-surface px-1.5 py-1 text-xs text-fg">
                                             <button type="submit" class="rounded bg-brand px-2 py-1 text-xs font-semibold text-fg-on-brand">{{ __('Move') }}</button>
                                         </form>
                                     </details>

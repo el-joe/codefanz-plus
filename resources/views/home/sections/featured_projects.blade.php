@@ -5,7 +5,7 @@
             <x-ui.button :href="route('portfolio.index')" variant="secondary" class="shrink-0" arrow>{{ $copy['cta_label'] }}</x-ui.button>
         @endif
     </div>
-    <ul class="grid items-start gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <ul class="grid grid-cols-1 items-start gap-6 md:grid-cols-2 lg:grid-cols-3">
         @foreach ($data as $project)
             @include('portfolio._card', ['project' => $project])
         @endforeach

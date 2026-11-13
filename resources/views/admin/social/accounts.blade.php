@@ -11,7 +11,7 @@
 
     <p class="max-w-3xl text-sm text-fg-secondary">{{ __('Publishing uses each platform’s official API. Where direct publishing isn’t permitted — the app is still in review, the plan has no write access, or the platform offers no API — approved posts become a ready-to-post package. Nothing is ever reported as published without a confirmation.') }}</p>
 
-    <div class="grid gap-4 lg:grid-cols-3">
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
         @foreach ($apps as $provider => $app)
             <x-ui.card data-social-app="{{ $provider }}">
                 <div class="flex items-center justify-between gap-3">
@@ -126,7 +126,7 @@
 
     <x-ui.card :title="__('Add a manual account')">
         <p class="mb-4 text-sm text-fg-secondary">{{ __('For TikTok, YouTube, or any platform while its app waits for approval. Approved posts for it are prepared as a copy-ready package.') }}</p>
-        <form method="POST" action="{{ route('admin.social.accounts.store') }}" class="grid gap-4 md:grid-cols-[200px_1fr_1fr_auto] md:items-end">
+        <form method="POST" action="{{ route('admin.social.accounts.store') }}" class="grid grid-cols-1 gap-4 md:grid-cols-[200px_1fr_1fr_auto] md:items-end">
             @csrf
             <x-ui.select name="platform" :label="__('Platform')" :options="collect(SocialPlatform::cases())->mapWithKeys(fn ($platform) => [$platform->value => $platform->label()])->all()" />
             <x-ui.input name="name" :label="__('Account name')" required maxlength="150" />

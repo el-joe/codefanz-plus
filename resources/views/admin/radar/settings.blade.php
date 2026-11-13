@@ -79,14 +79,14 @@
         <p class="px-5 py-4 text-xs text-fg-tertiary">{{ __('Only official APIs and alert emails the platforms send to you are used. Nothing is scraped, and no login, CAPTCHA or terms of service are bypassed. Email platforms become active once an inbound n8n endpoint with the “Radar: import a platform alert email” action is enabled.') }}</p>
     </x-ui.card>
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_380px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
         <form method="POST" action="{{ route('admin.radar.settings.update') }}" class="flex flex-col gap-6">
             @csrf
             @method('PUT')
 
             <x-ui.card :title="__('Scoring weights')">
                 <p class="mb-4 text-sm text-fg-secondary">{{ __('Each factor scores 0–100; the rule score is their weighted average. A weight of 0 ignores the factor.') }}</p>
-                <div class="grid gap-4 sm:grid-cols-3">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     @foreach ($factorLabels as $factor => $label)
                         <x-ui.input :id="'weight-'.$factor" :name="'weights['.$factor.']'" type="number" min="0" max="100" :label="$label" :value="$settings['weights'][$factor]" required />
                     @endforeach
@@ -94,7 +94,7 @@
             </x-ui.card>
 
             <x-ui.card :title="__('Alert thresholds')">
-                <div class="grid gap-4 sm:grid-cols-3">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <x-ui.input id="threshold-immediate" name="thresholds[immediate]" type="number" min="1" max="100" :label="__('Immediate alert from')" :value="$settings['thresholds']['immediate']" required />
                     <x-ui.input id="threshold-normal" name="thresholds[normal]" type="number" min="1" max="100" :label="__('Normal alert from')" :value="$settings['thresholds']['normal']" required />
                     <x-ui.input id="threshold-digest" name="thresholds[digest]" type="number" min="1" max="100" :label="__('Daily digest from')" :value="$settings['thresholds']['digest']" required />
@@ -105,7 +105,7 @@
             <x-ui.card :title="__('What we look for')">
                 <div class="flex flex-col gap-4">
                     @include('admin._textarea', ['name' => 'keywords', 'id' => 'keywords', 'label' => __('Extra skills and keywords'), 'value' => implode("\n", $settings['keywords']), 'rows' => 4, 'help' => __('One per line. Added to every technology on the website when matching skills.')])
-                    <div class="grid gap-4 sm:grid-cols-3">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                         <x-ui.input name="target_budget_usd" type="number" min="1" :label="__('Target fixed budget (USD)')" :value="$settings['target_budget_usd']" required />
                         <x-ui.input name="target_hourly_usd" type="number" min="1" :label="__('Target hourly rate (USD)')" :value="$settings['target_hourly_usd']" required />
                         <x-ui.input name="digest_size" type="number" min="1" max="50" :label="__('Projects in the daily digest')" :value="$settings['digest_size']" required />
@@ -133,7 +133,7 @@
             <div class="flex flex-wrap gap-3"><x-ui.button>{{ __('Save settings') }}</x-ui.button></div>
         </form>
 
-        <aside class="flex flex-col gap-6">
+        <div class="flex flex-col gap-6">
             <x-ui.card :title="__('Telegram alerts')" data-telegram-card>
                 <div class="flex items-center justify-between gap-3">
                     <p class="text-sm text-fg">{{ __('Bot status') }}</p>
@@ -165,7 +165,7 @@
                     <x-ui.button variant="secondary" size="sm">{{ __('Re-score recent projects') }}</x-ui.button>
                 </form>
             </x-ui.card>
-        </aside>
+        </div>
     </div>
 
     <x-ui.card padding="p-0" class="overflow-x-auto">

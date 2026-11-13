@@ -14,7 +14,7 @@
             ])
         </x-ui.card>
     @else
-        <div class="grid gap-4 md:grid-cols-2" data-projects>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2" data-projects>
             @foreach ($projects as $project)
                 @php($progress = $project->progressPercent())
                 @php($next = $project->nextMilestone())

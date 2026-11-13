@@ -3,7 +3,7 @@
         <x-ui.alert tone="danger" :title="__('Please fix the highlighted fields')">{{ __('Some fields need attention.') }}</x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_340px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <form id="technology-form" method="POST" action="{{ $technology->exists ? route('admin.technologies.update', $technology) : route('admin.technologies.store') }}" class="flex min-w-0 flex-col gap-6">
             @csrf
             @if ($technology->exists)
@@ -21,7 +21,7 @@
             @endforeach
 
             <x-ui.card :title="__('Details')">
-                <div class="grid gap-4 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <x-ui.select name="technology_category_id" :label="__('Category')" :value="$technology->technology_category_id" :options="$categories" />
                     <x-ui.input name="key" :label="__('Key')" :value="$technology->key" maxlength="60" dir="ltr" :helper="__('Unique identifier, e.g. laravel.')" />
                     <x-ui.input name="icon" :label="__('Icon key')" :value="$technology->icon" maxlength="60" dir="ltr" :helper="__('Optional brand icon identifier.')" />

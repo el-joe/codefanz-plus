@@ -10,7 +10,7 @@
 <x-layouts.admin :title="__('Leads')" :crumb="__('CRM & Delivery')">
     @include('admin.leads._tabs')
 
-    <form method="GET" action="{{ route('admin.leads.index') }}" class="grid gap-3 rounded-xl border border-line bg-surface p-4 sm:grid-cols-2 lg:grid-cols-6" role="search" aria-label="{{ __('Filter leads') }}">
+    <form method="GET" action="{{ route('admin.leads.index') }}" class="grid grid-cols-1 gap-3 rounded-xl border border-line bg-surface p-4 sm:grid-cols-2 lg:grid-cols-6" role="search" aria-label="{{ __('Filter leads') }}">
         @foreach (['follow_up', 'sort', 'direction'] as $keep)
             @if (filled($filters[$keep] ?? null))
                 <input type="hidden" name="{{ $keep }}" value="{{ $filters[$keep] }}">

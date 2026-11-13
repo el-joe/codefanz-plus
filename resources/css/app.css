@@ -142,7 +142,7 @@
 
     --cf-text-primary: #141826;
     --cf-text-secondary: #4d556a;
-    --cf-text-tertiary: #6a7389;
+    --cf-text-tertiary: #5d667b; /* a11y: ≥ 4.5:1 on every light surface (was #6a7389, 4.09:1 on muted) */
     --cf-text-disabled: #959db1;
     --cf-text-inverse: #ffffff;
     --cf-text-on-brand: #ffffff;
@@ -154,7 +154,7 @@
     --cf-text-info: #175cd3;
 
     --cf-border-default: #dce0ea;
-    --cf-border-strong: #c2c8d6;
+    --cf-border-strong: #858ea3; /* a11y: form-control borders ≥ 3:1 (WCAG 1.4.11) */
     --cf-border-subtle: #eceef4;
     --cf-border-brand: #6e56ff;
     --cf-border-focus: #6e56ff;
@@ -179,24 +179,24 @@
     --cf-bg-muted: #363d50;
     --cf-bg-inverse: #ffffff;
     --cf-bg-brand: #6e56ff;
-    --cf-bg-brand-hover: #8a77ff;
+    --cf-bg-brand-hover: #5a3df5; /* a11y: white label stays ≥ 4.5:1 on hover */
     --cf-bg-brand-subtle: #1b1350;
     --cf-bg-accent: #1ad5c8;
     --cf-bg-accent-subtle: #0e4d4b;
     --cf-bg-success-subtle: #054f31;
     --cf-bg-warning-subtle: #7a2e0e;
-    --cf-bg-danger: #f04438;
-    --cf-bg-danger-hover: #d92d20;
+    --cf-bg-danger: #d92d20;
+    --cf-bg-danger-hover: #b42318;
     --cf-bg-danger-subtle: #7a271a;
     --cf-bg-info-subtle: #194185;
     --cf-bg-disabled: #222838;
 
     --cf-text-primary: #f5f6fa;
     --cf-text-secondary: #c2c8d6;
-    --cf-text-tertiary: #959db1;
+    --cf-text-tertiary: #b0b7c8;
     --cf-text-disabled: #4d556a;
     --cf-text-inverse: #0a0d17;
-    --cf-text-brand: #a89bff;
+    --cf-text-brand: #bdb3ff;
     --cf-text-accent: #4cebdd;
     --cf-text-success: #6ce9a6;
     --cf-text-warning: #fec84b;
@@ -204,7 +204,7 @@
     --cf-text-info: #84caff;
 
     --cf-border-default: #363d50;
-    --cf-border-strong: #4d556a;
+    --cf-border-strong: #737c92;
     --cf-border-subtle: #222838;
     --cf-border-brand: #8a77ff;
     --cf-border-focus: #a89bff;
@@ -224,6 +224,8 @@
 @layer base {
     html {
         @apply bg-canvas text-fg antialiased;
+        /* WCAG 2.4.11: anchors and focused elements scrolled into view stay clear of the sticky headers. */
+        scroll-padding-top: 6rem;
     }
 
     html[dir='rtl'] body {
@@ -249,6 +251,7 @@
         *::after {
             animation-duration: 0.01ms !important;
             transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
         }
     }
 }
@@ -628,4 +631,9 @@
 /* The launcher steps aside while the mobile navigation drawer is open. */
 body:has([data-nav-panel][data-enhanced]:not([hidden])) [data-assistant-launcher] {
     display: none;
+}
+
+/* WCAG 2.4.11: while the cookie banner is open, keyboard focus scrolled into view stays above it. */
+html:has([data-consent-banner]:not([hidden])) {
+    scroll-padding-bottom: 14rem;
 }

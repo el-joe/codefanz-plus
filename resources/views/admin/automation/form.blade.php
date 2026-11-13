@@ -22,7 +22,7 @@
         </x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_360px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <form id="automation-form" method="POST" action="{{ $workflow->exists ? route('admin.automation.update', $workflow) : route('admin.automation.store') }}" class="flex flex-col gap-6">
             @csrf
             @if ($workflow->exists)
@@ -30,7 +30,7 @@
             @endif
 
             <x-ui.card :title="__('Workflow')">
-                <div class="grid gap-4 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <x-ui.input name="name" :label="__('Name')" :value="$workflow->name" required maxlength="120" dir="auto" :placeholder="__('New lead → Telegram + email')" />
                     <div class="flex flex-col gap-1.5">
                         <p class="text-sm font-semibold text-fg">{{ __('Direction') }}</p>
@@ -47,7 +47,7 @@
                         <x-ui.input name="url" type="url" :label="__('n8n webhook URL')" :value="$workflow->url" required maxlength="500" dir="ltr" placeholder="https://n8n.example.com/webhook/…" :helper="__('HTTPS only. Each delivery is signed with this workflow\'s secret and retried with backoff when n8n does not answer 2xx.')" />
                         <fieldset>
                             <legend class="mb-2 text-sm font-semibold text-fg">{{ __('Events') }}</legend>
-                            <div class="grid gap-2 sm:grid-cols-2">
+                            <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                                 @foreach ($events as $value => $label)
                                     <label class="flex items-center gap-2 rounded-md border border-line p-3 text-sm text-fg has-checked:border-line-brand has-checked:bg-brand-subtle">
                                         <input type="checkbox" name="events[]" value="{{ $value }}" @checked(in_array($value, $chosenEvents, true)) class="size-4 accent-brand">
@@ -69,7 +69,7 @@
                 </x-ui.card>
             @else
                 <x-ui.card :title="__('Inbound: n8n calls CodeFanz')">
-                    <div class="grid gap-4 sm:grid-cols-2">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <x-ui.select name="action" :label="__('Allowed action')" :options="$actions" :value="$workflow->action?->value" :placeholder="__('Choose one action')" />
                         <x-ui.select name="acts_as_user_id" :label="__('Runs as')" :options="$staff->all()" :value="$workflow->acts_as_user_id" :placeholder="__('Choose a staff member')" :helper="__('The action is limited to this person\'s permissions.')" />
                     </div>
@@ -78,7 +78,7 @@
             @endif
         </form>
 
-        <aside class="flex flex-col gap-6">
+        <div class="flex flex-col gap-6">
             <x-ui.card :title="__('Save')">
                 <div class="flex flex-col gap-3">
                     @unless ($workflow->exists)
@@ -117,7 +117,7 @@
 
                 @include('admin._trash-card', ['action' => route('admin.automation.destroy', $workflow), 'confirm' => __('Delete :name? Its run log is kept.', ['name' => $workflow->name]), 'label' => __('Delete workflow')])
             @endif
-        </aside>
+        </div>
     </div>
 
     @if ($workflow->exists)

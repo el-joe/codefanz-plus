@@ -2,7 +2,7 @@
 
 <li data-repeater-item class="flex flex-col gap-3 rounded-lg border border-line bg-canvas p-4">
     <input type="hidden" name="{{ $group }}[{{ $index }}][id]" value="{{ $row['id'] ?? '' }}">
-    <div class="grid gap-4 lg:grid-cols-2">
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
         @foreach (\App\Models\Language::active() as $code => $language)
             <div class="flex flex-col gap-2" lang="{{ $code }}" dir="{{ $language['direction'] }}">
                 <p class="text-xs font-semibold uppercase text-fg-tertiary">{{ $language['native_name'] }}</p>
@@ -12,10 +12,10 @@
                     <label for="{{ $inputId }}" class="sr-only">{{ $config['label'] }} ({{ $language['native_name'] }})</label>
                     @if ($config['multiline'])
                         <textarea id="{{ $inputId }}" name="{{ $group }}[{{ $index }}][translations][{{ $code }}][{{ $field }}]" rows="{{ $config['rows'] ?? 2 }}" maxlength="{{ $config['max'] }}" placeholder="{{ $config['label'] }}"
-                                  class="rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg placeholder:text-fg-tertiary">{{ $row['translations'][$code][$field] ?? '' }}</textarea>
+                                  class="rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg placeholder:text-fg-tertiary">{{ $row['translations'][$code][$field] ?? '' }}</textarea>
                     @else
                         <input id="{{ $inputId }}" type="text" name="{{ $group }}[{{ $index }}][translations][{{ $code }}][{{ $field }}]" value="{{ $row['translations'][$code][$field] ?? '' }}" maxlength="{{ $config['max'] }}" placeholder="{{ $config['label'] }}"
-                               class="rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg placeholder:text-fg-tertiary">
+                               class="rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg placeholder:text-fg-tertiary">
                     @endif
                     @error($key)<p class="text-sm text-fg-danger">{{ $message }}</p>@enderror
                 @endforeach

@@ -12,7 +12,7 @@
                 @if (! empty($filters[$keep]))<input type="hidden" name="{{ $keep }}" value="{{ $filters[$keep] }}">@endif
             @endforeach
             <label for="document-search" class="sr-only">{{ __('Search documents') }}</label>
-            <input id="document-search" type="search" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="{{ __('Search documents…') }}" class="w-56 rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg">
+            <input id="document-search" type="search" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="{{ __('Search documents…') }}" class="w-56 rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg">
         </form>
     </div>
 
@@ -26,7 +26,7 @@
 
     @if ($projects->isNotEmpty())
         <x-ui.card :title="__('Share a file with your team')">
-            <form method="POST" action="{{ route('portal.documents.store') }}" enctype="multipart/form-data" class="grid gap-4 md:grid-cols-2" data-document-upload>
+            <form method="POST" action="{{ route('portal.documents.store') }}" enctype="multipart/form-data" class="grid grid-cols-1 gap-4 md:grid-cols-2" data-document-upload>
                 @csrf
                 <x-ui.select name="project" :label="__('Project')" :options="$projects->pluck('name', 'ulid')" :value="$filters['project'] ?? null" required />
                 <x-ui.select name="category" :label="__('Type')" :options="\App\Enums\DocumentCategory::options()" value="other" />

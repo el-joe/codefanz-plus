@@ -3,7 +3,7 @@
         <x-ui.alert tone="danger" :title="__('Please fix the highlighted fields')">{{ $errors->first('status') ?: __('Some fields need attention.') }}</x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_340px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <form id="statistic-form" method="POST" action="{{ $statistic->exists ? route('admin.statistics.update', $statistic) : route('admin.statistics.store') }}" class="flex min-w-0 flex-col gap-6">
             @csrf
             @if ($statistic->exists)
@@ -18,7 +18,7 @@
             @foreach (\App\Models\Language::active() as $code => $language)
                 @php($translation = $statistic->exists ? $statistic->exactTranslation($code) : null)
                 <x-ui.card :title="$language['native_name']" lang="{{ $code }}" dir="{{ $language['direction'] }}">
-                    <div class="grid gap-4 md:grid-cols-[1fr_160px]">
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_160px]">
                         <x-ui.input :name="'translations['.$code.'][label]'" :id="'label-'.$code" :label="__('Label')" :value="$translation?->label" maxlength="80" :helper="__('E.g. Projects delivered.')" />
                         <x-ui.input :name="'translations['.$code.'][suffix]'" :id="'suffix-'.$code" :label="__('Suffix')" :value="$translation?->suffix" maxlength="10" dir="ltr" />
                     </div>

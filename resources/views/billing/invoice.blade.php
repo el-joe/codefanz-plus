@@ -15,7 +15,7 @@
         <p class="mt-6 rounded-md border border-ink-300 p-3 text-sm text-ink-600">{{ __('Void: :reason', ['reason' => $invoice->void_reason]) }}</p>
     @endif
 
-    <div class="mt-8 grid gap-6 sm:grid-cols-2">
+    <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
         @include('billing._bill-to', ['billTo' => $billTo, 'heading' => __('Bill to')])
         <dl class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm sm:justify-self-end">
             <dt class="text-ink-500">{{ __('Issued') }}</dt><dd class="font-semibold">{{ $invoice->issued_at?->translatedFormat('j M Y') ?? '—' }}</dd>

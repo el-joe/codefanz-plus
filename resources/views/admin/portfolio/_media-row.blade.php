@@ -1,5 +1,5 @@
 <li data-repeater-item class="flex flex-wrap items-center gap-2 rounded-lg border border-line bg-canvas p-2">
-    <select name="{{ $name }}[]" aria-label="{{ $label }}" class="min-w-0 flex-1 rounded-md border border-line bg-surface px-3 py-2 text-sm text-fg">
+    <select name="{{ $name }}[]" aria-label="{{ $label }}" class="min-w-0 flex-1 rounded-md border border-line-strong bg-surface px-3 py-2 text-sm text-fg">
         <option value="">{{ __('No image') }}</option>
         @foreach ($options as $value => $optionLabel)
             <option value="{{ $value }}" @selected($selected === (int) $value)>{{ $optionLabel }}</option>

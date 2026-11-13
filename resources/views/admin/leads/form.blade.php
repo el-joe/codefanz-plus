@@ -13,7 +13,7 @@
         <x-ui.alert tone="danger" :title="__('Please fix the highlighted fields')">{{ $errors->first('lock_version') ?: __('Some fields need attention.') }}</x-ui.alert>
     @endif
 
-    <form method="POST" action="{{ $lead->exists ? route('admin.leads.update', $lead) : route('admin.leads.store') }}" class="grid gap-6 xl:grid-cols-[1fr_340px]">
+    <form method="POST" action="{{ $lead->exists ? route('admin.leads.update', $lead) : route('admin.leads.store') }}" class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         @csrf
         @if ($lead->exists)
             @method('PUT')
@@ -22,7 +22,7 @@
 
         <div class="flex min-w-0 flex-col gap-6">
             <x-ui.card :title="__('Contact')">
-                <div class="grid gap-4 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <x-ui.input name="name" :label="__('Full name')" :value="$lead->name" required maxlength="120" dir="auto" />
                     <x-ui.input name="email" type="email" :label="__('Email')" :value="$lead->email" required maxlength="255" dir="ltr" />
                     <x-ui.input name="phone" type="tel" :label="__('Phone')" :value="$lead->phone" maxlength="30" dir="ltr" />
@@ -79,7 +79,7 @@
                             </div>
                         </details>
                     @endif
-                    <div class="grid gap-4 sm:grid-cols-2">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <x-ui.input name="existing_url" type="url" :label="__('Existing website')" :value="$lead->existing_url" maxlength="500" dir="ltr" placeholder="https://" />
                         <x-ui.select name="budget_range" :label="__('Estimated budget')" :options="\App\Enums\BudgetRange::options()" :value="$lead->budget_range?->value" :placeholder="__('Not specified')" />
                         <x-ui.select name="timeline" :label="__('Timeline')" :options="\App\Enums\ProjectTimeline::options()" :value="$lead->timeline?->value" :placeholder="__('Not specified')" />
@@ -89,7 +89,7 @@
             </x-ui.card>
         </div>
 
-        <aside class="flex flex-col gap-6">
+        <div class="flex flex-col gap-6">
             <x-ui.card :title="__('Sales')">
                 <div class="flex flex-col gap-4">
                     <x-ui.select name="priority" :label="__('Priority')" :options="\App\Enums\LeadPriority::options()" :value="$lead->priority?->value ?? 'normal'" />
@@ -97,7 +97,7 @@
                         <x-ui.select name="assigned_to" :label="__('Assigned to')" :options="$assignees" :value="auth()->id()" :placeholder="__('Unassigned')" />
                     @endunless
                     <x-ui.input name="follow_up_at" type="datetime-local" :label="__('Follow-up')" :value="$lead->follow_up_at?->format('Y-m-d\TH:i')" />
-                    <div class="grid grid-cols-[1fr_96px] gap-2">
+                    <div class="grid grid-cols-[minmax(0,1fr)_96px] gap-2">
                         <x-ui.input name="estimated_value" type="number" min="0" step="0.01" :label="__('Estimated value')" :value="$estimatedValue" dir="ltr" />
                         <x-ui.input name="currency" :label="__('Currency')" :value="$lead->currency ?? config('codefanz.leads.default_currency')" maxlength="3" dir="ltr" />
                     </div>
@@ -107,6 +107,6 @@
                     @endif
                 </div>
             </x-ui.card>
-        </aside>
+        </div>
     </form>
 </x-layouts.admin>

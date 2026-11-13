@@ -37,7 +37,7 @@
         @if ($dir) dir="{{ $dir }}" @endif
         @if ($hasError || $helper) aria-describedby="{{ $id }}-help" @endif
         @if ($hasError) aria-invalid="true" @endif
-        {{ $attributes->except(['id', 'bag'])->merge(['class' => 'w-full rounded-md border bg-surface '.$sizing.' '.$padding.' text-fg placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 '.($hasError ? 'border-line-danger' : 'border-line')]) }}
+        {{ $attributes->except(['id', 'bag'])->merge(['class' => 'w-full rounded-md border bg-surface '.$sizing.' '.$padding.' text-fg placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 '.($hasError ? 'border-line-danger' : 'border-line-strong')]) }}
     >
     @if ($iconPath)</div>@endif
     @if ($hasError)

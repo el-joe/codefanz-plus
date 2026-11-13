@@ -1,5 +1,5 @@
 <x-layouts.admin :title="__('Payments & transactions')" :crumb="__('Delivery')">
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" data-payment-kpis>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" data-payment-kpis>
         @foreach ([
             ['collected', __('Collected (this month)'), $kpis['collected'], null],
             ['links', __('Open payment links'), $kpis['open_links'], $kpis['open_links_total']],

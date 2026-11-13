@@ -10,7 +10,7 @@
         <x-ui.alert tone="danger" :title="__('Please fix the highlighted fields')">{{ $errors->first('roles') ?: $errors->first('is_active') ?: __('Some fields need attention.') }}</x-ui.alert>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[1fr_340px]">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <form id="user-form" method="POST" action="{{ $user->exists ? route('admin.users.update', $user) : route('admin.users.store') }}" class="flex flex-col gap-6">
             @csrf
             @if ($user->exists)
@@ -18,7 +18,7 @@
             @endif
 
             <x-ui.card :title="__('Details')">
-                <div class="grid gap-4 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <x-ui.input name="name" :label="__('Full name')" :value="$user->name" required autocomplete="off" dir="auto" />
                     <x-ui.input name="email" type="email" :label="__('Email')" :value="$user->email" required autocomplete="off" dir="ltr" />
                     <x-ui.select name="locale" :label="__('Language')" :value="$user->locale" :options="$languages" :helper="__('Used for emails and notifications.')" />
@@ -29,7 +29,7 @@
             <x-ui.card :title="__('Roles')">
                 <fieldset>
                     <legend class="mb-3 text-sm text-fg-secondary">{{ __('Permissions are combined across all assigned roles and checked on the server for every action.') }}</legend>
-                    <div class="grid gap-2 sm:grid-cols-2">
+                    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                         @foreach (\App\Enums\Role::staff() as $role)
                             <label class="flex items-start gap-3 rounded-md border border-line p-3 has-checked:border-line-brand has-checked:bg-brand-subtle">
                                 <input type="checkbox" name="roles[]" value="{{ $role->value }}" @checked(in_array($role->value, $assignedRoles, true))
@@ -48,7 +48,7 @@
             </x-ui.card>
         </form>
 
-        <aside class="flex flex-col gap-6">
+        <div class="flex flex-col gap-6">
             <x-ui.card :title="__('Account')">
                 <div class="flex flex-col gap-4">
                     @if ($user->exists)
@@ -96,6 +96,6 @@
                     </div>
                 </x-ui.card>
             @endif
-        </aside>
+        </div>
     </div>
 </x-layouts.admin>
