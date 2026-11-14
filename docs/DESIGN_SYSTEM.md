@@ -3,6 +3,8 @@
 > Figma file: https://www.figma.com/design/gZIo9Cvoi4CNAB2iUYVBMo (team "Youssef Magdy's team")
 > Status: **Milestone 2 design complete (v1.0)** — foundations, component library, website (88 frames), client portal (58), admin + AI (54) · 2026-11-12 · awaiting owner sign-off
 
+> **Design v2 (2026-11-14):** a premium upgrade of the public website now lives on the Figma pages "Website — v2" (`76:28`) and "v2 — Image Assets" (`75:21`). The v2 frames are upgraded duplicates of the v1 frames below, and v1 is unchanged. v2 adds a `v2` variable collection, `v2/*` text and effect styles, and 8 generated images in `resources/images/v2/`. The full spec, with node ids, tokens, the image map and an implementation checklist, is in [`DESIGN_V2.md`](DESIGN_V2.md).
+
 These tokens are mirrored into Tailwind v4 `@theme` in `resources/css/app.css` during Milestone 3.
 Figma variables already carry these CSS names as their WEB code syntax, so Dev Mode shows the matching `var(--…)`.
 
