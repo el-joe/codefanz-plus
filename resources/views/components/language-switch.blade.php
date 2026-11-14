@@ -11,8 +11,8 @@
     $isLocalized = $route && in_array('locale.route', $route->gatherMiddleware(), true);
     $shortNames = ['ar' => 'عربي'];
     $itemClass = $globe
-        ? 'inline-flex min-h-10 min-w-10 items-center justify-center gap-1.5 rounded-md px-2.5 py-2 type-label-md text-fg hover:bg-subtle'
-        : 'rounded-md px-2.5 py-1.5 text-sm font-semibold text-fg hover:bg-subtle';
+        ? 'inline-flex min-h-10 min-w-10 items-center justify-center gap-1.5 rounded-md px-2.5 py-2 type-label-md text-fg hover:bg-subtle site:rounded-full site:px-3.5 site:hover:bg-v2-tint'
+        : 'rounded-md px-2.5 py-1.5 text-sm font-semibold text-fg hover:bg-subtle site:rounded-full';
 @endphp
 
 <div {{ $attributes->merge(['class' => 'flex items-center gap-1']) }} role="group" aria-label="{{ __('Language') }}">

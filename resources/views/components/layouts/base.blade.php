@@ -1,4 +1,4 @@
-@props(['title' => null, 'entry' => null, 'themeable' => false])
+@props(['title' => null, 'entry' => null, 'themeable' => false, 'site' => false])
 
 @php
     $locale = app()->getLocale();
@@ -25,7 +25,7 @@
     @fonts
     @vite(['resources/css/app.css', $entry ?? 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-canvas text-fg">
+<body class="min-h-screen bg-canvas text-fg"{!! $site ? ' data-site' : '' !!}>
     <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-surface focus:px-4 focus:py-2">{{ __('Skip to content') }}</a>
 
     {{ $slot }}

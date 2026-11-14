@@ -1,27 +1,22 @@
-{{-- Figma "Card/Article": rounded thumbnail, meta, title link, excerpt and author. Expects $post loaded with Post::cardRelations(). --}}
+{{--
+    Figma "Card/Article" (v2): radius-20 cover with the card shadow, meta, title link, excerpt and author. Expects $post loaded
+    with Post::cardRelations(). Without an uploaded cover it uses the generated article fallback for the post id.
+--}}
 @php
     $cardLocale = app()->getLocale();
     $cardTranslation = $post->exactTranslation($cardLocale);
     $cardCover = $post->coverImage();
     $cardCategory = $post->category?->exactTranslation($cardLocale);
     $headingTag = $headingTag ?? 'h3';
-    // Figma Blog grid: each placeholder thumbnail gets its own gradient (teal, amber, violet, blue, green, ink).
-    $cardGradients = [
-        'bg-[linear-gradient(137deg,var(--color-accent-900)_12.5%,var(--color-accent-400)_75%)]',
-        'bg-[linear-gradient(137deg,#92400e_12.5%,var(--color-warning-500)_75%)]',
-        'bg-[linear-gradient(137deg,var(--color-brand-700)_12.5%,var(--color-brand-300)_75%)]',
-        'bg-[linear-gradient(137deg,#1e3a8a_12.5%,#3b82f6_75%)]',
-        'bg-[linear-gradient(137deg,#14532d_12.5%,#22c55e_75%)]',
-        'bg-[linear-gradient(137deg,var(--color-ink-900)_12.5%,var(--color-brand-600)_75%)]',
-    ];
+    $cardCoverSizes = '(min-width: 1024px) 410px, (min-width: 640px) 50vw, 100vw';
 @endphp
 
 <li class="group relative flex flex-col items-start gap-4" data-post-card>
-    <div class="relative aspect-[41/23] w-full overflow-hidden rounded-xl {{ $cardGradients[$post->id % count($cardGradients)] }} transition-shadow group-hover:shadow-lg">
+    <div class="relative aspect-[41/23] w-full overflow-hidden rounded-xl border border-v2-hairline bg-v2-tint shadow-v2-card transition-shadow duration-200 group-hover:shadow-v2-lift">
         @if ($cardCover)
-            <x-media.picture :media="$cardCover" sizes="(min-width: 1024px) 410px, (min-width: 640px) 50vw, 100vw" class="size-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" />
+            <x-media.picture :media="$cardCover" :sizes="$cardCoverSizes" class="size-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]" />
         @else
-            <x-site.window-mock class="absolute start-1/2 top-[6%] w-[94%] -translate-x-1/2 rtl:translate-x-1/2 transition-transform duration-300 group-hover:-translate-y-1" />
+            <x-site.image :name="\App\Services\SiteImages::coverFor($post->id, \App\Services\SiteImages::ARTICLE_COVERS)" :sizes="$cardCoverSizes" class="size-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]" />
         @endif
     </div>
     <p class="flex flex-wrap items-center gap-2">

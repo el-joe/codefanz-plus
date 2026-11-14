@@ -11,10 +11,10 @@
             <x-ui.empty-state :title="__('Our industry list is being updated')" />
         @else
             {{-- Figma "Industry List": two-column cards with icon tile, summary, typical solutions and the related-projects link. --}}
-            <ul class="grid grid-cols-1 gap-6 md:grid-cols-2 md:items-start">
+            <ul data-reveal-stagger class="grid grid-cols-1 gap-6 md:grid-cols-2 md:items-start">
                 @foreach ($industries as $industry)
                     @php($translation = $industry->exactTranslation(app()->getLocale()))
-                    <li id="{{ $translation->slug }}" class="flex scroll-mt-24 flex-col items-start gap-4 rounded-xl border border-line bg-surface p-6 sm:p-7">
+                    <li id="{{ $translation->slug }}" class="flex scroll-mt-24 flex-col items-start gap-4 rounded-3xl border border-v2-hairline bg-surface p-6 sm:p-7 shadow-v2-card">
                         <div class="flex items-center gap-3.5">
                             <span class="flex size-13 shrink-0 items-center justify-center rounded-lg bg-accent-subtle text-icon-primary" aria-hidden="true"><x-ui.icon :name="$industry->icon ?? 'briefcase'" :size="26" /></span>
                             <h2 class="type-h4 text-fg">{{ $translation->name }}</h2>
@@ -31,7 +31,7 @@
                         @endif
                         @if ($industry->portfolioProjects->isNotEmpty())
                             <div class="flex flex-col gap-1.5 self-stretch border-t border-line-subtle pt-4">
-                                <h3 class="type-overline text-fg-tertiary">{{ __('Related projects') }}</h3>
+                                <h3 class="type-eyebrow text-fg-tertiary">{{ __('Related projects') }}</h3>
                                 <ul class="flex flex-wrap gap-x-4 gap-y-1 type-label-md">
                                     @foreach ($industry->portfolioProjects as $project)
                                         @php($projectTranslation = $project->exactTranslation(app()->getLocale()))

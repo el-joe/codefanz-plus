@@ -18,7 +18,6 @@
     ]);
     $mainImage = $cover ?? $project->gallery->first();
     $thumbnails = $cover ? $project->gallery : $project->gallery->slice(1);
-    $placeholderTones = ['brand', 'teal', 'ink', 'brand-teal'];
     $facts = array_filter([
         __('Client') => $project->publicClientName() ?? __('Confidential client'),
         __('Industry') => $industryName,
@@ -35,7 +34,8 @@
     :image="$cover"
     :seoable="$project"
     :alternates="$project->translations->mapWithKeys(fn ($alt) => [$alt->locale => route('portfolio.show', ['locale' => $alt->locale, 'slug' => $alt->slug])])->all()">
-    <x-site.page-hero :title="$translation->title" :lead="$translation->summary"
+    {{-- No image accent: the project's own cover/gallery (or its generated fallback cover) follows directly. --}}
+    <x-site.page-hero :title="$translation->title" :lead="$translation->summary" :image="false"
                       :crumbs="[__('Portfolio') => route('portfolio.index'), $translation->title => null]">
         <x-slot:before>
             <p class="flex flex-wrap gap-2">
@@ -61,23 +61,19 @@
         @endif
     </x-site.page-hero>
 
-    <section class="bg-canvas pb-14 lg:pb-24" aria-label="{{ __('Project gallery') }}">
+    <section class="bg-v2-canvas pt-10 pb-14 lg:pt-16 lg:pb-24" aria-label="{{ __('Project gallery') }}">
         <div class="container-page flex flex-col gap-4">
             @if ($mainImage)
-                <x-media.picture :media="$mainImage" sizes="(min-width: 1440px) 1280px, 100vw" :eager="true" class="aspect-[32/15] w-full rounded-[24px] border border-line object-cover" />
+                <x-media.picture :media="$mainImage" sizes="(min-width: 1440px) 1280px, 100vw" :eager="true" class="aspect-[32/15] w-full rounded-4xl border border-v2-hairline object-cover shadow-v2-card max-sm:rounded-3xl" />
             @else
-                <x-site.screen-mockup :window="[1024, 480]" class="aspect-[35/22] rounded-[24px] sm:aspect-[32/15]" />
+                <div class="aspect-[16/10] overflow-hidden rounded-3xl border border-v2-hairline bg-v2-tint shadow-v2-card sm:aspect-[32/15] lg:rounded-4xl">
+                    <x-site.image :name="\App\Services\SiteImages::coverFor($project->id)" sizes="(min-width: 1440px) 1280px, 100vw" class="size-full object-cover" />
+                </div>
             @endif
             @if ($thumbnails->isNotEmpty())
                 <ul class="grid grid-cols-2 gap-4 lg:grid-cols-4" data-gallery>
                     @foreach ($thumbnails as $image)
-                        <li><x-media.picture :media="$image" sizes="(min-width: 1024px) 308px, 50vw" class="aspect-[77/45] w-full rounded-lg border border-line object-cover" /></li>
-                    @endforeach
-                </ul>
-            @elseif (! $mainImage)
-                <ul class="hidden grid-cols-4 gap-4 sm:grid">
-                    @foreach ($placeholderTones as $tone)
-                        <li><x-site.screen-mockup :tone="$tone" :window="[246, 144]" class="aspect-[77/45] rounded-lg" /></li>
+                        <li><x-media.picture :media="$image" sizes="(min-width: 1024px) 308px, 50vw" class="aspect-[77/45] w-full rounded-2xl border border-v2-hairline object-cover shadow-v2-card" /></li>
                     @endforeach
                 </ul>
             @endif

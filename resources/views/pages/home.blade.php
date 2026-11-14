@@ -11,6 +11,13 @@
     :title="$hero['copy']['heading'] ?? __('Turning Ideas Into Powerful Digital Products')"
     :description="$hero['copy']['subheading'] ?? __('CodeFanz designs, builds and scales web platforms, mobile apps, SaaS products and AI-powered automation.')"
     :alternates="\App\Models\Language::active()->keys()->mapWithKeys(fn ($code) => [$code => route('home', ['locale' => $code])])->all()">
+    @if ($hero)
+        <x-slot:head>
+            {{-- LCP: preload the hero artwork (AVIF; browsers without AVIF skip this hint and use the <picture> WebP). --}}
+            <link rel="preload" as="image" type="image/avif" fetchpriority="high"
+                  imagesrcset="{{ \App\Services\SiteImages::srcset('hero-glass-shapes', 'avif') }}" imagesizes="{{ \App\Services\SiteImages::HERO_SIZES }}">
+        </x-slot:head>
+    @endif
     @foreach ($blocks as $block)
         @include('home.sections.'.$block['section']->type->value, [
             'section' => $block['section'],

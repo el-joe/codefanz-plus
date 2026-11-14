@@ -11,10 +11,10 @@
     <div class="flex flex-col gap-8">
         <x-site.section-heading :id="$headingId" align="start" :eyebrow="$copy['eyebrow']" :heading="$copy['heading']" :subheading="$copy['subheading']" />
         @if ($copy['items'] !== [])
-            <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <ul data-reveal-stagger class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 @foreach ($copy['items'] as $reason)
                     <li class="flex flex-col items-start gap-3">
-                        <span class="flex size-11 items-center justify-center rounded-lg bg-brand-subtle text-icon-brand" aria-hidden="true">
+                        <span class="flex size-11 items-center justify-center rounded-lg tile-v2 text-icon-brand" aria-hidden="true">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">{!! $reasonIcons[$loop->index % count($reasonIcons)] !!}</svg>
                         </span>
                         <h3 class="type-h5 text-fg">{{ $reason['title'] }}</h3>
@@ -27,7 +27,9 @@
         @endif
     </div>
     @if ($copy['points'] !== [])
-        <div class="dark flex flex-col gap-5 rounded-[1.5rem] bg-[linear-gradient(140deg,var(--color-brand-800)_14%,var(--color-ink-950)_86%)] px-6 py-8 text-fg sm:px-8 sm:py-10">
+        {{-- v2 delivery promise: night + glow texture (40% instead of 90% so the white list text keeps AA over the glow; mirrored in RTL), radius 28, dark hairline, lift shadow. --}}
+        <div data-reveal class="dark relative isolate flex flex-col gap-5 overflow-hidden rounded-[1.75rem] border border-v2-hairline-dark bg-v2-night px-6 py-8 text-fg shadow-v2-lift sm:px-8 sm:py-10">
+            <div class="absolute inset-0 -z-10" aria-hidden="true"><x-site.image name="cta-dark-glow" sizes="(min-width: 1024px) 440px, 100vw" class="size-full object-cover object-right opacity-40 rtl:-scale-x-100" /></div>
             <h3 class="type-h4 text-fg">{{ __('Our delivery promise') }}</h3>
             <ul class="flex flex-col gap-5">
                 @foreach ($copy['points'] as $point)

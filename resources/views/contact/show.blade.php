@@ -30,7 +30,7 @@
                     <li data-channel="{{ $channel['key'] }}">
                         @if ($channel['href'])
                             <a href="{{ $channel['href'] }}" @if ($channel['external']) target="_blank" rel="noopener noreferrer" @endif
-                               class="group flex items-center gap-4 rounded-xl border border-line bg-surface p-5 shadow-xs transition hover:border-line-brand hover:shadow-md">
+                               class="group flex items-center gap-4 rounded-3xl border border-v2-hairline bg-surface p-5 shadow-v2-card transition hover:border-line-brand hover:shadow-md">
                                 {!! $inner !!}
                                 <span class="flex min-w-0 flex-1 flex-col gap-0.5">
                                     <span class="type-label-lg text-fg">{{ $channel['label'] }}</span>
@@ -61,7 +61,7 @@
             </ul>
         </section>
 
-        <section aria-labelledby="contact-form-title" class="rounded-2xl border border-line bg-surface p-6 shadow-xs sm:p-8">
+        <section aria-labelledby="contact-form-title" class="rounded-3xl border border-v2-hairline bg-surface p-6 shadow-v2-card sm:p-8">
             <h2 id="contact-form-title" class="type-h4 text-fg sm:type-h3">{{ __('Send us a message') }}</h2>
 
             @if ($sent)

@@ -3,7 +3,7 @@
     :title="$intro['heading']"
     :description="$intro['subheading']"
     :alternates="\App\Models\Language::active()->keys()->mapWithKeys(fn ($code) => [$code => route('about', ['locale' => $code])])->all()">
-    <x-site.page-hero :eyebrow="$intro['eyebrow']" :title="$intro['heading']" :lead="$intro['subheading']" :crumbs="[__('About Us') => null]" />
+    <x-site.page-hero :eyebrow="$intro['eyebrow']" :title="$intro['heading']" :lead="$intro['subheading']" :crumbs="[__('About Us') => null]" image="cover-violet-orbit" />
 
     @foreach ($blocks as $block)
         @include('about.sections.'.$block['section']->type->value, [

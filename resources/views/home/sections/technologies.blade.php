@@ -15,10 +15,10 @@
 
     @if ($groups->count() > 1)
         <div data-tabs class="flex flex-col items-center gap-12">
-            <div role="tablist" data-tablist hidden aria-label="{{ __('Technology categories') }}" class="flex max-w-full gap-1 overflow-x-auto rounded-lg bg-muted p-1">
+            <div role="tablist" data-tablist hidden aria-label="{{ __('Technology categories') }}" class="flex max-w-full gap-1 overflow-x-auto rounded-full border border-v2-hairline bg-v2-tint p-1">
                 @foreach ($groups as $key => $technologies)
                     <button type="button" role="tab" data-tab id="tech-tab-{{ $key }}" aria-controls="tech-panel-{{ $key }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}"
-                            class="rounded-md px-3 py-1.5 type-label-md whitespace-nowrap text-fg-secondary hover:text-fg aria-selected:bg-surface aria-selected:text-fg aria-selected:shadow-xs">{{ $groupName($technologies, $key) }}</button>
+                            class="rounded-full px-3.5 py-1.5 type-label-md whitespace-nowrap text-fg-secondary hover:text-fg aria-selected:bg-surface aria-selected:text-fg aria-selected:shadow-v2-card">{{ $groupName($technologies, $key) }}</button>
                 @endforeach
             </div>
             <div class="w-full">

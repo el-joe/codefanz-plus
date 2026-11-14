@@ -7,7 +7,7 @@
     $byline = collect([$quote?->author_role, $testimonial->company])->filter()->implode(' · ');
 @endphp
 
-<li {{ $attributes->merge(['class' => 'flex flex-col rounded-xl border border-line bg-surface p-6']) }}>
+<li {{ $attributes->merge(['class' => 'flex flex-col rounded-3xl border border-v2-hairline bg-surface p-6 shadow-v2-card']) }}>
     <figure class="flex h-full flex-col gap-5">
         <div class="flex items-start justify-between gap-4">
             <span class="h-10 font-sans text-[3.5rem] leading-[1] font-extrabold text-fg-brand rtl:-scale-x-100" aria-hidden="true">&ldquo;</span>

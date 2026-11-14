@@ -168,20 +168,61 @@ Fallback cover rule: when a project, article or product has no uploaded image, p
 
 ## 7. Implementation checklist for the website agent
 
-1. **Tokens.** Add the v2 colors (§3.1), shadows (§3.2) and the display/H1/H2 sizes (§3.4) to `@theme` in `resources/css/app.css`. Use the same names (`--color-v2-*`, `--shadow-v2-card|lift|glow`, `--text-display-xl`…). Do not remove v1 tokens.
-2. **Buttons.** Switch `x-ui.button` to `rounded-full`. Primary gets `shadow-v2-glow`, `hover:bg-brand-700 hover:-translate-y-px` and the focus ring. Secondary gets a hairline border and `hover:bg-ink-50`.
-3. **Header.** Make it sticky and transparent at the top. Add a small vanilla module (`resources/js/modules/header-scroll.js`) that toggles `is-scrolled` after 8px and applies `bg-white/72 backdrop-blur-[16px] backdrop-saturate-180 border-b border-[--color-v2-hairline]`. Pill language switch.
-4. **Home hero.** Add the grid backdrop (CSS `background-image` with two `linear-gradient`s at 64px/32px and a `mask-image: radial-gradient(...)`) and the two radial glows (mirror with `rtl:` positions). Apply the display type and the gradient span on the second line. Replace the dashboard mock with the `hero-glass-shapes` image in a radius-32 frame, keeping the assistant chat bubble as a glass chip (it opens the AI assistant).
-5. **Section headers.** Use the v2 H2 sizes and `max-w-[960px]` when centered. Arabic uses the AR sizes with no negative tracking (`rtl:tracking-normal`).
-6. **Cards.** Service, project, article, product, testimonial and industry cards get `rounded-3xl` (24), the hairline border, `shadow-v2-card`, and on hover `shadow-v2-lift` + `-translate-y-1` + `border-brand-600/30`. Project and article covers use the uploaded image, otherwise the fallback cover rule (§5). Remove the "browser window" placeholder markup.
-7. **Dark bands.** Stats, the delivery promise card and the CTA card use `bg-[--color-v2-night]` with `cta-dark-glow` as a cover background (mirrored in RTL). The footer uses `bg-[--color-v2-night]`.
-8. **Inner page hero component.** Make it 2-column with an optional `image` prop (default `about-glass-stack`), tint background, faint grid and glow. Use it on Services index first, then all other inner pages.
-9. **404 page.** Add the lost-cube image above a smaller gradient "404"; pill search and chips.
-10. **Section rhythm.** Change desktop `py-24` (96) to `py-32` (128) on home sections; leave mobile at `py-14`.
-11. **Motion.** Add `resources/js/modules/reveal.js` (IntersectionObserver, `data-reveal`, stagger via a CSS variable) with a full `prefers-reduced-motion` fallback. Add hover transitions per §6.
-12. **Images.** Serve `resources/images/v2/*` through the existing image pipeline as WebP/AVIF with JPEG fallback, with `width`/`height` set, `loading="lazy"` below the fold and `fetchpriority="high"` on the hero. Use alt text from §5 via `__()` with entries in `lang/ar.json`.
-13. **RTL check.** Glows, the CTA texture and arrow nudges mirror. Gradient text, numbers and the logo do not. Compare against `80:17697` / `80:18085`.
-14. **QA.** Check contrast (muted `#5B6478` on canvas is 5.8:1; white on night is about 19.8:1), visible keyboard focus everywhere, no layout shift from images, and a Lighthouse pass. Compare screenshots against the v2 frames.
+1. [x] **Tokens.** Add the v2 colors (§3.1), shadows (§3.2) and the display/H1/H2 sizes (§3.4) to `@theme` in `resources/css/app.css`. Use the same names (`--color-v2-*`, `--shadow-v2-card|lift|glow`, `--text-display-xl`…). Do not remove v1 tokens.
+2. [x] **Buttons.** Switch `x-ui.button` to `rounded-full`. Primary gets `shadow-v2-glow`, `hover:bg-brand-700 hover:-translate-y-px` and the focus ring. Secondary gets a hairline border and `hover:bg-ink-50`.
+3. [x] **Header.** Make it sticky and transparent at the top. Add a small vanilla module (`resources/js/modules/header-scroll.js`) that toggles `is-scrolled` after 8px and applies `bg-white/72 backdrop-blur-[16px] backdrop-saturate-180 border-b border-[--color-v2-hairline]`. Pill language switch.
+4. [x] **Home hero.** Add the grid backdrop (CSS `background-image` with two `linear-gradient`s at 64px/32px and a `mask-image: radial-gradient(...)`) and the two radial glows (mirror with `rtl:` positions). Apply the display type and the gradient span on the second line. Replace the dashboard mock with the `hero-glass-shapes` image in a radius-32 frame, keeping the assistant chat bubble as a glass chip (it opens the AI assistant).
+5. [x] **Section headers.** Use the v2 H2 sizes and `max-w-[960px]` when centered. Arabic uses the AR sizes with no negative tracking (`rtl:tracking-normal`).
+6. [x] **Cards.** Service, project, article, product, testimonial and industry cards get `rounded-3xl` (24), the hairline border, `shadow-v2-card`, and on hover `shadow-v2-lift` + `-translate-y-1` + `border-brand-600/30`. Project and article covers use the uploaded image, otherwise the fallback cover rule (§5). Remove the "browser window" placeholder markup.
+7. [x] **Dark bands.** Stats, the delivery promise card and the CTA card use `bg-[--color-v2-night]` with `cta-dark-glow` as a cover background (mirrored in RTL). The footer uses `bg-[--color-v2-night]`.
+8. [x] **Inner page hero component.** Make it 2-column with an optional `image` prop (default `about-glass-stack`), tint background, faint grid and glow. Use it on Services index first, then all other inner pages.
+9. [x] **404 page.** Add the lost-cube image above a smaller gradient "404"; pill search and chips.
+10. [x] **Section rhythm.** Change desktop `py-24` (96) to `py-32` (128) on home sections; leave mobile at `py-14`.
+11. [x] **Motion.** Add `resources/js/modules/reveal.js` (IntersectionObserver, `data-reveal`, stagger via a CSS variable) with a full `prefers-reduced-motion` fallback. Add hover transitions per §6.
+12. [x] **Images.** Serve `resources/images/v2/*` through the existing image pipeline as WebP/AVIF with JPEG fallback, with `width`/`height` set, `loading="lazy"` below the fold and `fetchpriority="high"` on the hero. Use alt text from §5 via `__()` with entries in `lang/ar.json`.
+13. [x] **RTL check.** Glows, the CTA texture and arrow nudges mirror. Gradient text, numbers and the logo do not. Compare against `80:17697` / `80:18085`.
+14. [x] **QA.** Check contrast (muted `#5B6478` on canvas is 5.8:1; white on night is about 19.8:1), visible keyboard focus everywhere, no layout shift from images, and a Lighthouse pass. Compare screenshots against the v2 frames.
+
+### Implementation status (website, 2026-11-14)
+
+All 14 items are implemented on the public website (branch `design-v2-upgrade`). Where the build differs from the
+frames or the spec, the reason is below.
+
+- **Scope.** v2 applies to the public site and the error pages only: their layouts mark `<body data-site>`, a
+  `site:` Tailwind variant scopes the shared `x-ui.button` / `x-ui.input` / language-switch changes, and
+  `[data-site]` remaps `--cf-bg-canvas` to `#FCFCFF` and `--cf-text-secondary` to `#5B6478`. Admin and portal keep v1.
+- **Type.** The v2 styles are `@utility` classes like the v1 ones (`type-display-xl`, `type-display-m`,
+  `type-v2-h1`, `type-v2-h2`, `type-v2-h2-mobile`, `type-v2-h3`, `type-lead`, `type-label`, `type-eyebrow`), each
+  switching to the Arabic metrics with 0 tracking under RTL, rather than `--text-*` theme sizes.
+- **Focus ring.** It is drawn as a 3px outline 2px off the element, not as the spec's box-shadow, so it survives the
+  shadow utilities (button glow) and forced-colors mode. Brand is at 85% instead of 60%, because 60% gave 2.8:1 against
+  the canvas and the ring needs at least 3:1 (WCAG 1.4.11).
+- **Display gradient.** It ends on `#0A958C` (`--color-v2-gradient-end`) instead of `#1AD5C8`, because teal/400 on the
+  canvas is 1.8:1 and the hero line needs at least 3:1 as large text (now 3.6:1). The 404 code is decorative
+  (`aria-hidden`), so it keeps the original teal.
+- **Glow texture opacity.** The stats band and the delivery promise run `cta-dark-glow` at 40% (spec 85% and 90%).
+  The CTA card uses 40% on mobile and 90% from `lg`, with its copy capped at 576px so it stays on the dark half. At the
+  spec values the labels crossing the glow measured 1.4–2.2:1. They are now at least 4.5:1, measured on rendered
+  pixels in EN and AR at 1440 and 390.
+- **Header.** Without JavaScript the header keeps the glass (scrolled) state, so content never scrolls under a
+  transparent bar. `header-scroll.js` opts in to the transparent top. With the mobile drawer open, the header is solid
+  white.
+- **Reveal.** `reveal.js` uses `rootMargin: 0 0 -15% 0` with threshold 0 instead of threshold .15, so elements
+  taller than the viewport still reveal. Elements already on screen when it starts are shown immediately, so there is
+  no flash and the LCP is never hidden.
+- **Hero visual (mobile).** It keeps the desktop 560:540 frame, as in the mobile frames (about 350×330), not 4:5. The
+  chat chip is a real link to `/{locale}/assistant`.
+- **Images.** Run `php artisan site-images:build` to generate them (`App\Services\SiteImages`). It writes centre-cropped AVIF and
+  WebP at 480/640/960/1280/1600 (capped at the crop width) plus one progressive JPEG fallback per image to
+  `public/images/v2/`, and `og-default.jpg` (1200×630), which is now the default OG image. `x-site.image` renders the
+  `<picture>`. Card covers and the CTA/stats texture are decorative (`alt=""`). The hero, the page-hero accent, the
+  About story visual and the 404 cube use the localized alt text.
+- **Page hero accents.** The default is `about-glass-stack`. Service detail uses `process-glass-steps` and About uses
+  `cover-violet-orbit`, because its story section already shows the glass stack. There is no accent on project and
+  product detail (their cover or gallery follows directly), on legal pages, on search or on the centred blog hero.
+- **Inputs.** Only search fields are pills (per §3.3). Contact and quote form fields keep radius 10.
+- **Removed.** The v1 dashboard mock, `x-site.window-mock` and `x-site.screen-mockup` are removed. Every placeholder is
+  now a generated cover, picked by `SiteImages::coverFor($id)`.
 
 ## 8. Notes and limits
 

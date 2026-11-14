@@ -30,7 +30,7 @@
              data-progress-text="{{ __(':collected of :total details collected') }}"
              data-strip-text="{{ __('Brief: :collected of :total details collected') }}">
 
-            <section class="flex min-w-0 flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-xs" aria-labelledby="assistant-title">
+            <section class="flex min-w-0 flex-col overflow-hidden rounded-3xl border border-v2-hairline bg-surface shadow-v2-card" aria-labelledby="assistant-title">
                 <header class="flex items-center gap-3 border-b border-line px-4 py-3 sm:px-6 sm:py-4">
                     <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand text-fg-on-brand sm:size-11">{!! $botIcon !!}</span>
                     <div class="min-w-0 flex-1">
@@ -228,7 +228,7 @@
                 </noscript>
             </section>
 
-            <aside class="hidden h-fit rounded-2xl border border-line bg-surface p-6 shadow-xs lg:sticky lg:top-24 lg:block" aria-labelledby="brief-title">
+            <aside class="hidden h-fit rounded-3xl border border-v2-hairline bg-surface p-6 shadow-v2-card lg:sticky lg:top-24 lg:block" aria-labelledby="brief-title">
                 <h2 id="brief-title" class="type-h5 text-fg">{{ __('Your project brief') }}</h2>
                 <p class="mt-4 type-body-sm text-fg-secondary" data-progress-text>{{ __(':collected of :total details collected', ['collected' => $progress['collected'], 'total' => $progress['total']]) }}</p>
                 <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-muted" role="progressbar" aria-labelledby="brief-title" aria-valuemin="0" aria-valuemax="{{ $progress['total'] }}" aria-valuenow="{{ $progress['collected'] }}" data-progress-bar>

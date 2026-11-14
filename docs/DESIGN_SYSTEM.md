@@ -201,7 +201,7 @@ Blade components mirroring the Figma library live in `resources/views/components
 | `x-site.section` (`tone` canvas / surface / subtle / none, `inner` classes) | Page band + container; the homepage alternates canvas / surface by position |
 | `x-site.section-heading` (`align` center / start) | Figma Section Header (overline, H2, lead) |
 | `x-site.page-hero`, `x-site.cta-band` (`tone`; WhatsApp button when configured), `x-site.consent-banner` | Inner-page header, closing CTA card (rendered in `.dark` tokens), cookie banner |
-| `x-site.service-card`, `x-site.product-card`, `x-site.industry-card`, `x-site.testimonial-card`, `x-site.tech-chip`, `x-site.faq-item`, `portfolio/_card`, `blog/_card` | Figma Card/* components; whole-card links via `after:inset-0`; project/article cards without a cover show the designed gradient + `x-site.window-mock` |
+| `x-site.service-card`, `x-site.product-card`, `x-site.industry-card`, `x-site.testimonial-card`, `x-site.tech-chip`, `x-site.faq-item`, `portfolio/_card`, `blog/_card` | Figma Card/* components; whole-card links via `after:inset-0`; project/article cards without a cover show a generated fallback cover (v2) |
 | `x-language-switch globe` | Navbar style: globe + native name (icon-only below `sm`) |
 | `type-h3` | EN/Heading/H3 28/36 (AR 27/40): in-page H2s such as "What you get" on the service detail |
 | `x-site.tile-card` (`icon`, `title`, `text`, `href`) | Figma Card/Industry layout as a compact tile (specialist services, About team disciplines); `x-site.industry-card` wraps it |
@@ -209,7 +209,7 @@ Blade components mirroring the Figma library live in `resources/views/components
 | Tabs `data-tab-all` | An "All" tab whose panel wraps the others shows every panel (Technologies catalogue underline tabs) |
 | Restyle slice 2 pages | Services, Service Detail (hero actions, What you get, quote card, related work, FAQ), Technologies, Industries, About (story visual with up to two published statistics) |
 | Dark bands | Add the `dark` class to a block (footer, stats, CTA card, delivery promise) so its tokens switch to the dark set |
-| `x-site.screen-mockup` (`tone`, `layout` chart / table, `window` [w, h]) | Figma "mockup" placeholder when a project/product has no media: gradient stage + SVG app window (80% wide, 14% from top; give the stage the window's aspect ratio). In RTL the sidebar moves right while the chart still rises left to right. Used for the featured project, project gallery + thumbs strip, product screens |
+| ~~`x-site.screen-mockup`~~, ~~`x-site.window-mock`~~ | Removed in Design v2: placeholders are generated covers (`x-site.image` + `SiteImages::coverFor`) |
 | `pagination.site` view (`->onEachSide(1)->links('pagination.site')`) | Figma Pagination: "Showing x–y of n" + 36px page squares, brand current page, mirrored chevrons, rel=prev/next |
 | Portfolio filter bar | Pill tabs (`bg-muted` track, `shadow-xs` active) + 48px search and native select; `data-auto-submit` submits on change, `<noscript>` Filter button as fallback |
 | `PricingModel::highlights()` | Three checklist lines per licensing model on the product page (no prices; quotes stay preliminary) |
@@ -225,6 +225,26 @@ Blade components mirroring the Figma library live in `resources/views/components
 | Theme | Public pages are always light (Figma); `x-layouts.base :themeable` (admin, portal) enables the stored dark choice only |
 | Error layout | Static Figma navbar (route() links, «عربي» switch, Client Portal, Start Your Project) and footer columns; `:footer="false"` on 500 as in the frame; 96/160px gradient code |
 | Restyle slice 4 pages | Blog, Blog Article, Contact, Request a Quote, AI Project Assistant, Careers (+ detail), FAQ, Testimonials, legal template, Search, 404/500 (+403/410/419/429/503 share the shell) |
+
+### Design v2 (website upgrade, `docs/DESIGN_V2.md`)
+
+| Piece | Notes |
+|---|---|
+| `<body data-site>` + `site:` variant | Public and error layouts opt into v2 (`x-layouts.base :site`); `site:` utilities in shared `x-ui.*` components apply only there, so admin/portal keep v1. `[data-site]` sets canvas `#FCFCFF`, secondary text `#5B6478` and the v2 focus ring (3px brand/85 outline, 2px offset) |
+| Tokens (`@theme`) | `--color-v2-{canvas,tint,night,glass,hairline,hairline-dark,display,muted,grid,violet,gradient-end}`, `--shadow-v2-{card,lift,glow,header}`, `--radius-3xl` 24 / `--radius-4xl` 32, `--ease-v2` |
+| `type-display-xl`, `type-display-m`, `type-v2-h1`, `type-v2-h2`, `type-v2-h2-mobile`, `type-v2-h3`, `type-lead`, `type-label`, `type-eyebrow` | v2 text styles; Arabic metrics and 0 tracking under RTL |
+| `text-gradient-v2`, `bg-grid-v2`, `tile-v2`, `tile-v2-product` | Display gradient (AA-safe teal end), hero/page-hero grid (64px, 32px below `lg`, radial mask), service/industry icon tile, product tile with glow |
+| `x-site.image` (`name`, `sizes`, `eager`, `described`) | `<picture>` for the generated set (`App\Services\SiteImages`): AVIF + WebP srcsets, JPEG fallback, intrinsic width/height, lazy/async by default, `eager` = `fetchpriority="high"`; decorative unless `described` (localized alt) |
+| `php artisan site-images:build` | Regenerates `public/images/v2/*` (committed) from `resources/images/v2/*.jpg`: centre crop per `SiteImages::definitions()`, 480–1600 widths, JPEG fallback, `og-default.jpg` |
+| `SiteImages::coverFor($id, $set)` | Stable fallback cover: projects/products `[indigo, teal, violet][id % 3]`, articles `[about, process, indigo]` |
+| Glass header (`[data-site-header]`, `header-scroll.js`) | Transparent at the top, glass (white 72%, blur 16, saturate 180, hairline) past 8px; glass without JS; solid when backdrop-filter is unsupported or the drawer is open |
+| Reveal (`data-reveal`, `data-reveal-stagger`, `reveal.js`) | Fade-up 16px / 300ms once; 60ms stagger (max 6) on grid children; hidden state only after the module runs (`html.reveal-ready`); opacity-only 150ms under reduced motion; always visible in print |
+| `x-ui.button` (site) | Pill; primary glow + −1px hover; secondary hairline + brand/35 hover; arrow nudges 4px toward the inline end |
+| Cards (service, tile/industry, product, project, article, testimonial, FAQ, careers) | Radius 24 (FAQ 16, article cover 20), `border-v2-hairline`, `shadow-v2-card`; hover `-translate-y-1` + `shadow-v2-lift` + `border-brand-600/30`; covers scale 1.04 over 500ms |
+| Dark bands | `bg-v2-night` + `cta-dark-glow` picture (`rtl:-scale-x-100`) on stats, delivery promise, CTA; footer night with dark hairline |
+| `x-site.page-hero` `image` | Tint band + faint grid + top-end glow; 440×320 image accent from `lg` (`false` = none; default `about-glass-stack`) |
+| `x-layouts.error` `image` | 404: lost-cube artwork (360 / 280) above a 72px gradient code |
+| `html.js` | Set by an inline (nonce) script in the public layout so the no-JS mobile menu is not painted before `nav.js` collapses it (prevents a 0.7 CLS on mobile) |
 
 ## Next
 Milestone 4: corporate website (services, portfolio, technologies, contact/lead form).

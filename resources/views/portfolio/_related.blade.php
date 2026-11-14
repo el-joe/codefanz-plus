@@ -5,7 +5,7 @@
             <x-site.section-heading :id="$headingId ?? 'related-projects'" align="start" :eyebrow="$eyebrow ?? __('More work')" :heading="$title ?? __('Related projects')" />
             <x-ui.button :href="route('portfolio.index')" variant="ghost" arrow>{{ __('View all projects') }}</x-ui.button>
         </div>
-        <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <ul data-reveal-stagger class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ($projects as $project)
                 @include('portfolio._card', ['project' => $project])
             @endforeach

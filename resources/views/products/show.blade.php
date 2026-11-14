@@ -6,8 +6,8 @@
     $models = $product->pricing_models ?? collect();
     $prose = 'flex flex-col gap-3 type-body-lg text-fg-secondary [&_a]:text-fg-brand [&_a]:underline [&_h2]:mt-2 [&_h2]:type-h4 [&_h2]:text-fg [&_h3]:type-h5 [&_h3]:text-fg [&_ol]:list-decimal [&_ol]:ps-6 [&_ul]:list-disc [&_ul]:ps-6';
     $featureIcons = ['layers', 'cart', 'credit-card', 'trending-up', 'users', 'plug', 'shield', 'database', 'cloud'];
-    $resourceCard = 'flex flex-col items-start gap-3 rounded-[18px] border border-line bg-surface p-6';
-    $resourceTile = 'flex size-11 items-center justify-center rounded-lg bg-accent-subtle text-icon-primary';
+    $resourceCard = 'flex flex-col items-start gap-3 rounded-3xl border border-v2-hairline bg-surface p-6 shadow-v2-card';
+    $resourceTile = 'flex size-11 items-center justify-center rounded-lg tile-v2 text-icon-brand';
     $mainImage = $cover ?? $product->screenshots->first();
     $thumbnails = $cover ? $product->screenshots : $product->screenshots->slice(1);
 @endphp
@@ -22,11 +22,11 @@
         @php($structuredData = app(\App\Services\Seo\StructuredData::class))
         {{ $structuredData->script($structuredData->product($translation->name, $translation->tagline, route('products.show', ['slug' => $translation->slug]), $cover?->largestVariant('webp') ? url($cover->largestVariant('webp')->url()) : null)) }}
     </x-slot:head>
-    <x-site.page-hero :title="$translation->name" :lead="$translation->tagline"
+    <x-site.page-hero :title="$translation->name" :lead="$translation->tagline" :image="false"
                       :crumbs="[__('Products') => route('products.index'), $translation->name => null]">
         <x-slot:before>
             <div class="flex flex-wrap items-center gap-3">
-                <span class="flex size-14 items-center justify-center rounded-lg bg-brand text-fg-on-brand" aria-hidden="true"><x-ui.icon :name="$product->icon ?? 'layers'" :size="28" /></span>
+                <span class="flex size-14 items-center justify-center rounded-lg tile-v2-product text-fg-on-brand" aria-hidden="true"><x-ui.icon :name="$product->icon ?? 'layers'" :size="28" /></span>
                 <x-ui.badge :tone="$product->availability->tone()">{{ $product->availability->label() }}</x-ui.badge>
                 @if ($latest)
                     <x-ui.badge tone="neutral" :dot="false"><span dir="ltr">v{{ $latest->version }}</span></x-ui.badge>
@@ -44,17 +44,19 @@
         </div>
     </x-site.page-hero>
 
-    <section class="bg-canvas pb-14 lg:pb-24" aria-label="{{ __('Screenshots') }}">
+    <section class="bg-v2-canvas pt-10 pb-14 lg:pt-16 lg:pb-24" aria-label="{{ __('Screenshots') }}">
         <div class="container-page flex flex-col gap-4">
             @if ($mainImage)
-                <x-media.picture :media="$mainImage" sizes="(min-width: 1440px) 1280px, 100vw" :eager="true" class="aspect-[16/7] w-full rounded-[24px] border border-line object-cover" />
+                <x-media.picture :media="$mainImage" sizes="(min-width: 1440px) 1280px, 100vw" :eager="true" class="aspect-[16/7] w-full rounded-4xl border border-v2-hairline object-cover shadow-v2-card max-sm:rounded-3xl" />
             @else
-                <x-site.screen-mockup tone="deep" layout="table" :window="[1024, 448]" class="aspect-[35/22] rounded-[24px] sm:aspect-[16/7]" />
+                <div class="aspect-[16/10] overflow-hidden rounded-3xl border border-v2-hairline bg-v2-tint shadow-v2-card sm:aspect-[16/7] lg:rounded-4xl">
+                    <x-site.image :name="\App\Services\SiteImages::coverFor($product->id)" sizes="(min-width: 1440px) 1280px, 100vw" class="size-full object-cover" />
+                </div>
             @endif
             @if ($thumbnails->isNotEmpty())
                 <ul class="grid grid-cols-2 gap-4 lg:grid-cols-4">
                     @foreach ($thumbnails as $image)
-                        <li><x-media.picture :media="$image" sizes="(min-width: 1024px) 308px, 50vw" class="aspect-[77/45] w-full rounded-lg border border-line object-cover" /></li>
+                        <li><x-media.picture :media="$image" sizes="(min-width: 1024px) 308px, 50vw" class="aspect-[77/45] w-full rounded-2xl border border-v2-hairline object-cover shadow-v2-card" /></li>
                     @endforeach
                 </ul>
             @endif
@@ -70,9 +72,9 @@
                 @endif
             </div>
             @if ($features !== [])
-                <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+                <ul data-reveal-stagger class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
                     @foreach ($features as $feature)
-                        <li class="flex flex-col items-start gap-3 rounded-[18px] border border-line bg-surface p-6">
+                        <li class="flex flex-col items-start gap-3 rounded-3xl border border-v2-hairline bg-surface p-6 shadow-v2-card">
                             <span class="flex size-11 items-center justify-center rounded-lg bg-brand-subtle text-icon-brand" aria-hidden="true"><x-ui.icon :name="$featureIcons[$loop->index % count($featureIcons)]" :size="22" /></span>
                             <h3 class="type-h5 text-fg">{{ $feature['title'] }}</h3>
                             @if ($feature['description'] ?? null)
@@ -89,7 +91,7 @@
         <x-site.section tone="canvas" id="licensing-models" aria-labelledby="licensing">
             <x-site.section-heading id="licensing" :eyebrow="__('Licensing')" :heading="__('Choose how you license :product', ['product' => $translation->name])"
                                     :subheading="__('Final pricing depends on users, branches and customization. All quotes are preliminary until scope is confirmed.')" />
-            <ul class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 lg:items-start" data-licensing-models>
+            <ul data-reveal-stagger class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 lg:items-start" data-licensing-models>
                 @foreach ($models as $model)
                     @php($highlighted = $loop->first && $models->count() > 1)
                     <li class="flex flex-col items-start gap-4 rounded-xl px-7 py-8 {{ $highlighted ? 'border-2 border-line-brand bg-brand-subtle' : 'border border-line bg-surface' }}">
@@ -171,7 +173,7 @@
 
     @if ($product->demo_enabled)
         <x-site.section tone="canvas" inner="">
-            <section id="request-demo" aria-labelledby="request-demo-title" class="mx-auto flex w-full max-w-[45rem] scroll-mt-24 flex-col items-start gap-5 rounded-[24px] border border-line bg-surface p-6 shadow-lg sm:p-10">
+            <section id="request-demo" aria-labelledby="request-demo-title" class="mx-auto flex w-full max-w-[45rem] scroll-mt-24 flex-col items-start gap-5 rounded-3xl border border-v2-hairline bg-surface p-6 shadow-v2-lift sm:p-10">
                 <h2 id="request-demo-title" class="type-h3 text-fg">{{ __('Request a :product demo', ['product' => $translation->name]) }}</h2>
                 <p class="type-body-md text-fg-secondary">{{ __('A product specialist will walk you through the platform using your workflows. Tell us your company, team size and number of branches.') }}</p>
                 <x-ui.button size="lg" arrow :href="route('contact', ['topic' => 'demo', 'ref' => $translation->name])">{{ __('Request demo') }}</x-ui.button>

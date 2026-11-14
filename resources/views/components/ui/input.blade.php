@@ -21,13 +21,15 @@
     $iconPath = $icon ? ($icons[$icon] ?? null) : null;
     $sizing = $size === 'lg' ? 'h-12 type-body-md' : 'py-2.5 text-base';
     $padding = $iconPath ? 'ps-10 pe-3' : 'px-3';
+    // Design v2: search fields are pills on the public site.
+    $shape = $icon === 'search' ? 'rounded-md site:rounded-full site:ps-11 site:pe-4' : 'rounded-md';
 @endphp
 
 <div class="flex flex-col gap-1.5">
     <label for="{{ $id }}" class="{{ $size === 'lg' ? 'type-label-md' : 'text-sm font-semibold' }} text-fg">{{ $label }}</label>
     @if ($iconPath)<div class="relative" @if ($dir) dir="{{ $dir }}" @endif>@endif
     @if ($iconPath)
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-icon-secondary">{!! $iconPath !!}</svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="pointer-events-none absolute start-3 top-1/2 site:start-4 -translate-y-1/2 text-icon-secondary">{!! $iconPath !!}</svg>
     @endif
     <input
         id="{{ $id }}"
@@ -37,7 +39,7 @@
         @if ($dir) dir="{{ $dir }}" @endif
         @if ($hasError || $helper) aria-describedby="{{ $id }}-help" @endif
         @if ($hasError) aria-invalid="true" @endif
-        {{ $attributes->except(['id', 'bag'])->merge(['class' => 'w-full rounded-md border bg-surface '.$sizing.' '.$padding.' text-fg placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 '.($hasError ? 'border-line-danger' : 'border-line-strong')]) }}
+        {{ $attributes->except(['id', 'bag'])->merge(['class' => 'w-full border bg-surface '.$shape.' '.$sizing.' '.$padding.' text-fg placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 '.($hasError ? 'border-line-danger' : 'border-line-strong')]) }}
     >
     @if ($iconPath)</div>@endif
     @if ($hasError)

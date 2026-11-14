@@ -1,6 +1,6 @@
 <x-site.section :tone="$tone" aria-labelledby="{{ $headingId }}" data-section="products">
     <x-site.section-heading :id="$headingId" :eyebrow="$copy['eyebrow']" :heading="$copy['heading']" :subheading="$copy['subheading']" />
-    <ul class="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <ul data-reveal-stagger class="grid grid-cols-1 gap-6 md:grid-cols-2">
         @foreach ($data as $product)
             <x-site.product-card :product="$product" />
         @endforeach

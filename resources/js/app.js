@@ -15,6 +15,8 @@ import { init as initConsent } from './modules/consent';
 import { init as initTabs } from './modules/tabs';
 import { init as initToc } from './modules/toc';
 import { init as initCharCount } from './modules/char-count';
+import { init as initHeaderScroll } from './modules/header-scroll';
+import { init as initReveal } from './modules/reveal';
 
 applyStoredTheme();
 
@@ -36,4 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initTabs();
     initToc();
     initCharCount();
+    initHeaderScroll();
+    initReveal();
 });

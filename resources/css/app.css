@@ -7,6 +7,9 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Design v2 applies to the public website only: the public and error layouts mark <body data-site>. */
+@custom-variant site (&:where([data-site], [data-site] *));
+
 /*
  * CodeFanz design tokens — mirrored from the Figma file (docs/DESIGN_SYSTEM.md).
  * Primitives are exposed as Tailwind colors; semantic tokens are CSS variables that
@@ -69,6 +72,30 @@
     --shadow-md: 0 4px 8px -2px rgb(20 24 38 / 0.08), 0 2px 4px -2px rgb(20 24 38 / 0.04);
     --shadow-lg: 0 12px 24px -4px rgb(20 24 38 / 0.1), 0 4px 8px -2px rgb(20 24 38 / 0.05);
     --shadow-xl: 0 24px 48px -12px rgb(20 24 38 / 0.14);
+
+    /* Design v2 (docs/DESIGN_V2.md §3, Figma collection "v2"). v1 tokens above stay unchanged. */
+    --color-v2-canvas: #fcfcff;
+    --color-v2-tint: #f6f4ff;
+    --color-v2-night: #07091a;
+    --color-v2-glass: rgb(255 255 255 / 0.72);
+    --color-v2-hairline: rgb(20 24 38 / 0.08);
+    --color-v2-hairline-dark: rgb(255 255 255 / 0.1);
+    --color-v2-display: #0a0d17;
+    --color-v2-muted: #5b6478;
+    --color-v2-grid: rgb(90 61 245 / 0.07);
+    --color-v2-violet: #8b5cf6;
+    /* a11y: the display gradient ends on a deeper teal than accent/400 so large text keeps ≥ 3:1 on canvas (3.6:1). */
+    --color-v2-gradient-end: #0a958c;
+
+    --radius-3xl: 24px;
+    --radius-4xl: 32px;
+
+    --shadow-v2-card: 0 1px 2px rgb(10 13 23 / 0.04), 0 8px 24px -8px rgb(27 19 80 / 0.08);
+    --shadow-v2-lift: 0 2px 4px rgb(10 13 23 / 0.04), 0 24px 48px -16px rgb(90 61 245 / 0.22);
+    --shadow-v2-glow: 0 8px 24px -6px rgb(90 61 245 / 0.45), inset 0 1px 0 rgb(255 255 255 / 0.25);
+    --shadow-v2-header: 0 1px 0 rgb(20 24 38 / 0.06);
+
+    --ease-v2: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 @theme inline {
@@ -245,6 +272,21 @@
         display: none !important;
     }
 
+    /*
+     * v2 focus ring (v2/Focus/Ring): a 3px brand ring 2px off the element. Drawn as an outline rather than the spec's
+     * box-shadow so it survives shadow utilities (button glow) and forced-colors mode; brand at 85% instead of 60%
+     * keeps the ring ≥ 3:1 against the canvas (WCAG 1.4.11).
+     */
+    [data-site] :focus-visible {
+        outline: 3px solid rgb(90 61 245 / 0.85);
+        outline-offset: 2px;
+    }
+
+    [data-site] {
+        --cf-bg-canvas: #fcfcff;
+        --cf-text-secondary: #5b6478;
+    }
+
     @media (prefers-reduced-motion: reduce) {
         *,
         *::before,
@@ -271,11 +313,12 @@
     }
 }
 
+/* v2: 128px desktop band padding (was 96), 56px on mobile. */
 @utility section-y {
     padding-block: 3.5rem;
 
     @media (width >= 64rem) {
-        padding-block: 6rem;
+        padding-block: 8rem;
     }
 }
 
@@ -446,6 +489,157 @@
         line-height: 1.125rem;
         letter-spacing: 0;
     }
+}
+
+/*
+ * Design v2 text styles (§3.4, Figma v2/*): larger, tighter display and headings in EN; Arabic (Cairo) switches to its
+ * own metrics with 0 tracking.
+ */
+@utility type-display-xl {
+    font-size: 5rem;
+    line-height: 5.25rem;
+    letter-spacing: -0.035em;
+    font-weight: 700;
+
+    &:where([dir='rtl'] *) {
+        font-size: 4.25rem;
+        line-height: 6rem;
+        letter-spacing: 0;
+    }
+}
+
+@utility type-display-m {
+    font-size: 2.75rem;
+    line-height: 3rem;
+    letter-spacing: -0.03em;
+    font-weight: 700;
+
+    &:where([dir='rtl'] *) {
+        font-size: 2.375rem;
+        line-height: 3.5rem;
+        letter-spacing: 0;
+    }
+}
+
+@utility type-v2-h1 {
+    font-size: 3.75rem;
+    line-height: 4rem;
+    letter-spacing: -0.03em;
+    font-weight: 700;
+
+    &:where([dir='rtl'] *) {
+        font-size: 3.25rem;
+        line-height: 4.75rem;
+        letter-spacing: 0;
+    }
+}
+
+@utility type-v2-h2 {
+    font-size: 3rem;
+    line-height: 3.5rem;
+    letter-spacing: -0.025em;
+    font-weight: 700;
+
+    &:where([dir='rtl'] *) {
+        font-size: 2.625rem;
+        line-height: 4rem;
+        letter-spacing: 0;
+    }
+}
+
+@utility type-v2-h2-mobile {
+    font-size: 2rem;
+    line-height: 2.5rem;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+
+    &:where([dir='rtl'] *) {
+        font-size: 1.75rem;
+        line-height: 2.75rem;
+        letter-spacing: 0;
+    }
+}
+
+@utility type-v2-h3 {
+    font-size: 1.375rem;
+    line-height: 1.875rem;
+    letter-spacing: -0.01em;
+    font-weight: 600;
+
+    &:where([dir='rtl'] *) {
+        font-size: 1.3125rem;
+        line-height: 2.125rem;
+        letter-spacing: 0;
+    }
+}
+
+@utility type-lead {
+    font-size: 1.25rem;
+    line-height: 2rem;
+    letter-spacing: -0.005em;
+
+    &:where([dir='rtl'] *) {
+        font-size: 1.1875rem;
+        line-height: 2.125rem;
+        letter-spacing: 0;
+    }
+}
+
+@utility type-label {
+    font-size: 0.9375rem;
+    line-height: 1.25rem;
+    letter-spacing: -0.005em;
+    font-weight: 600;
+
+    &:where([dir='rtl'] *) {
+        line-height: 1.375rem;
+        letter-spacing: 0;
+    }
+}
+
+@utility type-eyebrow {
+    font-size: 0.8125rem;
+    line-height: 1rem;
+    letter-spacing: 0.02em;
+    font-weight: 600;
+    text-transform: uppercase;
+
+    &:where([dir='rtl'] *) {
+        line-height: 1.25rem;
+        letter-spacing: 0;
+    }
+}
+
+/* Display gradient (hero second line, 404 code): indigo → teal, kept at 90deg in RTL. */
+@utility text-gradient-v2 {
+    background-image: linear-gradient(90deg, #5a3df5 0%, #6e56ff 55%, var(--color-v2-gradient-end) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Hero backdrop grid: brand lines at 7% every 64px (32px below lg), radially faded. */
+@utility bg-grid-v2 {
+    background-image:
+        linear-gradient(to right, var(--color-v2-grid) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--color-v2-grid) 1px, transparent 1px);
+    background-size: 2rem 2rem;
+    mask-image: radial-gradient(ellipse 70% 65% at 50% 40%, #000 30%, transparent 100%);
+
+    @media (width >= 64rem) {
+        background-size: 4rem 4rem;
+    }
+}
+
+/* Icon tiles: service/industry (light gradient + brand hairline) and product (brand → violet + glow). */
+@utility tile-v2 {
+    background-image: linear-gradient(135deg, #f0eeff, #e8fffc);
+    box-shadow: inset 0 0 0 1px rgb(90 61 245 / 0.12);
+}
+
+@utility tile-v2-product {
+    background-image: linear-gradient(135deg, #5a3df5, #8b5cf6);
+    box-shadow: var(--shadow-v2-glow);
 }
 
 /*
@@ -628,6 +822,11 @@
     }
 }
 
+/* With JavaScript the mobile menu stays out of the flow until nav.js turns it into the drawer (no layout shift). */
+.js [data-nav-panel]:not([data-enhanced]) {
+    display: none;
+}
+
 /* The launcher steps aside while the mobile navigation drawer is open. */
 body:has([data-nav-panel][data-enhanced]:not([hidden])) [data-assistant-launcher] {
     display: none;
@@ -636,4 +835,92 @@ body:has([data-nav-panel][data-enhanced]:not([hidden])) [data-assistant-launcher
 /* WCAG 2.4.11: while the cookie banner is open, keyboard focus scrolled into view stays above it. */
 html:has([data-consent-banner]:not([hidden])) {
     scroll-padding-bottom: 14rem;
+}
+
+/*
+ * v2 glass header (Figma Navbar state=top / state=scrolled). Without JavaScript the header always uses the glass
+ * state so content never scrolls under a transparent bar; header-scroll.js marks it [data-scroll-enhanced] and
+ * toggles .is-scrolled after 8px. Browsers without backdrop-filter get an opaque white bar instead.
+ */
+[data-site-header] {
+    transition:
+        background-color 200ms ease-out,
+        box-shadow 200ms ease-out,
+        backdrop-filter 200ms ease-out;
+}
+
+[data-site-header]:not([data-scroll-enhanced]),
+[data-site-header].is-scrolled,
+[data-site-header]:has([data-nav-toggle][aria-expanded='true']) {
+    background-color: var(--color-v2-glass);
+    backdrop-filter: blur(16px) saturate(180%);
+    box-shadow:
+        var(--shadow-v2-header),
+        inset 0 -1px 0 var(--color-v2-hairline);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    [data-site-header]:not([data-scroll-enhanced]),
+    [data-site-header].is-scrolled,
+    [data-site-header]:has([data-nav-toggle][aria-expanded='true']) {
+        background-color: #fff;
+    }
+}
+
+[data-site-header]:has([data-nav-toggle][aria-expanded='true']) {
+    background-color: #fff;
+}
+
+/*
+ * v2 reveal on scroll (§6). reveal.js adds .reveal-ready to <html> only once it runs, so content is never hidden
+ * without JavaScript; elements already in view are marked revealed before the class lands. Stagger comes from
+ * --reveal-delay (60ms steps, max 6). Reduced motion: opacity only, 150ms, no translate.
+ */
+.reveal-ready [data-reveal]:not(.is-revealed) {
+    opacity: 0;
+    transform: translateY(1rem);
+}
+
+.reveal-ready [data-reveal] {
+    /* Keeps the cards' own 200ms hover transitions (translate, shadow, border) alongside the reveal. */
+    transition:
+        opacity 300ms var(--ease-v2) var(--reveal-delay, 0ms),
+        transform 300ms var(--ease-v2) var(--reveal-delay, 0ms),
+        translate 200ms ease-out,
+        box-shadow 200ms ease-out,
+        border-color 200ms ease-out,
+        background-color 200ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reveal-ready [data-reveal]:not(.is-revealed) {
+        transform: none;
+    }
+
+    .reveal-ready [data-reveal] {
+        transition: opacity 150ms linear !important;
+    }
+
+    [data-site-header] {
+        transition: none;
+    }
+}
+
+/* Hero image: slow ±6px float, motion-safe only. */
+@keyframes hero-float {
+    0%,
+    100% {
+        transform: translateY(-6px);
+    }
+
+    50% {
+        transform: translateY(6px);
+    }
+}
+
+@media print {
+    .reveal-ready [data-reveal] {
+        opacity: 1 !important;
+        transform: none !important;
+    }
 }

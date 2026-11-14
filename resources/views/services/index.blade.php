@@ -15,7 +15,7 @@
     @if ($core->isNotEmpty())
         <x-site.section aria-labelledby="core-services">
             <x-site.section-heading id="core-services" align="start" :eyebrow="__('Core services')" :heading="__('What we build')" />
-            <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <ul data-reveal-stagger class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($core as $service)
                     <x-site.service-card :service="$service" />
                 @endforeach
@@ -26,7 +26,7 @@
     @if ($specialist->isNotEmpty())
         <x-site.section tone="canvas" aria-labelledby="specialist-services">
             <x-site.section-heading id="specialist-services" align="start" :eyebrow="__('Also available')" :heading="__('Specialist services')" />
-            <ul class="grid grid-cols-[minmax(0,1fr)] gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <ul data-reveal-stagger class="grid grid-cols-[minmax(0,1fr)] gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($specialist as $service)
                     @php($translation = $service->exactTranslation(app()->getLocale()))
                     <x-site.tile-card :icon="$service->icon ?? 'code'" :title="$translation->title" :text="$translation->summary"

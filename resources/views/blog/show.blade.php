@@ -140,12 +140,11 @@
                 </ul>
             </div>
 
-            <div class="relative mt-5 aspect-[16/9] overflow-hidden rounded-[24px] bg-[linear-gradient(146deg,var(--color-ink-900)_12.5%,var(--color-brand-600)_75%)] sm:aspect-[32/13]">
+            <div class="relative mt-5 aspect-[16/9] overflow-hidden rounded-3xl border border-v2-hairline bg-v2-tint shadow-v2-card sm:aspect-[32/13] lg:rounded-4xl">
                 @if ($cover)
                     <x-media.picture :media="$cover" sizes="(min-width: 1440px) 1280px, 100vw" :eager="true" class="size-full object-cover" />
                 @else
-                    <span class="absolute -end-[6%] -top-[40%] aspect-square w-[38%] rounded-full border-2 border-accent/50" aria-hidden="true"></span>
-                    <span class="absolute -bottom-[30%] -start-[4%] aspect-square w-[22%] rounded-full bg-brand-400/20 blur-2xl" aria-hidden="true"></span>
+                    <x-site.image :name="\App\Services\SiteImages::coverFor($post->id, \App\Services\SiteImages::ARTICLE_COVERS)" sizes="(min-width: 1440px) 1280px, 100vw" eager class="size-full object-cover" />
                 @endif
             </div>
         </header>
@@ -201,7 +200,7 @@
     @if ($related->isNotEmpty())
         <x-site.section tone="surface" inner="flex flex-col gap-8" aria-labelledby="related-heading">
             <h2 id="related-heading" class="type-h3 text-fg">{{ __('Keep reading') }}</h2>
-            <ul class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            <ul data-reveal-stagger class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($related as $relatedPost)
                     @include('blog._card', ['post' => $relatedPost])
                 @endforeach

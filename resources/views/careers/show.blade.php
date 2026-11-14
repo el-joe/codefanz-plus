@@ -75,7 +75,7 @@
         </div>
 
         <aside class="lg:sticky lg:top-24 lg:self-start" aria-labelledby="position-facts">
-            <div class="flex flex-col gap-5 rounded-2xl border border-line bg-surface p-6 shadow-xs">
+            <div class="flex flex-col gap-5 rounded-3xl border border-v2-hairline bg-surface p-6 shadow-v2-card">
                 <h2 id="position-facts" class="type-h5 text-fg">{{ __('About this role') }}</h2>
                 <dl class="flex flex-col divide-y divide-line-subtle type-body-sm">
                     @foreach ($facts as $label => $value)

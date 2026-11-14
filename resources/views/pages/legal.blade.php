@@ -6,7 +6,7 @@
     :description="$translation->seo_description ?: (\Illuminate\Support\Str::limit(\Illuminate\Support\Str::squish(strip_tags($body)), 155) ?: $translation->title)"
     :seoable="$translation->page"
     :alternates="$alternates->mapWithKeys(fn ($alt) => [$alt->locale => route('pages.show', ['locale' => $alt->locale, 'slug' => $alt->slug])])->all()">
-    <x-site.page-hero :title="$translation->title" :crumbs="[$translation->title => null]">
+    <x-site.page-hero :title="$translation->title" :crumbs="[$translation->title => null]" :image="false">
         <p class="type-body-sm text-fg-tertiary">{{ __('Last updated: :date', ['date' => $translation->updated_at->translatedFormat('j F Y')]) }}</p>
     </x-site.page-hero>
 

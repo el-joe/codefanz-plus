@@ -25,10 +25,10 @@
         <form method="GET" action="{{ $action }}" role="search" class="mt-2 w-full max-w-lg">
             <label for="blog-search" class="sr-only">{{ __('Search articles') }}</label>
             <div class="relative">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-icon-secondary"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="pointer-events-none absolute start-4 top-1/2 -translate-y-1/2 text-icon-secondary"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
                 <input id="blog-search" type="search" name="q" value="{{ $search }}" maxlength="100" placeholder="{{ __('Search articles…') }}"
-                       class="h-12 w-full rounded-md border border-line-strong bg-surface ps-10 pe-24 type-body-md text-fg shadow-xs placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20">
-                <button type="submit" class="absolute end-1.5 top-1/2 -translate-y-1/2 rounded-md px-3 py-1.5 type-label-md text-fg-brand hover:bg-brand-subtle">{{ __('Search') }}</button>
+                       class="h-12 w-full rounded-full border border-line-strong bg-surface ps-11 pe-24 type-body-md text-fg shadow-v2-card placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20">
+                <button type="submit" class="absolute end-1.5 top-1/2 -translate-y-1/2 rounded-full px-4 py-1.5 type-label-md text-fg-brand hover:bg-brand-subtle">{{ __('Search') }}</button>
             </div>
         </form>
     </x-site.page-hero>
@@ -59,12 +59,12 @@
         @if ($featured && $featuredTranslation)
             @php($featuredCover = $featured->coverImage())
             @php($featuredCategory = $featured->category?->exactTranslation($locale))
-            <article class="group relative grid grid-cols-1 items-center gap-6 lg:grid-cols-2 lg:gap-12" aria-labelledby="featured-article" data-featured-post>
-                <div class="relative aspect-[16/10] overflow-hidden rounded-[24px] bg-[linear-gradient(137deg,var(--color-ink-900)_12.5%,var(--color-brand-600)_75%)] transition-shadow group-hover:shadow-lg">
+            <article data-reveal class="group relative grid grid-cols-1 items-center gap-6 lg:grid-cols-2 lg:gap-12" aria-labelledby="featured-article" data-featured-post>
+                <div class="relative aspect-[16/10] overflow-hidden rounded-3xl border border-v2-hairline bg-v2-tint shadow-v2-card transition-shadow duration-200 group-hover:shadow-v2-lift">
                     @if ($featuredCover)
-                        <x-media.picture :media="$featuredCover" sizes="(min-width: 1024px) 640px, 100vw" :eager="true" class="size-full object-cover" />
+                        <x-media.picture :media="$featuredCover" sizes="(min-width: 1024px) 640px, 100vw" :eager="true" class="size-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]" />
                     @else
-                        <span class="absolute -end-[12%] -top-[30%] aspect-square w-[62%] rounded-full border-2 border-accent/60" aria-hidden="true"></span>
+                        <x-site.image :name="\App\Services\SiteImages::coverFor($featured->id, \App\Services\SiteImages::ARTICLE_COVERS)" sizes="(min-width: 1024px) 640px, 100vw" class="size-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]" />
                     @endif
                 </div>
                 <div class="flex flex-col items-start gap-4">
@@ -93,7 +93,7 @@
             <x-ui.empty-state :title="$isFiltered ? __('No articles match your search') : __('No articles yet')"
                               :description="$isFiltered ? __('Try another category or search term.') : __('Our first articles are on the way. Please check back soon.')" />
         @elseif ($posts->isNotEmpty())
-            <ul class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            <ul data-reveal-stagger class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($posts as $post)
                     @include('blog._card', ['post' => $post])
                 @endforeach

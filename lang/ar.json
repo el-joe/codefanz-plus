@@ -32,7 +32,7 @@
     "Client Portal": "بوابة العملاء",
     "CodeFanz. All rights reserved.": "كود فانز. جميع الحقوق محفوظة.",
     "CodeFanz designs, builds and scales web platforms, mobile apps, SaaS products and AI-powered automation.": "تصمم كود فانز وتبني وتطوّر منصات الويب وتطبيقات الجوال ومنتجات SaaS والأتمتة بالذكاء الاصطناعي.",
-    "CodeFanz home": "الصفحة الرئيسية لكود فانز",
+    "CodeFanz home": "codefanz — الصفحة الرئيسية",
     "Confirm": "تأكيد",
     "Confirm and enable": "تأكيد وتفعيل",
     "Confirm password": "تأكيد كلمة المرور",
@@ -3486,5 +3486,12 @@
     "Sidebar": "الشريط الجانبي",
     "Articles about :category from the CodeFanz team: practical engineering, design, SEO and AI guides.": "مقالات عن :category من فريق CodeFanz: أدلة عملية في الهندسة والتصميم وتحسين محركات البحث والذكاء الاصطناعي.",
     "Articles tagged “:tag” from the CodeFanz team: practical engineering, design, SEO and AI guides.": "مقالات موسومة بـ «:tag» من فريق CodeFanz: أدلة عملية في الهندسة والتصميم وتحسين محركات البحث والذكاء الاصطناعي.",
-    "Dark theme": "المظهر الداكن"
+    "Dark theme": "المظهر الداكن",
+    "Floating glass shapes in indigo and teal": "أشكال زجاجية عائمة بدرجات النيلي والفيروزي",
+    "Stacked glass layers representing a product being built": "طبقات زجاجية متراصة ترمز إلى بناء منتج رقمي",
+    "Glass discs in an ascending sequence, one step at a time": "أقراص زجاجية في تسلسل تصاعدي خطوة بخطوة",
+    "Abstract indigo glass ring": "حلقة زجاجية تجريدية باللون النيلي",
+    "Abstract teal glass arch and steps": "قوس ودرجات زجاجية تجريدية باللون الفيروزي",
+    "Abstract violet and teal glass orbit": "مدار زجاجي تجريدي بالبنفسجي والفيروزي",
+    "A single glass cube drifting away from its grid": "مكعب زجاجي منفرد ابتعد عن مجموعته"
 }

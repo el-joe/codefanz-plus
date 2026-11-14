@@ -1,21 +1,21 @@
-{{-- Figma "Card/Project". Expects $project loaded with PortfolioController::cardRelations(). Without a cover the thumbnail shows the designed gradient + product window. --}}
+{{--
+    Figma "Card/Project" (v2): radius 24, hairline, card shadow; hover = lift and the cover scales 1.04 over 500ms.
+    Expects $project loaded with PortfolioController::cardRelations(). Without an uploaded cover the thumbnail uses the
+    generated fallback cover for the project id (SiteImages::coverFor, stable across requests).
+--}}
 @php
     $cardTranslation = $project->exactTranslation(app()->getLocale());
     $cardCover = $project->coverImage();
     $headingTag = $headingTag ?? 'h3';
-    $cardGradients = [
-        'bg-[linear-gradient(135deg,var(--color-brand-600)_12.5%,var(--color-accent-400)_75%)]',
-        'bg-[linear-gradient(135deg,var(--color-warning-500)_12.5%,var(--color-danger-500)_75%)]',
-        'bg-[linear-gradient(135deg,var(--color-accent-900)_12.5%,var(--color-accent-400)_75%)]',
-    ];
+    $cardCoverSizes = '(min-width: 1024px) 410px, (min-width: 768px) 50vw, 100vw';
 @endphp
 
-<li class="group relative flex flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-xs transition hover:border-line-brand hover:shadow-lg">
-    <div class="relative aspect-[41/24] overflow-hidden {{ $cardGradients[$project->id % count($cardGradients)] }}">
+<li class="group relative flex flex-col overflow-hidden rounded-3xl border border-v2-hairline bg-surface shadow-v2-card transition duration-200 ease-out hover:-translate-y-1 hover:border-brand-600/30 hover:shadow-v2-lift">
+    <div class="relative aspect-[41/24] overflow-hidden bg-v2-tint">
         @if ($cardCover)
-            <x-media.picture :media="$cardCover" sizes="(min-width: 1024px) 410px, (min-width: 768px) 50vw, 100vw" class="size-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" />
+            <x-media.picture :media="$cardCover" :sizes="$cardCoverSizes" class="size-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]" />
         @else
-            <x-site.window-mock class="absolute start-1/2 top-[6%] w-[94%] -translate-x-1/2 rtl:translate-x-1/2 transition-transform duration-300 group-hover:-translate-y-1" />
+            <x-site.image :name="\App\Services\SiteImages::coverFor($project->id)" :sizes="$cardCoverSizes" class="size-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]" />
         @endif
     </div>
     <div class="flex flex-1 flex-col items-start gap-3 p-5">
@@ -26,7 +26,7 @@
             @endif
         </p>
         <{{ $headingTag }} class="type-h5 text-fg">
-            <a href="{{ route('portfolio.show', ['slug' => $cardTranslation->slug]) }}" class="after:absolute after:inset-0 after:rounded-xl focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-line-focus">{{ $cardTranslation->title }}</a>
+            <a href="{{ route('portfolio.show', ['slug' => $cardTranslation->slug]) }}" class="after:absolute after:inset-0 after:rounded-3xl focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-line-focus">{{ $cardTranslation->title }}</a>
         </{{ $headingTag }}>
         @if ($cardTranslation->summary)
             <p class="type-body-sm text-fg-secondary">{{ $cardTranslation->summary }}</p>
@@ -34,13 +34,13 @@
         @if ($project->technologies->isNotEmpty())
             <ul class="flex flex-wrap gap-1.5" aria-label="{{ __('Technologies') }}">
                 @foreach ($project->technologies->take(4) as $technology)
-                    <li class="rounded-sm bg-subtle px-2 py-[3px] type-body-xs text-fg-secondary" dir="auto">{{ $technology->translation()?->name ?? $technology->key }}</li>
+                    <li class="rounded-full bg-v2-tint px-2.5 py-[3px] type-body-xs text-fg-secondary" dir="auto">{{ $technology->translation()?->name ?? $technology->key }}</li>
                 @endforeach
             </ul>
         @endif
         <span class="mt-auto inline-flex items-center gap-1.5 pt-1 type-label-md text-fg-brand" aria-hidden="true">
             {{ __('View case study') }}
-            <x-ui.arrow :size="16" class="transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
+            <x-ui.arrow :size="16" class="transition-transform duration-200 group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
         </span>
     </div>
 </li>

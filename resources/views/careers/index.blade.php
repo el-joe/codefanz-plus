@@ -13,14 +13,14 @@
         <x-site.section tone="surface" inner="flex flex-col gap-10" aria-labelledby="careers-perks" data-section="careers_perks">
             <div class="flex flex-col gap-3">
                 @if (filled($perks['eyebrow'] ?? null))
-                    <p class="type-overline text-fg-brand">{{ $perks['eyebrow'] }}</p>
+                    <p class="type-eyebrow text-fg-brand">{{ $perks['eyebrow'] }}</p>
                 @endif
                 <h2 id="careers-perks" class="type-h3 text-fg">{{ $perks['heading'] }}</h2>
                 @if (filled($perks['subheading'] ?? null))
                     <p class="max-w-3xl type-body-lg text-fg-secondary">{{ $perks['subheading'] }}</p>
                 @endif
             </div>
-            <ul class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <ul data-reveal-stagger class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach ($perks['items'] as $perk)
                     <li class="flex flex-col gap-2">
                         <span class="mb-2 flex size-10 items-center justify-center rounded-lg bg-brand-subtle text-icon-brand"><x-ui.icon :name="$icons[$loop->index % count($icons)]" /></span>

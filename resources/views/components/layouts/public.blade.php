@@ -40,8 +40,12 @@
     $gaMeasurementId = $consent->shouldLoadGa4(request()) ? $consent->measurementId() : null;
 @endphp
 
-<x-layouts.base :title="$title">
+{{-- `site` marks <body data-site>: the Design v2 tokens and `site:` variants apply to the public website only. --}}
+<x-layouts.base :title="$title" site>
     <x-slot:meta>
+        {{-- Marks JavaScript as available before first paint so the no-JS mobile menu (stacked under the header) is not
+             painted and then collapsed by nav.js, which would shift the whole page (CLS). --}}
+        <script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">document.documentElement.classList.add('js');</script>
         @if ($description)
             <meta name="description" content="{{ $description }}">
         @endif
@@ -72,8 +76,14 @@
             <meta property="og:image:width" content="{{ $ogImage->width }}">
             <meta property="og:image:height" content="{{ $ogImage->height }}">
             <meta property="og:image:alt" content="{{ $image->altText() }}">
+        @else
+            {{-- Design v2 default OG image: 1200×630 crop of the hero artwork. --}}
+            <meta property="og:image" content="{{ asset(\App\Services\SiteImages::PUBLIC_DIRECTORY.'/'.\App\Services\SiteImages::OG_IMAGE) }}">
+            <meta property="og:image:width" content="1200">
+            <meta property="og:image:height" content="630">
+            <meta property="og:image:alt" content="{{ \App\Services\SiteImages::alt('hero-glass-shapes') }}">
         @endif
-        <meta name="twitter:card" content="{{ $ogImage ? 'summary_large_image' : 'summary' }}">
+        <meta name="twitter:card" content="summary_large_image">
         {{ $structuredData->script($structuredData->organization()) }}
         {{ $structuredData->script($structuredData->website()) }}
         @if ($gaMeasurementId)
@@ -84,7 +94,8 @@
         {{ $head ?? '' }}
     </x-slot:meta>
 
-    <header class="sticky top-0 z-30 border-b border-line-subtle bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/90">
+    {{-- v2 glass header: transparent at the top, glass after 8px of scroll (header-scroll.js; glass without JavaScript). --}}
+    <header data-site-header class="sticky top-0 z-30">
         <div class="container-page flex items-center gap-4 py-3 lg:py-4">
             <a href="{{ route('home') }}" class="shrink-0 rounded-md" aria-label="{{ __('CodeFanz home') }}"><x-ui.logo :size="34" class="lg:hidden" /><x-ui.logo :size="40" class="max-lg:hidden" /></a>
 
@@ -105,7 +116,7 @@
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0 transition-transform" data-nav-chevron><path d="m6 9 6 6 6-6"/></svg>
                                 </a>
                                 <div class="absolute start-0 top-full z-40 pt-3" data-nav-dropdown>
-                                    <ul id="nav-submenu-{{ $loop->index }}" class="w-64 rounded-lg border border-line bg-surface-raised p-2 shadow-lg">
+                                    <ul id="nav-submenu-{{ $loop->index }}" class="w-64 rounded-2xl border border-v2-hairline bg-surface-raised p-2 shadow-v2-lift">
                                         <li><a href="{{ $link['url'] }}" class="block rounded-md px-3 py-2 type-label-md text-fg hover:bg-subtle hover:text-fg-brand focus-visible:bg-subtle">{{ __('All :item', ['item' => mb_strtolower($link['label'])]) }}</a></li>
                                         @foreach ($link['children'] as $child)
                                             <li><a href="{{ $child['url'] }}" {!! $newTab($child) !!} class="block rounded-md px-3 py-2 type-body-sm text-fg hover:bg-subtle hover:text-fg-brand focus-visible:bg-subtle">{{ $child['label'] }}</a></li>
@@ -128,7 +139,7 @@
                 <x-ui.button :href="route('login')" variant="ghost" class="whitespace-nowrap max-lg:hidden">{{ __('Client Portal') }}</x-ui.button>
                 <x-ui.button :href="$quoteUrl" class="whitespace-nowrap max-md:hidden" arrow>{{ __('Start Your Project') }}</x-ui.button>
                 <button type="button" hidden data-nav-toggle aria-controls="mobile-nav" aria-expanded="false"
-                        class="flex size-10 items-center justify-center rounded-md border border-line text-icon-primary hover:bg-subtle aria-expanded:border-line-brand aria-expanded:text-fg-brand xl:hidden">
+                        class="flex size-10 items-center justify-center rounded-full border border-v2-hairline bg-surface text-icon-primary hover:bg-v2-tint aria-expanded:border-line-brand aria-expanded:text-fg-brand xl:hidden">
                     <span class="sr-only" data-nav-label-open>{{ __('Open menu') }}</span>
                     <span class="sr-only" data-nav-label-close hidden>{{ __('Close menu') }}</span>
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
@@ -137,7 +148,7 @@
         </div>
 
         {{-- Mobile navigation: visible without JavaScript; the nav module turns it into a full-height drawer (data-enhanced). --}}
-        <nav id="mobile-nav" data-nav-panel class="border-t border-line-subtle bg-surface xl:hidden data-enhanced:absolute data-enhanced:inset-x-0 data-enhanced:top-full data-enhanced:h-[calc(100dvh-4rem)] data-enhanced:overflow-y-auto data-enhanced:shadow-lg" aria-label="{{ __('Mobile navigation') }}">
+        <nav id="mobile-nav" data-nav-panel class="border-t border-v2-hairline bg-surface xl:hidden data-enhanced:absolute data-enhanced:inset-x-0 data-enhanced:top-full data-enhanced:h-[calc(100dvh-4rem)] data-enhanced:overflow-y-auto data-enhanced:shadow-lg" aria-label="{{ __('Mobile navigation') }}">
             <ul class="container-page flex flex-col py-4">
                 @foreach ($header as $link)
                     <li class="border-b border-line-subtle last:border-b-0">
@@ -171,7 +182,7 @@
 
     <main id="main">{{ $slot }}</main>
 
-    <footer class="dark bg-canvas text-fg">
+    <footer class="dark bg-v2-night text-fg">
         <div class="container-page flex flex-col gap-12 pt-14 pb-8 lg:pt-16">
             <div class="flex flex-col gap-10 lg:flex-row lg:justify-between lg:gap-16">
                 <div class="flex flex-col gap-5 lg:w-[21.25rem] lg:shrink-0">
@@ -179,15 +190,15 @@
                     <p class="type-body-sm text-fg-secondary">{{ $tagline }}</p>
                     <ul class="flex gap-2.5" aria-label="{{ __('Contact channels') }}">
                         @if ($whatsapp)
-                            <li><a href="{{ \App\Services\ContactChannels::whatsappUrl($whatsapp) }}" target="_blank" rel="noopener noreferrer" class="flex size-10 items-center justify-center rounded-md bg-subtle text-icon-primary transition-colors hover:bg-muted hover:text-fg" aria-label="{{ __('WhatsApp') }}">
+                            <li><a href="{{ \App\Services\ContactChannels::whatsappUrl($whatsapp) }}" target="_blank" rel="noopener noreferrer" class="flex size-10 items-center justify-center rounded-lg border border-v2-hairline-dark bg-white/5 text-icon-primary transition-colors hover:bg-white/10 hover:text-fg" aria-label="{{ __('WhatsApp') }}">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 20 1.3-4A8.5 8.5 0 1 1 8.1 19z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 .8A3.5 3.5 0 0 1 10.7 11.5l.8-1-1-2z"/></svg>
                             </a></li>
                         @endif
-                        <li><a href="mailto:{{ $email }}" class="flex size-10 items-center justify-center rounded-md bg-subtle text-icon-primary transition-colors hover:bg-muted hover:text-fg" aria-label="{{ __('Email') }}">
+                        <li><a href="mailto:{{ $email }}" class="flex size-10 items-center justify-center rounded-lg border border-v2-hairline-dark bg-white/5 text-icon-primary transition-colors hover:bg-white/10 hover:text-fg" aria-label="{{ __('Email') }}">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
                         </a></li>
                         @if ($phone)
-                            <li><a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone) }}" class="flex size-10 items-center justify-center rounded-md bg-subtle text-icon-primary transition-colors hover:bg-muted hover:text-fg" aria-label="{{ __('Phone') }}">
+                            <li><a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone) }}" class="flex size-10 items-center justify-center rounded-lg border border-v2-hairline-dark bg-white/5 text-icon-primary transition-colors hover:bg-white/10 hover:text-fg" aria-label="{{ __('Phone') }}">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>
                             </a></li>
                         @endif
@@ -218,7 +229,7 @@
                     </div>
                 </div>
             </div>
-            <div class="flex flex-col gap-4 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex flex-col gap-4 border-t border-v2-hairline-dark pt-6 sm:flex-row sm:items-center sm:justify-between">
                 <p class="type-body-sm text-fg-tertiary">© {{ now()->year }} {{ __('CodeFanz. All rights reserved.') }}</p>
                 @if ($legal !== [] || $consent->isNeeded())
                     <nav aria-label="{{ __('Legal') }}">

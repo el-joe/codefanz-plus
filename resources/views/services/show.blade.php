@@ -22,9 +22,9 @@
     </x-slot:head>
 
     {{-- Figma "Service Detail" hero: filled brand icon tile, title, lead and the two actions. --}}
-    <x-site.page-hero :title="$translation->title" :lead="$translation->summary" :crumbs="$crumbs">
+    <x-site.page-hero :title="$translation->title" :lead="$translation->summary" :crumbs="$crumbs" image="process-glass-steps">
         <x-slot:before>
-            <span class="flex size-14 items-center justify-center rounded-lg bg-brand text-fg-on-brand" aria-hidden="true"><x-ui.icon :name="$service->icon ?? 'code'" :size="28" /></span>
+            <span class="flex size-14 items-center justify-center rounded-lg tile-v2-product text-fg-on-brand" aria-hidden="true"><x-ui.icon :name="$service->icon ?? 'code'" :size="28" /></span>
         </x-slot:before>
         <div class="flex flex-wrap gap-3">
             <x-ui.button :href="$quoteUrl" size="lg" arrow>{{ __('Request a quote') }}</x-ui.button>
@@ -37,7 +37,7 @@
     <x-site.section inner="grid gap-12 lg:grid-cols-[minmax(0,1fr)_23.75rem] lg:items-start lg:gap-16">
         <div class="flex min-w-0 flex-col gap-12">
             @if ($cover)
-                <x-media.picture :media="$cover" sizes="(min-width: 1024px) 836px, 100vw" :eager="true" class="w-full rounded-xl border border-line" />
+                <x-media.picture :media="$cover" sizes="(min-width: 1024px) 836px, 100vw" :eager="true" class="w-full rounded-3xl border border-v2-hairline shadow-v2-card" />
             @endif
 
             @if (trim($body) !== '')
@@ -49,7 +49,7 @@
             @if ($service->features->isNotEmpty())
                 <section aria-labelledby="deliverables" class="flex flex-col gap-6">
                     <h2 id="deliverables" class="type-h3 text-fg">{{ __('What you get') }}</h2>
-                    <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <ul data-reveal-stagger class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         @foreach ($service->features as $feature)
                             @continue(! ($featureTranslation = $feature->exactTranslation($locale)))
                             <li class="flex items-start gap-3">
@@ -84,7 +84,7 @@
             @if ($service->children->isNotEmpty())
                 <section aria-labelledby="sub-services" class="flex flex-col gap-4">
                     <h2 id="sub-services" class="type-h4 text-fg">{{ __('Related services') }}</h2>
-                    <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <ul data-reveal-stagger class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         @foreach ($service->children as $child)
                             @php($childTranslation = $child->exactTranslation($locale))
                             <x-site.tile-card :icon="$child->icon ?? 'code'" :title="$childTranslation->title" :text="$childTranslation->summary"
@@ -96,7 +96,7 @@
         </div>
 
         <aside class="lg:sticky lg:top-24" aria-labelledby="quote-card">
-            <div class="flex flex-col gap-4 rounded-xl border border-line bg-surface px-6 py-7 shadow-lg">
+            <div class="flex flex-col gap-4 rounded-3xl border border-v2-hairline bg-surface px-6 py-7 shadow-v2-lift">
                 <h2 id="quote-card" class="type-h4 text-fg">{{ __('Get a free estimate') }}</h2>
                 <p class="type-body-sm text-fg-secondary">{{ __('Tell us about your project and get a free preliminary estimate within 48 hours. No payment required.') }}</p>
                 <x-ui.button :href="$quoteUrl" size="lg" class="w-full" arrow>{{ __('Request a quote') }}</x-ui.button>

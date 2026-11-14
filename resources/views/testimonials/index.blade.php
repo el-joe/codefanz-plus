@@ -12,7 +12,7 @@
                 <x-ui.button :href="route('portfolio.index')" variant="secondary" class="mt-2">{{ __('View our portfolio') }}</x-ui.button>
             </x-ui.empty-state>
         @else
-            <ul class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <ul data-reveal-stagger class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                 @foreach ($testimonials as $testimonial)
                     <x-site.testimonial-card :testimonial="$testimonial">
                         @if ($testimonial->project && ($projectTranslation = $testimonial->project->exactTranslation(app()->getLocale())))

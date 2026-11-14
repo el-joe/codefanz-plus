@@ -13,9 +13,9 @@
             <div data-faq-search hidden class="flex flex-col gap-2">
                 <label for="faq-search" class="sr-only">{{ __('Search questions') }}</label>
                 <div class="relative">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-icon-secondary"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="pointer-events-none absolute start-4 top-1/2 -translate-y-1/2 text-icon-secondary"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
                     <input id="faq-search" type="search" autocomplete="off" placeholder="{{ __('Search questions…') }}"
-                           class="h-12 w-full rounded-md border border-line-strong bg-surface pe-3 ps-10 type-body-md text-fg shadow-xs placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20">
+                           class="h-12 w-full rounded-full border border-line-strong bg-surface pe-4 ps-11 type-body-md text-fg shadow-v2-card placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20">
                 </div>
                 <p class="sr-only" aria-live="polite" data-faq-status data-template="{{ __(':count matching questions') }}"></p>
             </div>

@@ -1,4 +1,4 @@
-{{-- Figma "Card/Product": brand icon tile, name + tagline (availability badge unless generally available), three key features and the demo (contact form, topic=demo) / learn-more actions. Expects translations loaded. --}}
+{{-- Figma "Card/Product" (v2: radius 24, hairline, card shadow, brand → violet tile with glow): icon tile, name + tagline (availability badge unless generally available), three key features and the demo (contact form, topic=demo) / learn-more actions. Expects translations loaded. --}}
 @props(['product', 'headingTag' => 'h3'])
 
 @php
@@ -6,9 +6,9 @@
     $url = route('products.show', ['slug' => $translation->slug]);
 @endphp
 
-<li {{ $attributes->merge(['class' => 'flex flex-col items-start gap-5 rounded-2xl border border-line bg-surface p-6 shadow-sm sm:p-8']) }}>
+<li {{ $attributes->merge(['class' => 'flex flex-col items-start gap-5 rounded-3xl border border-v2-hairline bg-surface p-6 shadow-v2-card transition duration-200 ease-out hover:-translate-y-1 hover:border-brand-600/30 hover:shadow-v2-lift sm:p-8']) }}>
     <div class="flex w-full items-center gap-4">
-        <span class="flex size-14 shrink-0 items-center justify-center rounded-lg bg-brand text-fg-on-brand" aria-hidden="true"><x-ui.icon :name="$product->icon ?? 'layers'" :size="28" /></span>
+        <span class="flex size-14 shrink-0 items-center justify-center rounded-lg tile-v2-product text-fg-on-brand" aria-hidden="true"><x-ui.icon :name="$product->icon ?? 'layers'" :size="28" /></span>
         <div class="flex min-w-0 flex-1 flex-col gap-1">
             <{{ $headingTag }} class="flex flex-wrap items-center gap-x-2 gap-y-1 type-h4 text-fg">
                 <a href="{{ $url }}" class="hover:text-fg-brand">{{ $translation->name }}</a>

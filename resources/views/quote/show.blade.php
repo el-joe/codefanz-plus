@@ -22,7 +22,7 @@
     $textareaClass = fn (string $field) => 'w-full rounded-md border bg-surface px-3 py-2.5 type-body-md text-fg placeholder:text-fg-tertiary focus:border-line-focus focus:outline-none focus:ring-4 focus:ring-brand/20 '.($errors->has($field) ? 'border-line-danger' : 'border-line-strong');
     $checkboxCard = 'flex items-center gap-2 rounded-md border border-line bg-surface px-3 py-2 type-body-sm text-fg transition-colors hover:border-line-strong has-checked:border-line-brand has-checked:bg-brand-subtle';
     $checkboxInline = 'flex items-center gap-2 type-body-md text-fg';
-    $stepCard = 'flex flex-col gap-5 rounded-2xl border border-line bg-surface p-5 shadow-xs sm:p-8';
+    $stepCard = 'flex flex-col gap-5 rounded-3xl border border-v2-hairline bg-surface p-5 shadow-v2-card sm:p-8';
     $stepTitle = 'flex items-center gap-3 type-h5 text-fg sm:type-h4';
     $stepNumber = 'flex size-7 shrink-0 items-center justify-center rounded-full bg-brand type-label-md text-fg-on-brand';
     $fieldLabel = 'type-label-md text-fg';
@@ -274,7 +274,7 @@
             @endif
         </div>
 
-        <aside aria-labelledby="quote-next-title" class="dark h-fit rounded-2xl bg-[linear-gradient(150deg,var(--color-brand-700),var(--color-brand-900)_55%,var(--color-ink-900))] p-6 text-fg shadow-lg lg:sticky lg:top-24">
+        <aside aria-labelledby="quote-next-title" class="dark h-fit rounded-3xl border border-v2-hairline-dark bg-v2-night p-6 text-fg shadow-v2-lift lg:sticky lg:top-24">
             <h2 id="quote-next-title" class="type-h5 text-fg">{{ __('What happens next') }}</h2>
             <ol class="mt-5 flex flex-col gap-4 type-body-sm text-fg">
                 @foreach ([
